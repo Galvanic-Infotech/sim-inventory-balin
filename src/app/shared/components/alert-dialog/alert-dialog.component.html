@@ -1,0 +1,25 @@
+@if (open()) {
+  <div class="dialog-backdrop" aria-hidden="true"></div>
+  <aside
+    class="dialog-card alert-dialog"
+    role="alertdialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="dialogTitleId"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="dialog-header">
+      <div class="alert-dialog__title">
+        <span class="material-icons alert-dialog__icon">{{ icon() }}</span>
+        <h3 [id]="dialogTitleId">{{ title() }}</h3>
+      </div>
+    </div>
+    <div class="dialog-body">
+      <p>{{ message() }}</p>
+    </div>
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-primary" (click)="confirm.emit()">
+        {{ confirmLabel() }}
+      </button>
+    </div>
+  </aside>
+}

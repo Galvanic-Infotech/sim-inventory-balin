@@ -1,0 +1,75 @@
+@if (wip) {
+  <div class="page-header">
+    <h1>Dashboard</h1>
+  </div>
+  <div class="card card--centered">
+    <span class="material-icons" style="font-size: 48px; color: var(--color-text-muted)">construction</span>
+    <p class="text-muted">Work in progress</p>
+  </div>
+} @else if (!canView()) {
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Overview of SIM inventory and activation status</p>
+  </div>
+  <div class="card card--centered">
+    <span class="material-icons" style="font-size: 48px; color: var(--color-text-muted)">lock</span>
+    <p class="text-muted">You do not have permission to view the SIM dashboard.</p>
+  </div>
+} @else {
+  <div class="page-header sim-dashboard__header">
+    <div>
+      <h1>Dashboard</h1>
+      <p>Overview of SIM inventory and activation status</p>
+    </div>
+    <button
+      type="button"
+      class="btn btn-ghost sim-dashboard__refresh"
+      [disabled]="loadingBasket()"
+      (click)="fetchBasket()"
+      title="Refresh"
+    >
+      <span class="material-icons">refresh</span>
+    </button>
+  </div>
+
+  <div class="sim-dashboard__layout">
+    <div class="sim-dashboard__main">
+      @if (loadingBasket()) {
+        <div class="grid grid-auto">
+          @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+            <div class="stat-card stat-card--skeleton">
+              <span class="stat-card__skel-icon"></span>
+              <div>
+                <span class="stat-card__skel-value"></span>
+                <span class="stat-card__skel-label"></span>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (basketError()) {
+        <div class="alert alert-danger sim-dashboard__error">
+          <span>{{ basketError() }}</span>
+          <button type="button" class="btn btn-outline" (click)="fetchBasket()">Retry</button>
+        </div>
+      } @else if (basket(); as b) {
+        <div class="grid grid-auto sim-dashboard__stats">
+          @for (item of statItems(); track item.label) {
+            <div class="stat-card">
+              <span class="material-icons stat-icon" [style.color]="item.color">{{ item.icon }}</span>
+              <div>
+                <span class="stat-value">{{ item.value }}</span>
+                <span class="stat-label">{{ item.label }}</span>
+                <span class="stat-subtitle text-muted">{{ item.subtitle }}</span>
+              </div>
+            </div>
+          }
+        </div>
+        <app-sim-status-overview [basket]="b" />
+      }
+    </div>
+
+    <aside class="sim-dashboard__aside">
+      <app-sim-search-panel (basketRefresh)="fetchBasket()" />
+    </aside>
+  </div>
+}

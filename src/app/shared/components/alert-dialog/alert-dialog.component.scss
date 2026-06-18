@@ -1,0 +1,26 @@
+.alert-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1002;
+  max-width: 420px;
+}
+
+.alert-dialog__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.alert-dialog__icon {
+  font-size: 1.5rem;
+  color: var(--color-warning, #d97706);
+}
+
+.dialog-body p {
+  margin: 0;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}

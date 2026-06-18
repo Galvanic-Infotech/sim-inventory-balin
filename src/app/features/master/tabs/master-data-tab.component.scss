@@ -1,0 +1,130 @@
+.md-layout {
+  display: flex;
+  gap: var(--space-md);
+  min-height: 500px;
+}
+
+// ── Sidebar ──
+.md-sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm);
+  transition: width 0.2s, min-width 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &.collapsed {
+    width: 56px;
+    min-width: 56px;
+  }
+}
+
+.md-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.md-sidebar-title {
+  font-weight: 600;
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.md-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px 12px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  font-size: var(--font-sm);
+  font-family: var(--font-family);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  width: 100%;
+  text-align: left;
+
+  .material-icons {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  &.active {
+    background: var(--color-primary-bg);
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+}
+
+// ── Detail Panel ──
+.md-detail {
+  flex: 1;
+  min-width: 0;
+}
+
+.hide-mobile {
+  display: inline;
+}
+
+// ── Current Permissions Grouped ──
+.current-perms-grouped {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.current-perms-group-label {
+  display: block;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+// ── Responsive ──
+@media (max-width: 768px) {
+  .md-layout {
+    flex-direction: column;
+  }
+
+  .md-sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: var(--space-xs);
+  }
+
+  .md-sidebar-header {
+    display: none;
+  }
+
+  .md-sidebar-item {
+    padding: 8px 12px;
+    width: auto;
+    font-size: var(--font-xs);
+  }
+
+  .hide-mobile {
+    display: none;
+  }
+}

@@ -1,0 +1,50 @@
+.profile-page {
+  padding: var(--space-lg);
+  max-width: 600px;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .material-icons {
+    font-size: 32px;
+    color: var(--color-primary);
+  }
+}
+
+.profile-info {
+  h2 {
+    font-size: var(--font-lg);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs);
+  }
+}
+
+.profile-chips {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.profile-details {
+  margin-bottom: var(--space-lg);
+}
+
+.password-form {
+  max-width: 400px;
+}

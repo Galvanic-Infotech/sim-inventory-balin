@@ -1,0 +1,28 @@
+<aside class="sidebar" [class.collapsed]="collapsed()">
+  <div class="sidebar-header">
+    <span class="material-icons logo-icon">directions_car</span>
+    @if (!collapsed()) {
+      <span class="logo-text">{{ appName() }}</span>
+    }
+    <button class="toggle-btn" (click)="toggle()" [attr.aria-label]="'layout.toggleSidebar' | translate">
+      <span class="material-icons">
+        {{ collapsed() ? 'chevron_right' : 'chevron_left' }}
+      </span>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (item of navItems(); track item.route) {
+      <a
+        class="nav-item"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+      >
+        <span class="material-icons nav-icon">{{ item.icon }}</span>
+        @if (!collapsed()) {
+          <span class="nav-label">{{ item.label }}</span>
+        }
+      </a>
+    }
+  </nav>
+</aside>

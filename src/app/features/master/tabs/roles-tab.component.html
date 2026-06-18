@@ -1,0 +1,213 @@
+<!-- Toolbar -->
+<div class="tab-toolbar">
+  <div class="tab-toolbar-left">
+    <h3>{{ 'master.roles.title' | translate }}</h3>
+    <span class="count-badge">{{ totalRecords() }}</span>
+  </div>
+  <div class="tab-toolbar-right">
+    <app-search-bar
+      [placeholder]="'master.roles.searchPlaceholder' | translate"
+      [initialValue]="searchTerm()"
+      (searchChange)="onSearchChange($event)"
+    />
+    <button class="btn btn-ghost" (click)="fetch()">
+      <span class="material-icons">refresh</span>
+    </button>
+    @if (canCreate()) {
+      <button class="btn btn-primary" (click)="openDialog()">
+        <span class="material-icons">add</span> {{ 'master.roles.addRole' | translate }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger">
+    <span class="material-icons">error</span> {{ error() }}
+    <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+  </div>
+} @else {
+  <p-table
+    [value]="roles()"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [paginator]="true"
+    [rows]="tableQuery().pageSize ?? 10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [first]="tableFirst()"
+    sortMode="single"
+    styleClass="app-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">#</th>
+        <th pSortableColumn="roleName">{{ 'master.roles.columns.roleName' | translate }} <p-sortIcon field="roleName" /></th>
+        <th pSortableColumn="entityName">{{ 'master.roles.columns.entity' | translate }} <p-sortIcon field="entityName" /></th>
+        <th style="width: 5rem">{{ 'master.common.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-r let-rowIndex="rowIndex">
+      <tr>
+        <td>{{ rowIndex + 1 }}</td>
+        <td>{{ r.roleName }}</td>
+        <td>{{ r.entityName ?? '—' }}</td>
+        <td class="action-cell">
+          @if (canAssignPerms()) {
+            <button class="btn btn-ghost btn-sm" (click)="openAssign(r)" [title]="'master.roles.editPerms' | translate">
+              <span class="material-icons">edit</span>
+            </button>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4">
+          <div class="tab-empty" style="padding: var(--space-lg)">
+            <span class="material-icons">shield</span>
+            <p>{{ 'master.roles.empty' | translate }}</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+}
+
+<!-- Create Drawer -->
+@if (showDialog()) {
+  <div class="drawer-backdrop" (click)="showDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="role-create-drawer-title">
+      <div class="dialog-header">
+        <h3 id="role-create-drawer-title">{{ 'master.roles.createTitle' | translate }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="dialog-body">
+        @if (dialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ dialogError() }}
+          </div>
+        }
+        <div class="form-group">
+          <label>{{ 'master.roles.roleName' | translate }} *</label>
+          <input class="form-control" [(ngModel)]="name" [placeholder]="'master.roles.roleNamePlaceholder' | translate" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'master.masterData.columns.description' | translate }}</label>
+          <input class="form-control" [(ngModel)]="description" [placeholder]="'master.masterData.columns.description' | translate" />
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button type="button" class="btn btn-outline" (click)="showDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="create()" [disabled]="saving()">
+          @if (saving()) { <span class="spinner"></span> }
+          {{ 'master.common.create' | translate }}
+        </button>
+      </div>
+  </aside>
+}
+
+<!-- Edit Permissions Drawer -->
+@if (showPermDialog()) {
+  <div class="drawer-backdrop" (click)="showPermDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel drawer-panel--wide" role="dialog" aria-modal="true" aria-labelledby="role-perm-drawer-title">
+      <div class="dialog-header">
+        <h3 id="role-perm-drawer-title">{{ 'master.common.editPermissions' | translate: { name: permDialogRole()?.roleName ?? '' } }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showPermDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="dialog-body">
+        @if (permDialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ permDialogError() }}
+          </div>
+        }
+        @if (permLoading()) {
+          <div class="tab-loading"><div class="spinner spinner--dark spinner--lg"></div></div>
+        } @else {
+          <!-- Current Permissions -->
+          <div style="margin-bottom: var(--space-lg)">
+            <label style="display: block; font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); color: var(--color-text-secondary)">
+              {{ 'master.common.currentPermissions' | translate }}
+              <span class="count-badge" style="margin-left: var(--space-xs)">{{ selectedPermIds().size }}</span>
+            </label>
+            @if (!selectedPermIds().size) {
+              <p class="text-muted">{{ 'master.common.noPermissionsYet' | translate }}</p>
+            } @else {
+              <div class="current-perms-grouped">
+                @for (group of permissionGroups(); track group.id) {
+                  @if (group.permissions.some(p => selectedPermIds().has(p.id))) {
+                    <div class="current-perms-group">
+                      <small class="current-perms-group-label">{{ group.name }}</small>
+                      <div class="chip-grid">
+                        @for (p of group.permissions; track p.id) {
+                          @if (selectedPermIds().has(p.id)) {
+                            <span class="chip chip--primary">
+                              {{ p.name }}
+                              <span class="material-icons" style="font-size: 14px; margin-left: 4px; cursor: pointer;" (click)="togglePerm(p.id)">close</span>
+                            </span>
+                          }
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+
+          <div style="margin: 0 0 var(--space-lg); height: 1px; background: var(--color-border)"></div>
+
+          <!-- Assign / Remove -->
+          <label style="display: block; font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); color: var(--color-text-secondary)">
+            {{ 'master.common.assignRemove' | translate }}
+          </label>
+          <div class="perm-groups">
+            @for (group of permissionGroups(); track group.id) {
+              <div class="perm-group">
+                <div class="perm-group-header" (click)="toggleGroup(group.id)">
+                  <div class="perm-group-header-left">
+                    <input
+                      type="checkbox"
+                      [checked]="isGroupAllSelected(group)"
+                      [indeterminate]="isGroupPartial(group)"
+                      (click)="$event.stopPropagation()"
+                      (change)="toggleGroupAll(group)"
+                    />
+                    <span class="material-icons perm-group-arrow">
+                      {{ expandedGroups().has(group.id) ? 'expand_more' : 'chevron_right' }}
+                    </span>
+                    <strong>{{ group.name }}</strong>
+                    <small class="text-muted">{{ group.permissions.length }}</small>
+                  </div>
+                </div>
+                @if (expandedGroups().has(group.id)) {
+                  <div class="perm-list">
+                    @for (p of group.permissions; track p.id) {
+                      <label class="perm-item">
+                        <input type="checkbox" [checked]="selectedPermIds().has(p.id)" (change)="togglePerm(p.id)" />
+                        <span>{{ p.name }}</span>
+                        @if (p.description) { <small>{{ p.description }}</small> }
+                      </label>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="dialog-footer">
+        <span class="text-muted" style="margin-right: auto">{{ 'master.common.selectedCount' | translate: { count: selectedPermIds().size } }}</span>
+        <button type="button" class="btn btn-outline" (click)="showPermDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="savePermissions()" [disabled]="saving()">
+          @if (saving()) { <span class="spinner"></span> }
+          {{ 'master.common.save' | translate }}
+        </button>
+      </div>
+  </aside>
+}

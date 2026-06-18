@@ -1,0 +1,354 @@
+<!-- Toolbar -->
+<div class="tab-toolbar">
+  <div class="tab-toolbar-left">
+    <h3>{{ 'master.users.title' | translate }}</h3>
+    @if (pagination(); as pg) {
+      <span class="count-badge">{{ pg.totalCount }}</span>
+    }
+  </div>
+  <div class="tab-toolbar-right">
+    <app-search-bar
+      [placeholder]="'master.users.searchPlaceholder' | translate"
+      [initialValue]="searchTerm()"
+      (searchChange)="onSearchChange($event)"
+    />
+    <button class="btn btn-ghost" (click)="fetch()">
+      <span class="material-icons">refresh</span>
+    </button>
+    @if (canCreate()) {
+      <button class="btn btn-primary" (click)="openDialog()">
+        <span class="material-icons">add</span> {{ 'master.users.addUser' | translate }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger">
+    <span class="material-icons">error</span> {{ error() }}
+    <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+  </div>
+} @else {
+  <p-table
+    [value]="users()"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [paginator]="true"
+    [rows]="tableQuery().pageSize ?? 10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [first]="tableFirst()"
+    sortMode="single"
+    styleClass="app-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">#</th>
+        <th pSortableColumn="firstName">{{ 'master.users.columns.name' | translate }} <p-sortIcon field="firstName" /></th>
+        <th pSortableColumn="email">{{ 'master.users.columns.email' | translate }} <p-sortIcon field="email" /></th>
+        <th pSortableColumn="mobileNumber">{{ 'master.users.columns.mobile' | translate }} <p-sortIcon field="mobileNumber" /></th>
+        <th pSortableColumn="role">{{ 'master.users.columns.role' | translate }} <p-sortIcon field="role" /></th>
+        <th pSortableColumn="entity">{{ 'master.users.columns.entity' | translate }} <p-sortIcon field="entity" /></th>
+        <th style="width: 7rem">{{ 'master.users.columns.status' | translate }}</th>
+        @if (hasActions()) {
+          <th style="width: 7rem">{{ 'master.common.action' | translate }}</th>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-u let-rowIndex="rowIndex">
+      <tr>
+        <td>{{ rowIndex + 1 }}</td>
+        <td>{{ u.firstName }} {{ u.lastName }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.mobileNumber }}</td>
+        <td><span class="chip">{{ u.role?.name ?? '—' }}</span></td>
+        <td>{{ u.entity?.name ?? '—' }}</td>
+        <td>
+          <span class="chip" [style.color]="u.isActive ? 'var(--color-success)' : 'var(--color-danger)'">
+            {{ (u.isActive ? 'master.users.statusActive' : 'master.users.statusInactive') | translate }}
+          </span>
+        </td>
+        @if (hasActions()) {
+          <td>
+            <div class="action-cell">
+              @if (canAssignRole()) {
+                <button class="btn btn-ghost" [title]="'master.users.changeRole' | translate" (click)="openRoleDialog(u)">
+                  <span class="material-icons">swap_horiz</span>
+                </button>
+              }
+              @if (canBlock()) {
+                <button
+                  class="btn btn-ghost"
+                  [title]="(u.isActive ? 'master.users.blockUser' : 'master.users.unblockUser') | translate"
+                  [disabled]="togglingId() === u.id"
+                  (click)="openToggleConfirm(u)"
+                >
+                  @if (togglingId() === u.id) {
+                    <span class="spinner spinner--dark"></span>
+                  } @else {
+                    <span class="material-icons" [style.color]="u.isActive ? 'var(--color-danger)' : 'var(--color-success)'">
+                      {{ u.isActive ? 'block' : 'check_circle' }}
+                    </span>
+                  }
+                </button>
+              }
+            </div>
+          </td>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="hasActions() ? 8 : 7">
+          <div class="tab-empty" style="padding: var(--space-lg)">
+            <span class="material-icons">people</span>
+            <p>{{ 'master.users.empty' | translate }}</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+}
+
+<!-- Create Drawer -->
+@if (showDialog()) {
+  <div class="drawer-backdrop" (click)="showDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="user-create-drawer-title">
+      <div class="dialog-header">
+        <h3 id="user-create-drawer-title">{{ 'master.users.createTitle' | translate }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        @if (dialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ dialogError() }}
+          </div>
+        }
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label>{{ 'master.users.firstName' | translate }} *</label>
+            <input class="form-control" [(ngModel)]="firstName" [placeholder]="'master.users.firstNamePlaceholder' | translate" />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.users.lastName' | translate }}</label>
+            <input class="form-control" [(ngModel)]="lastName" [placeholder]="'master.users.lastNamePlaceholder' | translate" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>{{ 'master.users.columns.email' | translate }} *</label>
+          <div class="input-wrapper">
+            <input
+              class="form-control"
+              type="email"
+              [ngModel]="email"
+              (ngModelChange)="onEmailChange($event)"
+              [placeholder]="'master.users.emailPlaceholder' | translate"
+            />
+            @switch (emailStatus()) {
+              @case ('checking') { <span class="spinner spinner--dark input-action" style="position:absolute"></span> }
+              @case ('available') { <span class="material-icons input-action" style="color: var(--color-success)">check_circle</span> }
+              @case ('taken') { <span class="material-icons input-action" style="color: var(--color-danger)">error</span> }
+              @case ('invalid') { <span class="material-icons input-action" style="color: var(--color-warning)">warning</span> }
+            }
+          </div>
+          @switch (emailStatus()) {
+            @case ('taken') { <small style="color: var(--color-danger)">{{ 'master.users.emailTaken' | translate }}</small> }
+            @case ('invalid') { <small style="color: var(--color-warning)">{{ 'master.users.emailInvalid' | translate }}</small> }
+            @case ('available') { <small style="color: var(--color-success)">{{ 'master.users.emailAvailable' | translate }}</small> }
+          }
+        </div>
+        <div class="form-group">
+          <label>{{ 'master.users.columns.mobile' | translate }} *</label>
+          <div class="input-wrapper">
+            <input
+              class="form-control"
+              [ngModel]="mobile"
+              (ngModelChange)="onMobileChange($event)"
+              [placeholder]="'master.users.mobilePlaceholder' | translate"
+              inputmode="numeric"
+              maxlength="10"
+            />
+            @switch (mobileStatus()) {
+              @case ('checking') { <span class="spinner spinner--dark input-action" style="position:absolute"></span> }
+              @case ('available') { <span class="material-icons input-action" style="color: var(--color-success)">check_circle</span> }
+              @case ('taken') { <span class="material-icons input-action" style="color: var(--color-danger)">error</span> }
+              @case ('invalid') { <span class="material-icons input-action" style="color: var(--color-warning)">warning</span> }
+            }
+          </div>
+          @switch (mobileStatus()) {
+            @case ('taken') { <small style="color: var(--color-danger)">{{ 'master.users.mobileTaken' | translate }}</small> }
+            @case ('invalid') { <small style="color: var(--color-warning)">{{ 'master.users.mobileInvalid' | translate }}</small> }
+            @case ('available') { <small style="color: var(--color-success)">{{ 'master.users.mobileAvailable' | translate }}</small> }
+          }
+        </div>
+        <app-password-strength-field
+          [label]="'master.users.password' | translate"
+          [required]="true"
+          [placeholder]="'master.users.passwordPlaceholder' | translate"
+          [password]="password()"
+          (passwordChange)="password.set($event)"
+        />
+        <div class="form-group">
+          <label>{{ 'master.users.columns.role' | translate }} *</label>
+          <select class="form-control" [(ngModel)]="selectedRoleId" [disabled]="!selectedEntityId">
+            <option value="">{{ 'master.common.selectRole' | translate }}</option>
+            @for (r of roles(); track r.id) {
+              <option [value]="r.id">{{ r.roleName }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button type="button" class="btn btn-outline" (click)="showDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="create()" [disabled]="!canSubmit()">
+          @if (saving()) { <span class="spinner"></span> }
+          {{ 'master.common.create' | translate }}
+        </button>
+      </div>
+  </aside>
+}
+
+<!-- Change Role Drawer -->
+@if (showRoleDialog()) {
+  <div class="drawer-backdrop" (click)="showRoleDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="user-role-drawer-title">
+      <div class="dialog-header">
+        <h3 id="user-role-drawer-title">{{ 'master.users.changeRoleTitle' | translate }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showRoleDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        @if (roleDialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ roleDialogError() }}
+          </div>
+        }
+        @if (roleDialogUser(); as u) {
+          <p class="text-muted" style="margin-bottom: var(--space-md)">
+            {{ 'master.users.changingRoleFor' | translate }} <strong>{{ u.firstName }} {{ u.lastName }}</strong>
+          </p>
+        }
+
+        <div class="form-group">
+          <label>{{ 'master.users.currentRole' | translate }}</label>
+          <input class="form-control" [value]="roleDialogUser()?.role?.name ?? '—'" disabled />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'master.users.newRole' | translate }} *</label>
+          @if (!roleDialogRoles().length) {
+            <div style="padding: 8px 0">
+              <div class="spinner spinner--dark"></div>
+            </div>
+          } @else {
+            <select class="form-control" [(ngModel)]="newRoleId">
+              <option value="">{{ 'master.common.selectRole' | translate }}</option>
+              @for (r of roleDialogRoles(); track r.id) {
+                <option [value]="r.id">{{ r.roleName }}</option>
+              }
+            </select>
+          }
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button type="button" class="btn btn-outline" (click)="showRoleDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="changeRole()"
+          [disabled]="savingRole() || !newRoleId || newRoleId === roleDialogUser()?.role?.id"
+        >
+          @if (savingRole()) { <span class="spinner"></span> }
+          {{ 'master.users.updateRole' | translate }}
+        </button>
+      </div>
+  </aside>
+}
+
+<!-- Block / Unblock Confirm Dialog -->
+@if (confirmUser(); as cu) {
+  <div class="dialog-backdrop" (click)="closeToggleConfirm()" aria-hidden="true">
+  <aside
+    class="dialog-card"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="user-toggle-confirm-title"
+    style="max-width: 440px;"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="dialog-header">
+      <h3 id="user-toggle-confirm-title">
+        {{ (cu.isActive ? 'master.users.blockUser' : 'master.users.unblockUser') | translate }}
+      </h3>
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm"
+        (click)="closeToggleConfirm()"
+        [disabled]="!!togglingId()"
+        [attr.aria-label]="'common.close' | translate"
+      >
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="dialog-body">
+      @if (toggleError()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ toggleError() }}
+        </div>
+      }
+      <div
+        class="confirm-icon"
+        style="display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;margin:0 auto var(--space-md);"
+        [style.background]="cu.isActive ? 'rgba(220,38,38,0.1)' : 'rgba(22,163,74,0.1)'"
+      >
+        <span
+          class="material-icons"
+          [style.color]="cu.isActive ? 'var(--color-danger)' : 'var(--color-success)'"
+          style="font-size: 32px;"
+        >
+          {{ cu.isActive ? 'block' : 'check_circle' }}
+        </span>
+      </div>
+      <p style="text-align:center; margin-bottom: var(--space-sm)">
+        {{ (cu.isActive ? 'master.users.confirmBlockMsg' : 'master.users.confirmUnblockMsg') | translate }}
+      </p>
+      <p style="text-align:center; margin-bottom: var(--space-sm)">
+        <strong>{{ cu.firstName }} {{ cu.lastName }}</strong>
+        <br />
+        <small class="text-muted">{{ cu.email }}</small>
+      </p>
+    </div>
+    <div class="dialog-footer">
+      <button
+        type="button"
+        class="btn btn-outline"
+        [disabled]="!!togglingId()"
+        (click)="closeToggleConfirm()"
+      >
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button
+        type="button"
+        [class]="cu.isActive ? 'btn btn-danger' : 'btn btn-primary'"
+        [disabled]="!!togglingId()"
+        (click)="confirmToggle()"
+      >
+        @if (togglingId()) {
+          <span class="spinner"></span>
+        } @else {
+          <span class="material-icons">{{ cu.isActive ? 'block' : 'check_circle' }}</span>
+        }
+        {{ (cu.isActive ? 'master.users.blockUser' : 'master.users.unblockUser') | translate }}
+      </button>
+    </div>
+  </aside>
+  </div>
+}

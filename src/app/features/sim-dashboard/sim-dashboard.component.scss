@@ -1,0 +1,124 @@
+.sim-dashboard__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.sim-dashboard__refresh {
+  flex-shrink: 0;
+
+  .material-icons {
+    font-size: 22px;
+    color: var(--color-primary);
+  }
+
+  &:disabled .material-icons {
+    color: var(--color-text-muted);
+  }
+}
+
+.sim-dashboard__layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.sim-dashboard__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+.sim-dashboard__aside {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .sim-dashboard__layout {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .sim-dashboard__main {
+    flex: 7;
+  }
+
+  .sim-dashboard__aside {
+    flex: 3;
+    position: sticky;
+    top: var(--space-md);
+  }
+}
+
+@media (max-width: 899px) {
+  .sim-dashboard__layout {
+    flex-direction: column-reverse;
+  }
+}
+
+.stat-card {
+  flex-direction: column;
+  align-items: flex-start;
+
+  .stat-subtitle {
+    display: block;
+    font-size: 10px;
+    margin-top: 2px;
+  }
+
+  &--skeleton {
+    pointer-events: none;
+
+    .stat-card__skel-icon,
+    .stat-card__skel-value,
+    .stat-card__skel-label {
+      background: linear-gradient(
+        90deg,
+        var(--color-border-light) 25%,
+        var(--color-border) 50%,
+        var(--color-border-light) 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      border-radius: var(--radius-sm);
+    }
+
+    .stat-card__skel-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+    }
+
+    .stat-card__skel-value {
+      display: block;
+      width: 48px;
+      height: 20px;
+      margin-bottom: 6px;
+    }
+
+    .stat-card__skel-label {
+      display: block;
+      width: 100px;
+      height: 12px;
+    }
+  }
+}
+
+.sim-dashboard__error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

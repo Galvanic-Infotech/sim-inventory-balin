@@ -1,0 +1,680 @@
+<div class="md-layout">
+  <!-- Sidebar -->
+  <aside class="md-sidebar" [class.collapsed]="sidebarCollapsed()">
+    <div class="md-sidebar-header">
+      @if (!sidebarCollapsed()) {
+        <span class="md-sidebar-title">{{ 'master.masterData.title' | translate }}</span>
+      }
+      <button class="btn btn-ghost btn-sm" (click)="sidebarCollapsed.set(!sidebarCollapsed())">
+        <span class="material-icons">{{ sidebarCollapsed() ? 'chevron_right' : 'chevron_left' }}</span>
+      </button>
+    </div>
+    @for (sec of sections(); track sec.key) {
+      <button
+        class="md-sidebar-item"
+        [class.active]="activeSection() === sec.key"
+        (click)="selectSection(sec.key)"
+      >
+        <span class="material-icons">{{ sec.icon }}</span>
+        @if (!sidebarCollapsed()) {
+          <span>{{ sec.labelKey | translate }}</span>
+        }
+      </button>
+    }
+  </aside>
+
+  <!-- Detail Panel -->
+  <div class="md-detail">
+    <!-- Toolbar -->
+    <div class="tab-toolbar">
+      <div class="tab-toolbar-left">
+        <h3>{{ activeSectionLabel() }}</h3>
+        <span class="count-badge">{{ totalRecords() }}</span>
+      </div>
+      <div class="tab-toolbar-right">
+        @if (activeSection() === 'districts' || activeSection() === 'rtos') {
+          <select class="form-control filter-select" [ngModel]="filterStateId()" (ngModelChange)="onStateFilterChange($event)">
+            <option value="">{{ 'master.common.selectState' | translate }}</option>
+            @for (s of filterStates(); track s.id) {
+              <option [value]="s.id">{{ s.stateName }}</option>
+            }
+          </select>
+        }
+        @if (activeSection() === 'rtos') {
+          <select class="form-control filter-select" [ngModel]="filterDistrictId()" (ngModelChange)="onDistrictFilterChange($event)">
+            <option value="">{{ 'master.common.selectDistrict' | translate }}</option>
+            @for (d of filterDistricts(); track d.id) {
+              <option [value]="d.id">{{ d.districtName }}</option>
+            }
+          </select>
+        }
+        <app-search-bar
+          [placeholder]="'master.common.search' | translate"
+          [initialValue]="searchTerm()"
+          (searchChange)="onSearchChange($event)"
+        />
+        <button class="btn btn-ghost" (click)="fetchSection()">
+          <span class="material-icons">refresh</span>
+        </button>
+        <button class="btn btn-primary" (click)="openDialog()">
+          <span class="material-icons">add</span>
+          <span class="hide-mobile">{{ 'master.masterData.add' | translate }}</span>
+        </button>
+      </div>
+    </div>
+
+    @if (error()) {
+      <div class="alert alert-danger">
+        <span class="material-icons">error</span> {{ error() }}
+        <button class="btn btn-ghost" (click)="fetchSection()">{{ 'common.retry' | translate }}</button>
+      </div>
+    } @else if (activeSection() === 'districts' && !filterStateId()) {
+      <div class="tab-empty"><span class="material-icons">location_city</span><p>{{ 'master.common.selectState' | translate }}</p></div>
+    } @else if (activeSection() === 'rtos' && (!filterStateId() || !filterDistrictId())) {
+      <div class="tab-empty"><span class="material-icons">local_shipping</span><p>{{ 'master.common.selectDistrict' | translate }}</p></div>
+    } @else {
+      @if (activeSection() === 'simProviders') {
+        <p-table
+          [value]="simProviders()"
+          [lazy]="true"
+          (onLazyLoad)="onLazyLoad($event)"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [totalRecords]="totalRecords()"
+          [loading]="loading()"
+          [first]="tableFirst()"
+          sortMode="single"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th pSortableColumn="name">{{ 'master.masterData.columns.name' | translate }} <p-sortIcon field="name" /></th>
+              <th pSortableColumn="description">{{ 'master.masterData.columns.description' | translate }} <p-sortIcon field="description" /></th>
+              <th pSortableColumn="isActive">{{ 'devices.columns.status' | translate }} <p-sortIcon field="isActive" /></th>
+              <th style="width: 5rem">{{ 'master.common.action' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-p let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+              <td>{{ p.name }}</td>
+              <td>{{ p.description ?? '—' }}</td>
+              <td>
+                <span class="chip" [class.chip--primary]="p.isActive !== false">
+                  {{ statusLabel(p.isActive) }}
+                </span>
+              </td>
+              <td class="action-cell">
+                <button class="btn btn-ghost btn-sm" [title]="'master.masterData.edit.simProvider' | translate" (click)="openEditProvider(p)">
+                  <span class="material-icons">edit</span>
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5">
+                <div class="tab-empty" style="padding: var(--space-lg)">
+                  <span class="material-icons">sim_card</span>
+                  <p>{{ emptyMessage() }}</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+
+      @if (activeSection() === 'vehicleCategories') {
+        <p-table
+          [value]="vehicleCategories()"
+          [lazy]="true"
+          (onLazyLoad)="onLazyLoad($event)"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [totalRecords]="totalRecords()"
+          [loading]="loading()"
+          [first]="tableFirst()"
+          sortMode="single"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th pSortableColumn="name">{{ 'master.masterData.columns.name' | translate }} <p-sortIcon field="name" /></th>
+              <th pSortableColumn="description">{{ 'master.masterData.columns.description' | translate }} <p-sortIcon field="description" /></th>
+              <th pSortableColumn="isActive">{{ 'devices.columns.status' | translate }} <p-sortIcon field="isActive" /></th>
+              <th style="width: 5rem">{{ 'master.common.action' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-c let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+              <td>{{ c.name }}</td>
+              <td>{{ c.description ?? '—' }}</td>
+              <td>
+                <span class="chip" [class.chip--primary]="c.isActive !== false">
+                  {{ statusLabel(c.isActive) }}
+                </span>
+              </td>
+              <td class="action-cell">
+                <button class="btn btn-ghost btn-sm" [title]="'master.masterData.edit.vehicleCategory' | translate" (click)="openEditVehicleCategory(c)">
+                  <span class="material-icons">edit</span>
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5">
+                <div class="tab-empty" style="padding: var(--space-lg)">
+                  <span class="material-icons">directions_car</span>
+                  <p>{{ emptyMessage() }}</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+
+      @if (activeSection() === 'testingAgencies') {
+        <p-table
+          [value]="testingAgencies()"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [totalRecords]="totalRecords()"
+          [loading]="loading()"
+          sortMode="single"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th pSortableColumn="testingAgencyId">{{ 'master.masterData.columns.agencyId' | translate }} <p-sortIcon field="testingAgencyId" /></th>
+              <th pSortableColumn="testingAgencyName">{{ 'master.masterData.columns.agencyName' | translate }} <p-sortIcon field="testingAgencyName" /></th>
+              <th style="width: 5rem">{{ 'master.common.action' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-a let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+              <td>{{ a.testingAgencyId }}</td>
+              <td>{{ a.testingAgencyName }}</td>
+              <td class="action-cell">
+                <button class="btn btn-ghost btn-sm" [title]="'master.masterData.edit.testingAgency' | translate" (click)="openEditTestingAgency(a)">
+                  <span class="material-icons">edit</span>
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4">
+                <div class="tab-empty" style="padding: var(--space-lg)">
+                  <span class="material-icons">fact_check</span>
+                  <p>{{ emptyMessage() }}</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+
+      @if (activeSection() === 'documentTypes') {
+        <p-table
+          [value]="documentTypes()"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [totalRecords]="totalRecords()"
+          [loading]="loading()"
+          sortMode="single"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th pSortableColumn="name">{{ 'master.masterData.columns.name' | translate }} <p-sortIcon field="name" /></th>
+              <th style="width: 8rem">{{ 'master.masterData.columns.required' | translate }}</th>
+              <th style="width: 5rem">{{ 'master.common.action' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-d let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+              <td>{{ d.name }}</td>
+              <td>
+                <span class="chip" [class.chip--primary]="d.isRequired">
+                  {{ d.isRequired ? ('master.common.required' | translate) : '—' }}
+                </span>
+              </td>
+              <td class="action-cell">
+                <button class="btn btn-ghost btn-sm" [title]="'master.masterData.edit.documentType' | translate" (click)="openEditDocumentType(d)">
+                  <span class="material-icons">edit</span>
+                </button>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="4">
+                <div class="tab-empty" style="padding: var(--space-lg)">
+                  <span class="material-icons">description</span>
+                  <p>{{ emptyMessage() }}</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+
+      @if (activeSection() === 'entityTypes') {
+        <p-table
+          [value]="entityTypes()"
+          [lazy]="true"
+          (onLazyLoad)="onLazyLoad($event)"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [totalRecords]="totalRecords()"
+          [loading]="loading()"
+          [first]="tableFirst()"
+          sortMode="single"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th pSortableColumn="name">{{ 'master.masterData.columns.name' | translate }} <p-sortIcon field="name" /></th>
+              <th pSortableColumn="description">{{ 'master.masterData.columns.description' | translate }} <p-sortIcon field="description" /></th>
+              <th style="width: 5rem">{{ 'master.common.actions' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-et let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+              <td>{{ et.name }}</td>
+              <td>{{ et.description ?? '—' }}</td>
+              <td class="action-cell">
+                @if (canAssignEtPerms()) {
+                  <button class="btn btn-ghost btn-sm" (click)="openAssignEtPerms(et)" [title]="'master.masterData.editPerms' | translate">
+                    <span class="material-icons">edit</span>
+                  </button>
+                }
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr><td colspan="4"><div class="tab-empty" style="padding: var(--space-lg)"><span class="material-icons">account_tree</span><p>{{ emptyMessage() }}</p></div></td></tr>
+          </ng-template>
+        </p-table>
+      }
+
+      @if (activeSection() === 'states') {
+        <p-table
+          [value]="tableStates()"
+          [lazy]="true"
+          (onLazyLoad)="onLazyLoad($event)"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [totalRecords]="totalRecords()"
+          [loading]="loading()"
+          [first]="tableFirst()"
+          sortMode="single"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th pSortableColumn="stateCode">{{ 'master.masterData.columns.stateCode' | translate }} <p-sortIcon field="stateCode" /></th>
+              <th pSortableColumn="stateName">{{ 'master.masterData.columns.stateName' | translate }} <p-sortIcon field="stateName" /></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-s let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+              <td>{{ s.stateCode }}</td>
+              <td>{{ s.stateName }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr><td colspan="3"><div class="tab-empty" style="padding: var(--space-lg)"><span class="material-icons">map</span><p>{{ emptyMessage() }}</p></div></td></tr>
+          </ng-template>
+        </p-table>
+      }
+
+      @if (activeSection() === 'districts') {
+        <p-table
+          [value]="districts()"
+          [lazy]="true"
+          (onLazyLoad)="onLazyLoad($event)"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [totalRecords]="totalRecords()"
+          [loading]="loading()"
+          [first]="tableFirst()"
+          sortMode="single"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th pSortableColumn="districtCode">{{ 'master.masterData.columns.districtCode' | translate }} <p-sortIcon field="districtCode" /></th>
+              <th pSortableColumn="districtName">{{ 'master.masterData.columns.districtName' | translate }} <p-sortIcon field="districtName" /></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-d let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+              <td>{{ d.districtCode }}</td>
+              <td>{{ d.districtName }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr><td colspan="3"><div class="tab-empty" style="padding: var(--space-lg)"><span class="material-icons">location_city</span><p>{{ emptyMessage() }}</p></div></td></tr>
+          </ng-template>
+        </p-table>
+      }
+
+      @if (activeSection() === 'rtos') {
+        <p-table
+          [value]="rtos()"
+          [lazy]="true"
+          (onLazyLoad)="onLazyLoad($event)"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [totalRecords]="totalRecords()"
+          [loading]="loading()"
+          [first]="tableFirst()"
+          sortMode="single"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th pSortableColumn="rtoCode">{{ 'master.masterData.columns.rtoCode' | translate }} <p-sortIcon field="rtoCode" /></th>
+              <th pSortableColumn="rtoName">{{ 'master.masterData.columns.rtoName' | translate }} <p-sortIcon field="rtoName" /></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-r let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ rowIndex + 1 }}</td>
+              <td>{{ r.rtoCode }}</td>
+              <td>{{ r.rtoName }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr><td colspan="3"><div class="tab-empty" style="padding: var(--space-lg)"><span class="material-icons">local_shipping</span><p>{{ emptyMessage() }}</p></div></td></tr>
+          </ng-template>
+        </p-table>
+      }
+    }
+  </div>
+</div>
+
+<!-- Create Drawer -->
+@if (showDialog()) {
+  <div class="drawer-backdrop" (click)="showDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="create-drawer-title">
+      <div class="dialog-header">
+        <h3 id="create-drawer-title">{{ drawerTitle() }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="dialog-body">
+        @if (dialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ dialogError() }}
+          </div>
+        }
+        @switch (activeSection()) {
+          @case ('simProviders') {
+            <div class="form-group">
+              <label>{{ 'master.common.name' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createName" [placeholder]="'master.masterData.placeholders.simProvider' | translate" />
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.description' | translate }}</label>
+              <input class="form-control" [(ngModel)]="createDescription" [placeholder]="'master.masterData.columns.description' | translate" />
+            </div>
+          }
+          @case ('vehicleCategories') {
+            <div class="form-group">
+              <label>{{ 'master.common.name' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createName" [placeholder]="'master.masterData.placeholders.vehicleCategory' | translate" />
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.description' | translate }}</label>
+              <input class="form-control" [(ngModel)]="createDescription" [placeholder]="'master.masterData.columns.description' | translate" />
+            </div>
+          }
+          @case ('testingAgencies') {
+            <div class="form-group">
+              <label>{{ 'master.masterData.testingAgencyId' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createTestingAgencyId" [placeholder]="'master.masterData.placeholders.agencyId' | translate" />
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.testingAgencyName' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createTestingAgencyName" [placeholder]="'master.masterData.placeholders.agencyName' | translate" />
+            </div>
+          }
+          @case ('documentTypes') {
+            <div class="form-group">
+              <label>{{ 'master.masterData.documentTypeName' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createName" [placeholder]="'master.masterData.placeholders.documentType' | translate" />
+            </div>
+            <div class="form-group">
+              <label style="display: inline-flex; align-items: center; gap: var(--space-xs); cursor: pointer">
+                <input type="checkbox" [(ngModel)]="createIsRequired" />
+                <span>{{ 'master.common.required' | translate }}</span>
+              </label>
+            </div>
+          }
+          @case ('entityTypes') {
+            <div class="form-group">
+              <label>{{ 'master.common.name' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createName" [placeholder]="'master.masterData.placeholders.entityType' | translate" />
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.description' | translate }}</label>
+              <input class="form-control" [(ngModel)]="createDescription" [placeholder]="'master.masterData.columns.description' | translate" />
+            </div>
+          }
+          @case ('states') {
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.stateCode' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createStateCode" [placeholder]="'master.masterData.placeholders.stateCode' | translate" />
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.stateName' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createStateName" [placeholder]="'master.masterData.placeholders.stateName' | translate" />
+            </div>
+          }
+          @case ('districts') {
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.state' | translate }} *</label>
+              <select class="form-control" [(ngModel)]="createStateId">
+                <option value="">{{ 'master.common.selectState' | translate }}</option>
+                @for (s of filterStates(); track s.id) {
+                  <option [value]="s.id">{{ s.stateName }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.districtCode' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createDistrictCode" [placeholder]="'master.masterData.placeholders.districtCode' | translate" />
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.districtName' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createDistrictName" [placeholder]="'master.masterData.placeholders.districtName' | translate" />
+            </div>
+          }
+          @case ('rtos') {
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.state' | translate }} *</label>
+              <select class="form-control" [ngModel]="createStateId" (ngModelChange)="onCreateStateChange($event)">
+                <option value="">{{ 'master.common.selectState' | translate }}</option>
+                @for (s of filterStates(); track s.id) {
+                  <option [value]="s.id">{{ s.stateName }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.district' | translate }} *</label>
+              <select class="form-control" [(ngModel)]="createDistrictId" [disabled]="!createStateId">
+                <option value="">{{ 'master.common.selectDistrict' | translate }}</option>
+                @for (d of filterDistricts(); track d.id) {
+                  <option [value]="d.id">{{ d.districtName }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.rtoCode' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createRtoCode" [placeholder]="'master.masterData.placeholders.rtoCode' | translate" />
+            </div>
+            <div class="form-group">
+              <label>{{ 'master.masterData.columns.rtoName' | translate }} *</label>
+              <input class="form-control" [(ngModel)]="createRtoName" [placeholder]="'master.masterData.placeholders.rtoName' | translate" />
+            </div>
+          }
+        }
+      </div>
+      <div class="dialog-footer">
+        <button type="button" class="btn btn-outline" (click)="showDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="createItem()" [disabled]="saving()">
+          @if (saving()) { <span class="spinner"></span> }
+          {{ drawerSubmitLabel() }}
+        </button>
+      </div>
+  </aside>
+}
+
+<!-- Entity Type Permissions Drawer -->
+@if (showPermDialog()) {
+  <div class="drawer-backdrop" (click)="showPermDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel drawer-panel--wide" role="dialog" aria-modal="true" aria-labelledby="perm-drawer-title">
+      <div class="dialog-header">
+        <h3 id="perm-drawer-title">{{ 'master.common.editPermissions' | translate: { name: permDialogEntityType()?.name ?? '' } }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showPermDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="dialog-body">
+        @if (permDialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ permDialogError() }}
+          </div>
+        }
+        @if (permLoading()) {
+          <div class="tab-loading"><div class="spinner spinner--dark spinner--lg"></div></div>
+        } @else {
+          <!-- Current Permissions -->
+          <div style="margin-bottom: var(--space-lg)">
+            <label style="display: block; font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); color: var(--color-text-secondary)">
+              {{ 'master.common.currentPermissions' | translate }}
+              <span class="count-badge" style="margin-left: var(--space-xs)">{{ selectedPermIds().size }}</span>
+            </label>
+            @if (!selectedPermIds().size) {
+              <p class="text-muted">{{ 'master.common.noPermissionsYet' | translate }}</p>
+            } @else {
+              <div class="current-perms-grouped">
+                @for (group of permissionGroups(); track group.id) {
+                  @if (group.permissions.some(p => selectedPermIds().has(p.id))) {
+                    <div class="current-perms-group">
+                      <small class="current-perms-group-label">{{ group.name }}</small>
+                      <div class="chip-grid">
+                        @for (p of group.permissions; track p.id) {
+                          @if (selectedPermIds().has(p.id)) {
+                            <span class="chip chip--primary">
+                              {{ p.name }}
+                              <span class="material-icons" style="font-size: 14px; margin-left: 4px; cursor: pointer;" (click)="togglePerm(p.id)">close</span>
+                            </span>
+                          }
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+
+          <div class="entity-divider" style="margin: 0 0 var(--space-lg); height: 1px; background: var(--color-border)"></div>
+
+          <!-- Edit Groups -->
+          <label style="display: block; font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); color: var(--color-text-secondary)">
+            {{ 'master.common.assignRemove' | translate }}
+          </label>
+          <div class="perm-groups">
+            @for (group of permissionGroups(); track group.id) {
+              <div class="perm-group">
+                <div class="perm-group-header" (click)="toggleGroup(group.id)">
+                  <div class="perm-group-header-left">
+                    <input
+                      type="checkbox"
+                      [checked]="isGroupAllSelected(group)"
+                      [indeterminate]="isGroupPartial(group)"
+                      (click)="$event.stopPropagation()"
+                      (change)="toggleGroupAll(group)"
+                    />
+                    <span class="material-icons perm-group-arrow">
+                      {{ expandedGroups().has(group.id) ? 'expand_more' : 'chevron_right' }}
+                    </span>
+                    <strong>{{ group.name }}</strong>
+                    <small class="text-muted">{{ group.permissions.length }}</small>
+                  </div>
+                </div>
+                @if (expandedGroups().has(group.id)) {
+                  @if (!group.permissions.length) {
+                    <div class="perm-list-empty">{{ 'master.common.noPermissionsInGroup' | translate }}</div>
+                  } @else {
+                    <div class="table-wrapper">
+                      <table class="table table--compact">
+                        <thead>
+                          <tr>
+                            <th style="width: 2.5rem"></th>
+                            <th>{{ 'master.common.name' | translate }}</th>
+                            <th>{{ 'master.masterData.columns.description' | translate }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (p of group.permissions; track p.id) {
+                            <tr>
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  [checked]="selectedPermIds().has(p.id)"
+                                  (change)="togglePerm(p.id)"
+                                />
+                              </td>
+                              <td>{{ p.name }}</td>
+                              <td>{{ p.description ?? '—' }}</td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="dialog-footer">
+        <span class="text-muted" style="margin-right: auto">{{ 'master.common.selectedCount' | translate: { count: selectedPermIds().size } }}</span>
+        <button type="button" class="btn btn-outline" (click)="showPermDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="saveEtPermissions()" [disabled]="saving()">
+          @if (saving()) { <span class="spinner"></span> }
+          {{ 'master.common.save' | translate }}
+        </button>
+      </div>
+  </aside>
+}

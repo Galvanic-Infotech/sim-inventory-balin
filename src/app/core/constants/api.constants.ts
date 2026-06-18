@@ -1,0 +1,80 @@
+export const API_ENDPOINTS = {
+  RBAC: {
+    LOGIN: '/auth/login',
+    USERS: '/Users',
+    CHECK_EMAIL: '/users/check-email',
+    CHECK_MOBILE: '/users/check-mobile',
+    ENTITY: '/Entity',
+    ROLE: '/Role',
+    ROLE_PERMISSIONS: '/role/view-role-permissions',
+    ASSIGN_ROLE_PERMISSIONS: '/role/assign-role-permissions',
+    PERMISSIONS: '/entity/entity-permissions',
+    CREATE_PERMISSION: '/Permissions',
+    PERMISSION_GROUPS: '/permissions/group',
+    PERMISSION_GROUPS_BY_ENTITY: '/permissions/group/byEntityId',
+    PERMISSION_GROUPS_BY_ROLE: '/permissions/group/byRoleId',
+    CREATE_PERMISSION_GROUP: '/permissions/group-create',
+    ENTITY_TYPE: '/EntityType',
+    ENTITY_TYPE_OF_ENTITY: '/EntityType/view-entity-type-of-entity',
+    ENTITY_TYPE_PERMISSIONS: '/EntityType/view-permissions',
+    ASSIGN_ENTITY_TYPE_PERMISSIONS: '/EntityType/assign-permissions',
+    ASSIGN_ENTITY_TYPE_ON_ENTITY: '/entitytype/assign-entity-type-on-entity',
+    ITEM_TYPES: '/Master/get-item-types',
+    CREATE_ITEM_TYPE: '/Master/create-item-type',
+    SIM_CARD_PROVIDER: '/SimCardProvider',
+    VEHICLE_CATEGORY: '/VehicleCategory',
+    STATES: '/master/get-states',
+    CREATE_STATE: '/master/create-state',
+    DISTRICTS: '/master/get-districts',
+    CREATE_DISTRICT: '/master/create-district',
+    RTOS: '/master/get-rtos',
+    CREATE_RTO: '/master/create-rto',
+    TESTING_AGENCIES: '/master/get-testing-agencies',
+    CREATE_TESTING_AGENCY: '/master/create-testing-agencies',
+    UPDATE_TESTING_AGENCY: '/Master/update-testing-agency', // /{id}
+    DOCUMENT_TYPES: '/Master/get-document-types',
+    CREATE_DOCUMENT_TYPE: '/Master/create-document-type',
+    UPDATE_DOCUMENT_TYPE: '/Master/update-document-type', // /{id}
+    FORGOT_PASSWORD_INITIATE: '/auth/forgot-password/initiate',
+    FORGOT_PASSWORD_RESEND_OTP: '/auth/forgot-password/resend-otp',
+    FORGOT_PASSWORD_VERIFY_OTP: '/auth/forgot-password/verify-otp',
+    FORGOT_PASSWORD_RESET: '/auth/forgot-password/reset',
+    CHANGE_PASSWORD: '/users/change-password',
+    UPDATE_USER_ROLE: '/users/update-role',
+    DISABLE_USER: '/users', // /{userId}/disable-user
+    PROFILE: '/users/profile',
+    ENTITY_ATTRIBUTES: '/Entity', // /{id}/attributes
+    ENTITY_PROFILE: '/Entity/Profile',
+    ENTITY_PORT_MAPPING: '/EntityPortMapping',
+    AIS_DEVICE_MODEL: '/AisDeviceModel',
+    AIS_DEVICE_MODEL_UPLOAD_DOCS: '/AisDeviceModel', // /{id}/upload-documents
+    ENTITY_DOCUMENT: '/EntityDocument',
+    ENTITY_DOCUMENT_UPLOAD: '/EntityDocument/upload',
+    FIRMWARE: '/Firmware',
+    FIRMWARE_UPLOAD: '/Firmware/upload',
+    ENTITY_RTO: '/EntityRto',
+    ENTITY_RTO_PARENT_POOL: '/EntityRto/by-logged-in-entity',
+  },
+  SIM: {
+    BASKET: '/SimActivation/fetch_basket_details',
+    ACTIVATION: '/SimActivation',
+    TEMP_DISCONNECT: '/SimActivation/temp-disconnected',
+    RESUME: '/SimActivation/resume-temp-disconnected',
+    SMS_WHITELIST_FETCH: '/SimActivation/fetch-sms-whitelisting',
+    SMS_WHITELIST_PATCH: '/SimActivation/patch-sms-whitelisting',
+  },
+};
+
+export const STORAGE_KEYS = {
+  AUTH_TOKEN: 'vahan_portal_token',
+  RBAC_USER: 'vahan_portal_rbac_user',
+  SIDEBAR_COLLAPSED: 'vahan_portal_sidebar',
+  LANG: 'vahan_portal_lang',
+};
+
+export const APP_CONFIG = {
+  APP_NAME: 'VahanNewPortal',
+  DEBOUNCE_MS: 200,
+  MAX_RETRY_ATTEMPTS: 3,
+  RETRY_DELAY_MS: 1_000,
+};

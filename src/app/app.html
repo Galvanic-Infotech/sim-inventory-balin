@@ -1,0 +1,10 @@
+<router-outlet />
+
+<app-alert-dialog
+  [open]="sessionExpired.visible()"
+  title="Session Expired"
+  message="Your session has expired. Please login again."
+  confirmLabel="Login"
+  icon="schedule"
+  (confirm)="sessionExpired.dismiss()"
+/>

@@ -1,0 +1,40 @@
+:host {
+  display: inline-flex;
+  flex: 0 1 auto;
+}
+
+.search-bar {
+  position: relative;
+  width: 100%;
+
+  ::ng-deep .p-inputtext {
+    padding-right: 34px;
+  }
+
+  &__clear {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background: var(--color-bg-page);
+      color: var(--color-text-secondary);
+    }
+
+    .material-icons {
+      font-size: 14px;
+    }
+  }
+}

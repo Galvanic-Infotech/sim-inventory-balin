@@ -1,0 +1,234 @@
+<div class="card sim-search">
+  <div class="sim-search__header">
+    <h2>Search SIM</h2>
+    <div class="sim-search__input-row">
+      <input
+        class="form-control"
+        type="text"
+        inputmode="numeric"
+        placeholder="Enter SIM Number (ICCID)"
+        [(ngModel)]="searchValue"
+        (keyup.enter)="search()"
+      />
+      <button
+        type="button"
+        class="btn btn-primary sim-search__btn"
+        [disabled]="searching()"
+        (click)="search()"
+      >
+        @if (searching()) {
+          <span class="spinner"></span>
+        } @else {
+          <span class="material-icons">search</span>
+        }
+      </button>
+    </div>
+    <span class="sim-search__hint">SIM/MSISDN NUMBER</span>
+  </div>
+
+  <div class="sim-search__results">
+    @if (searching()) {
+      <div class="sim-search__center">
+        <span class="spinner spinner--dark spinner--lg"></span>
+      </div>
+    } @else if (searchError()) {
+      <div class="alert alert-danger">{{ searchError() }}</div>
+    } @else if (simDetail(); as sim) {
+      @if (copiedToast()) {
+        <div class="alert alert-success sim-search__toast">Copied!</div>
+      }
+      @if (actionSuccess()) {
+        <div class="alert alert-success">{{ actionSuccess() }}</div>
+      }
+      <div class="sim-detail">
+        <div class="sim-detail__header">
+          <h3>SIM Details</h3>
+          <span [class]="statusClass(sim.status)">{{ statusLabel(sim.status) }}</span>
+        </div>
+        @for (field of [
+          { icon: 'sim_card', label: 'SIM Number (ICCID)', value: sim.iccid },
+          { icon: 'phone', label: 'SIM Phone', value: sim.simPhone },
+          { icon: 'numbers', label: 'Serial Number', value: sim.serialNumber },
+          { icon: 'info', label: 'Status', value: statusLabel(sim.status) },
+          { icon: 'calendar_today', label: 'Onboarded At', value: formatDate(sim.onboardedAt) },
+          { icon: 'check_circle', label: 'Activation At', value: formatDate(sim.activationAt) },
+        ]; track field.label) {
+          <div class="sim-detail__field">
+            <span class="material-icons sim-detail__icon">{{ field.icon }}</span>
+            <div>
+              <span class="sim-detail__label">{{ field.label }}</span>
+              <div class="sim-detail__value-row">
+                <span class="sim-detail__value">{{ field.value }}</span>
+                @if (field.value !== '—') {
+                  <button
+                    type="button"
+                    class="btn btn-ghost sim-detail__copy"
+                    (click)="copyValue(field.value)"
+                  >
+                    <span class="material-icons">content_copy</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (actionError()) {
+          <div class="alert alert-danger">{{ actionError() }}</div>
+        }
+
+        @if (isInitial(sim) && canActivate()) {
+          <button
+            type="button"
+            class="btn btn-outline sim-detail__action sim-detail__action--success"
+            [disabled]="actionLoading()"
+            (click)="openConfirm('activate')"
+          >
+            Activate SIM
+          </button>
+        }
+        @if (isActive(sim) && canTempSuspend()) {
+          <button
+            type="button"
+            class="btn btn-outline sim-detail__action sim-detail__action--warning"
+            [disabled]="actionLoading()"
+            (click)="openConfirm('temp')"
+          >
+            Temp Deactivate
+          </button>
+        }
+        @if (isTempDisconnected(sim) && canResume()) {
+          <button
+            type="button"
+            class="btn btn-outline sim-detail__action sim-detail__action--primary"
+            [disabled]="actionLoading()"
+            (click)="openConfirm('resume')"
+          >
+            Resume Connection
+          </button>
+        }
+
+        <button
+          type="button"
+          class="btn btn-outline sim-detail__action"
+          (click)="showSmsDialog.set(true)"
+        >
+          <span class="material-icons">sms</span>
+          SMS Whitelisting
+        </button>
+      </div>
+    } @else if (hasSearched()) {
+      <p class="sim-search__empty text-muted">No SIM found</p>
+    }
+  </div>
+</div>
+
+@if (showConfirm(); as confirmType) {
+  @if (simDetail(); as sim) {
+    <div class="dialog-backdrop" (click)="closeConfirm()">
+      <div class="dialog-card" [class.dialog-card--wide]="confirmType === 'activate'" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>
+            @switch (confirmType) {
+              @case ('activate') { Activate SIM }
+              @case ('temp') { Temp Deactivate }
+              @case ('resume') { Resume Connection }
+            }
+          </h2>
+          <button class="btn btn-ghost" (click)="closeConfirm()">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <div class="dialog-body">
+          @if (actionError()) {
+            <div class="alert alert-danger">
+              <span class="material-icons">error</span> {{ actionError() }}
+            </div>
+          }
+
+          <div class="sim-confirm-fields">
+            <div><span class="text-muted">ICCID</span><strong>{{ sim.iccid }}</strong></div>
+            <div><span class="text-muted">SIM Phone</span><strong>{{ sim.simPhone }}</strong></div>
+          </div>
+
+          @if (confirmType === 'activate') {
+            <div class="activate-form">
+              <div class="form-group">
+                <label>Valid Till *</label>
+                <select class="form-control" [(ngModel)]="validTillPreset">
+                  <option value="3months">3 Months</option>
+                  <option value="6months">6 Months</option>
+                  <option value="1year">1 Year</option>
+                  <option value="custom">Custom Date</option>
+                </select>
+              </div>
+              @if (validTillPreset === 'custom') {
+                <div class="form-group">
+                  <label>Select Date *</label>
+                  <input
+                    class="form-control"
+                    type="date"
+                    [(ngModel)]="validTillCustom"
+                    [min]="minDate"
+                  />
+                </div>
+              } @else {
+                <div class="form-group">
+                  <label>Computed Date</label>
+                  <input class="form-control" [value]="computedValidTill" disabled />
+                </div>
+              }
+              <div class="form-group">
+                <label>IMEI</label>
+                <input class="form-control" [(ngModel)]="imei" placeholder="Enter IMEI number" />
+              </div>
+              <div class="form-group">
+                <label>Customer Name</label>
+                <input class="form-control" [(ngModel)]="customerName" placeholder="Enter customer name" />
+              </div>
+              <div class="form-group">
+                <label>Remarks</label>
+                <textarea class="form-control" [(ngModel)]="remarks" rows="2" placeholder="Enter remarks (optional)"></textarea>
+              </div>
+            </div>
+          } @else {
+            <p class="text-muted" style="margin-top: var(--space-md)">
+              @switch (confirmType) {
+                @case ('temp') {
+                  Are you sure you want to temporarily deactivate this SIM?
+                }
+                @case ('resume') {
+                  Are you sure you want to resume this SIM connection?
+                }
+              }
+            </p>
+          }
+        </div>
+        <div class="dialog-footer">
+          <button type="button" class="btn btn-outline" (click)="closeConfirm()">Cancel</button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="confirmAction()"
+            [disabled]="actionLoading() || (confirmType === 'activate' && validTillPreset === 'custom' && !validTillCustom)"
+          >
+            @if (actionLoading()) { <span class="spinner"></span> }
+            @switch (confirmType) {
+              @case ('activate') { Activate }
+              @case ('temp') { Deactivate }
+              @case ('resume') { Resume }
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+}
+
+@if (showSmsDialog() && simDetail(); as sim) {
+  <app-sim-sms-whitelist-dialog
+    [iccid]="sim.iccid"
+    (closed)="showSmsDialog.set(false)"
+    (saved)="showSmsDialog.set(false)"
+  />
+}

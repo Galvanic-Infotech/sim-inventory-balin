@@ -1,0 +1,157 @@
+<!-- Toolbar -->
+<div class="tab-toolbar">
+  <div class="tab-toolbar-left">
+    <h3>{{ 'master.permissions.title' | translate }}</h3>
+    <span class="count-badge">{{ totalPermCount }}</span>
+  </div>
+  <div class="tab-toolbar-right">
+    <button class="btn btn-ghost" (click)="fetch()">
+      <span class="material-icons">refresh</span>
+    </button>
+    @if (canCreateGroup()) {
+      <button class="btn btn-outline" (click)="openGroupDialog()">
+        <span class="material-icons">create_new_folder</span> {{ 'master.permissions.addGroup' | translate }}
+      </button>
+    }
+    @if (canCreate()) {
+      <button class="btn btn-primary" (click)="openPermDialog()">
+        <span class="material-icons">add</span> {{ 'master.permissions.addPermission' | translate }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="tab-loading"><div class="spinner spinner--dark spinner--lg"></div></div>
+} @else if (error()) {
+  <div class="alert alert-danger">
+    <span class="material-icons">error</span> {{ error() }}
+    <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+  </div>
+} @else if (!groups().length) {
+  <div class="tab-empty">
+    <span class="material-icons">lock</span>
+    <p>{{ 'master.permissions.empty' | translate }}</p>
+  </div>
+} @else {
+  <div class="perm-groups perm-groups--view">
+    @for (group of groups(); track group.id) {
+      <div class="perm-group">
+        <div class="perm-group-header" (click)="toggleGroup(group.id)">
+          <div class="perm-group-header-left">
+            <span class="material-icons perm-group-arrow">
+              {{ expandedGroups().has(group.id) ? 'expand_more' : 'chevron_right' }}
+            </span>
+            <strong>{{ group.name }}</strong>
+            <small class="text-muted">{{ group.permissions.length }}</small>
+          </div>
+        </div>
+        @if (expandedGroups().has(group.id)) {
+          @if (!group.permissions.length) {
+            <div class="perm-list-empty">{{ 'master.common.noPermissionsInGroup' | translate }}</div>
+          } @else {
+            <div class="table-wrapper">
+              <table class="table table--compact">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>{{ 'master.permissions.columns.name' | translate }}</th>
+                    <th>{{ 'master.permissions.columns.description' | translate }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of group.permissions; track p.id; let i = $index) {
+                    <tr>
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ p.name }}</td>
+                      <td>{{ p.description ?? '—' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+      </div>
+    }
+  </div>
+}
+
+<!-- Create Permission Drawer -->
+@if (showPermDialog()) {
+  <div class="drawer-backdrop" (click)="showPermDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="perm-create-drawer-title">
+      <div class="dialog-header">
+        <h3 id="perm-create-drawer-title">{{ 'master.permissions.createTitle' | translate }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showPermDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="dialog-body">
+        @if (permDialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ permDialogError() }}
+          </div>
+        }
+        <div class="form-group">
+          <label>{{ 'master.permissions.group' | translate }} *</label>
+          <select class="form-control" [(ngModel)]="permGroupId">
+            <option value="">{{ 'master.common.selectGroup' | translate }}</option>
+            @for (g of groups(); track g.id) {
+              <option [value]="g.id">{{ g.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>{{ 'master.common.name' | translate }} *</label>
+          <input class="form-control" [(ngModel)]="permName" [placeholder]="'master.permissions.permNamePlaceholder' | translate" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'master.permissions.columns.description' | translate }}</label>
+          <input class="form-control" [(ngModel)]="permDescription" [placeholder]="'master.permissions.columns.description' | translate" />
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button type="button" class="btn btn-outline" (click)="showPermDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="createPermission()" [disabled]="saving() || !permName || !permGroupId">
+          @if (saving()) { <span class="spinner"></span> }
+          {{ 'master.common.create' | translate }}
+        </button>
+      </div>
+  </aside>
+}
+
+<!-- Create Group Drawer -->
+@if (showGroupDialog()) {
+  <div class="drawer-backdrop" (click)="showGroupDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="perm-group-drawer-title">
+      <div class="dialog-header">
+        <h3 id="perm-group-drawer-title">{{ 'master.permissions.createGroupTitle' | translate }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showGroupDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="dialog-body">
+        @if (groupDialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ groupDialogError() }}
+          </div>
+        }
+        <div class="form-group">
+          <label>{{ 'master.common.name' | translate }} *</label>
+          <input class="form-control" [(ngModel)]="groupName" [placeholder]="'master.permissions.groupNamePlaceholder' | translate" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'master.permissions.columns.description' | translate }}</label>
+          <input class="form-control" [(ngModel)]="groupDescription" [placeholder]="'master.permissions.columns.description' | translate" />
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button type="button" class="btn btn-outline" (click)="showGroupDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="createGroup()" [disabled]="saving() || !groupName">
+          @if (saving()) { <span class="spinner"></span> }
+          {{ 'master.common.create' | translate }}
+        </button>
+      </div>
+  </aside>
+}

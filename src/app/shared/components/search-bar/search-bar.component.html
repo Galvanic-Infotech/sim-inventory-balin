@@ -1,0 +1,19 @@
+<div class="table-search-wrap search-bar" [style.min-width]="minWidth()">
+  <i class="pi pi-search"></i>
+  <input
+    pInputText
+    [placeholder]="placeholder()"
+    [ngModel]="raw()"
+    (ngModelChange)="onInput($event)"
+  />
+  @if (clearable() && raw()) {
+    <button
+      type="button"
+      class="search-bar__clear"
+      (click)="clear()"
+      aria-label="Clear search"
+    >
+      <span class="material-icons">close</span>
+    </button>
+  }
+</div>

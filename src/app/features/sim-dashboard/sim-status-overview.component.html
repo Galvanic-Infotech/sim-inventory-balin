@@ -1,0 +1,31 @@
+<div class="card status-overview">
+  <h2 class="status-overview__title">SIM Status Overview</h2>
+  <div class="status-overview__body">
+    <div class="status-overview__donut-wrap">
+      <div class="status-overview__donut" [style.background]="donutGradient()">
+        <div class="status-overview__donut-hole">
+          <span class="status-overview__donut-label">Total SIMs</span>
+          <span class="status-overview__donut-value">{{ basket().totalSim }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="status-overview__bars">
+      @for (seg of segments(); track seg.label) {
+        <div class="status-overview__bar-row">
+          <span class="status-overview__dot" [style.background]="seg.color"></span>
+          <span class="status-overview__bar-label">{{ seg.label }}</span>
+          <div class="status-overview__bar-track">
+            <div
+              class="status-overview__bar-fill"
+              [style.width.%]="barPercent(seg.value, basket().totalSim)"
+              [style.background]="seg.color"
+            ></div>
+          </div>
+          <span class="status-overview__bar-value">
+            {{ barLabel(seg.value, basket().totalSim) }}
+          </span>
+        </div>
+      }
+    </div>
+  </div>
+</div>

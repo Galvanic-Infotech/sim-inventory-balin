@@ -1,0 +1,240 @@
+<!-- Toolbar -->
+<div class="tab-toolbar">
+  <div class="tab-toolbar-left">
+    <h3>{{ menuLabel() }}</h3>
+    <span class="count-badge">{{ totalRecords() }}</span>
+    <select class="form-control filter-select" [ngModel]="filterTypeId()" (ngModelChange)="onTypeFilterChange($event)">
+      <option value="">{{ 'master.common.allTypes' | translate }}</option>
+      @for (t of entityTypes(); track t.id) {
+        <option [value]="t.id" [title]="t.name">{{ shortName(t.name) }}</option>
+      }
+    </select>
+  </div>
+  <div class="tab-toolbar-right">
+    <app-search-bar
+      [placeholder]="'master.entities.searchPlaceholder' | translate: { label: menuLabel() }"
+      [initialValue]="searchTerm()"
+      (searchChange)="onSearchChange($event)"
+    />
+    <button class="btn btn-ghost" (click)="fetch()">
+      <span class="material-icons">refresh</span>
+    </button>
+    @if (canCreate()) {
+      <button class="btn btn-primary" (click)="openDialog()">
+        <span class="material-icons">add</span> {{ 'master.entities.add' | translate: { label: menuLabel() } }}
+      </button>
+    }
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger">
+    <span class="material-icons">error</span> {{ error() }}
+    <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+  </div>
+} @else {
+  <p-table
+    [value]="entities()"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [paginator]="true"
+    [rows]="tableQuery().pageSize ?? 10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [first]="tableFirst()"
+    sortMode="single"
+    styleClass="app-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">#</th>
+        <th pSortableColumn="name">{{ 'master.entities.columns.name' | translate }} <p-sortIcon field="name" /></th>
+        <th pSortableColumn="description">{{ 'master.entities.columns.description' | translate }} <p-sortIcon field="description" /></th>
+        <th pSortableColumn="entityType">{{ 'master.entities.columns.type' | translate }} <p-sortIcon field="entityType" /></th>
+        @if (canAssignType()) {
+          <th style="width: 5rem">{{ 'master.common.action' | translate }}</th>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-e let-rowIndex="rowIndex">
+      <tr>
+        <td>{{ rowIndex + 1 }}</td>
+        <td>{{ e.name }}</td>
+        <td>{{ e.description }}</td>
+        <td><span class="chip" [title]="e.entityType?.name ?? ''">{{ shortName(e.entityType?.name) }}</span></td>
+        @if (canAssignType()) {
+          <td>
+            <div class="action-cell">
+              <button class="btn btn-ghost" [title]="'master.entities.assignType' | translate" (click)="openAssignDialog(e)">
+                <span class="material-icons">category</span>
+              </button>
+            </div>
+          </td>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="canAssignType() ? 5 : 4">
+          <div class="tab-empty" style="padding: var(--space-lg)">
+            <span class="material-icons">business</span>
+            <p>{{ 'master.entities.empty' | translate: { label: menuLabel() } }}</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+}
+
+<!-- Create Drawer -->
+@if (showDialog()) {
+  <div class="drawer-backdrop" (click)="showDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="entity-create-drawer-title">
+      <div class="dialog-header">
+        <h3 id="entity-create-drawer-title">{{ 'master.entities.createTitle' | translate: { label: menuLabel() } }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="dialog-body">
+        @if (dialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ dialogError() }}
+          </div>
+        }
+        <div class="form-group">
+          <label>{{ 'master.entities.columns.name' | translate }} *</label>
+          <input class="form-control" [(ngModel)]="name" [placeholder]="'master.entities.namePlaceholder' | translate: { label: menuLabel() }" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'master.entities.columns.description' | translate }}</label>
+          <input class="form-control" [(ngModel)]="description" [placeholder]="'master.entities.columns.description' | translate" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'master.entities.columns.type' | translate }} *</label>
+          <select
+            class="form-control"
+            [ngModel]="createEntityTypeId()"
+            (ngModelChange)="createEntityTypeId.set($event)"
+          >
+            <option value="">{{ 'master.common.selectType' | translate }}</option>
+            @for (t of entityTypes(); track t.id) {
+              <option [value]="t.id" [title]="t.name">{{ shortName(t.name) }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button type="button" class="btn btn-outline" (click)="showDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="create()" [disabled]="saving()">
+          @if (saving()) { <span class="spinner"></span> }
+          {{ 'master.common.create' | translate }}
+        </button>
+      </div>
+  </aside>
+}
+
+<!-- Assign Entity Type Drawer -->
+@if (showAssignDialog()) {
+  <div class="drawer-backdrop" (click)="showAssignDialog.set(false)" aria-hidden="true"></div>
+  <aside class="drawer-panel drawer-panel--wide" role="dialog" aria-modal="true" aria-labelledby="entity-assign-drawer-title">
+      <div class="dialog-header">
+        <h3 id="entity-assign-drawer-title">{{ 'master.entities.assignType' | translate }}</h3>
+        <button type="button" class="btn btn-ghost" (click)="showAssignDialog.set(false)" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="dialog-body">
+        @if (assignDialogError()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span> {{ assignDialogError() }}
+          </div>
+        }
+        @if (assignLoading()) {
+          <div class="tab-loading"><div class="spinner spinner--dark spinner--lg"></div></div>
+        } @else {
+        @if (assignEntity(); as ent) {
+          <div class="assign-entity-banner">
+            <span class="material-icons">business</span>
+            <strong>{{ ent.name }}</strong>
+            @if (previousTypeNames().length) {
+              <span class="assign-entity-banner__label">{{ 'master.entities.currentTypes' | translate }}</span>
+              <div class="chip-grid">
+                @for (name of previousTypeNames(); track name) {
+                  <span class="chip chip--primary">{{ name }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <div class="input-wrapper" style="margin-bottom: var(--space-sm)">
+          <span class="material-icons input-icon">search</span>
+          <input
+            class="form-control form-control--icon-left"
+            [placeholder]="'master.entities.searchTypes' | translate"
+            [ngModel]="assignTypeSearch()"
+            (ngModelChange)="assignTypeSearch.set($event)"
+          />
+        </div>
+
+        <div class="assign-type-grid">
+          @for (t of filteredEntityTypes(); track t.id) {
+            <button
+              type="button"
+              class="assign-type-card"
+              [class.assign-type-card--selected]="isTypeSelected(t.id)"
+              [class.assign-type-card--current]="isPreviousType(t.id)"
+              (click)="toggleTypeId(t.id)"
+            >
+              <span class="assign-type-check">
+                <span class="material-icons">
+                  {{ isTypeSelected(t.id) ? 'check_box' : 'check_box_outline_blank' }}
+                </span>
+              </span>
+              <div class="assign-type-info">
+                <div class="assign-type-info__head">
+                  <strong>{{ t.name }}</strong>
+                  @if (isPreviousType(t.id)) {
+                    <span class="chip">{{ 'master.common.current' | translate }}</span>
+                  }
+                </div>
+                @if (t.description) {
+                  <small>{{ t.description }}</small>
+                }
+              </div>
+            </button>
+          } @empty {
+            <div class="tab-empty" style="padding: var(--space-md)">
+              <p>{{ 'master.entities.noTypesMatch' | translate }}</p>
+            </div>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="dialog-footer">
+        <span class="text-muted" style="margin-right: auto">
+          @if (assignLoading()) {
+            {{ 'master.common.loading' | translate }}
+          } @else if (selectedTypeCount()) {
+            {{ 'master.common.selectedCount' | translate: { count: selectedTypeCount() } }}
+          } @else {
+            {{ 'master.common.selectAtLeastOne' | translate }}
+          }
+        </span>
+        <button type="button" class="btn btn-outline" (click)="showAssignDialog.set(false)">{{ 'common.cancel' | translate }}</button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="assignType()"
+          [disabled]="savingAssign() || assignLoading() || !selectedTypeCount()"
+        >
+          @if (savingAssign()) { <span class="spinner"></span> }
+          {{ 'master.common.assign' | translate }}
+        </button>
+      </div>
+  </aside>
+}
