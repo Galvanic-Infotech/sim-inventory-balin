@@ -1,43 +1,42 @@
 <div class="master-page">
-  <div class="master-header">
-    <div class="master-title">
+  <div class="master-heading">
+    <div class="master-eyebrow">
       <span class="material-icons">admin_panel_settings</span>
-      <h1>{{ 'master.title' | translate }}</h1>
+      <span>{{ 'master.title' | translate }}</span>
       <span class="rbac-badge">RBAC</span>
     </div>
-    <div class="master-user">
-      <span class="material-icons">person</span>
-      <span>{{ auth.userName() }}</span>
-    </div>
+    <p class="master-subtitle">{{ 'master.subtitle' | translate }}</p>
   </div>
 
   @if (!visibleTabs().length) {
-    <div class="tab-empty">
-      <span class="material-icons">lock</span>
-      <p>{{ 'master.noPermission' | translate }}</p>
+    <div class="card card--centered">
+      <span class="material-icons" style="font-size:48px;color:var(--color-text-muted)">lock</span>
+      <p style="margin-top:var(--space-sm);color:var(--color-text-secondary)">{{ 'master.noPermission' | translate }}</p>
     </div>
   } @else {
-    <div class="tab-bar">
-      @for (tab of visibleTabs(); track tab.key) {
-        <button
-          class="tab-item"
-          [class.active]="currentTab() === tab.key"
-          (click)="selectTab(tab.key)"
-        >
-          <span class="material-icons">{{ tab.icon }}</span>
-          <span class="tab-label">{{ tab.label }}</span>
-        </button>
-      }
-    </div>
+    <section class="master-panel">
+      <div class="tab-bar">
+        @for (tab of visibleTabs(); track tab.key) {
+          <button
+            class="tab-item"
+            [class.active]="currentTab() === tab.key"
+            (click)="selectTab(tab.key)"
+          >
+            <span class="material-icons">{{ tab.icon }}</span>
+            <span class="tab-label">{{ tab.label }}</span>
+          </button>
+        }
+      </div>
 
-    <div class="tab-content">
-      @switch (currentTab()) {
-        @case ('users') { <app-users-tab /> }
-        @case ('entities') { <app-entities-tab /> }
-        @case ('roles') { <app-roles-tab /> }
-        @case ('permissions') { <app-permissions-tab /> }
-        @case ('master-data') { <app-master-data-tab /> }
-      }
-    </div>
+      <div class="tab-content">
+        @switch (currentTab()) {
+          @case ('users') { <app-users-tab /> }
+          @case ('entities') { <app-entities-tab /> }
+          @case ('roles') { <app-roles-tab /> }
+          @case ('permissions') { <app-permissions-tab /> }
+          @case ('master-data') { <app-master-data-tab /> }
+        }
+      </div>
+    </section>
   }
 </div>

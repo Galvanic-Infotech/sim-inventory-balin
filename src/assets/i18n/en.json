@@ -727,6 +727,7 @@
   },
   "master": {
     "title": "Admin Console",
+    "subtitle": "Manage users, entities, roles and permissions.",
     "noPermission": "No permissions to view admin console",
     "tabs": {
       "users": "Users",

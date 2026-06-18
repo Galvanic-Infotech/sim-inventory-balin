@@ -1,68 +1,62 @@
-// ── Master Page ──
 .master-page {
-  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
-.master-header {
+.master-heading {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-lg);
-  flex-wrap: wrap;
-  gap: var(--space-sm);
+  flex-direction: column;
+  gap: 4px;
 }
 
-.master-title {
-  display: flex;
+.master-eyebrow {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 10px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
 
   .material-icons {
-    font-size: 28px;
+    font-size: 18px;
     color: var(--color-primary);
-  }
-
-  h1 {
-    font-size: var(--font-xl);
-    font-weight: 700;
-    margin: 0;
   }
 }
 
 .rbac-badge {
-  background: var(--color-primary-bg);
+  background: var(--color-primary-soft);
   color: var(--color-primary);
-  font-size: var(--font-xs);
+  font-size: 10px;
   font-weight: 700;
-  padding: 2px 8px;
+  letter-spacing: 1px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
+  text-transform: uppercase;
 }
 
-.master-user {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
+.master-subtitle {
   font-size: var(--font-sm);
   color: var(--color-text-secondary);
-
-  .material-icons {
-    font-size: 20px;
-  }
+  margin: 0;
 }
 
-.btn-sm {
-  padding: 4px 8px;
-  font-size: var(--font-xs);
-}
-
-// ── Tab Bar ──
-.tab-bar {
-  display: flex;
-  gap: 2px;
+.master-panel {
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 4px;
+  box-shadow: var(--shadow-card);
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+}
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+  padding: 6px;
   overflow-x: auto;
   margin-bottom: var(--space-lg);
 }
@@ -70,10 +64,10 @@
 .tab-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 10px 16px;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   background: transparent;
   font-size: var(--font-sm);
   font-weight: 500;
@@ -81,20 +75,22 @@
   color: var(--color-text-secondary);
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
 
   .material-icons {
     font-size: 18px;
   }
 
   &:hover {
-    background: var(--color-bg-page);
+    background: rgba(255, 255, 255, 0.7);
     color: var(--color-text-primary);
   }
 
   &.active {
-    background: var(--color-primary);
-    color: #fff;
+    background: var(--color-bg-card);
+    color: var(--color-primary);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
   }
 }
 
@@ -102,10 +98,9 @@
   min-height: 400px;
 }
 
-// ── Responsive ──
 @media (max-width: 640px) {
-  .master-page {
-    padding: var(--space-md);
+  .master-panel {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
   }
 
   .tab-label {
