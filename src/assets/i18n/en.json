@@ -983,12 +983,14 @@
     "tableTitle": "Transactions",
     "empty": "No transactions found",
     "summary": {
-      "pageDebited": "Debited (this page)",
-      "pageCredited": "Credited (this page)",
-      "pageTax": "Tax (this page)",
-      "avgSims": "Avg active SIMs",
-      "thisPage": "Sum across visible rows",
-      "rate": "Daily rate"
+      "outstanding": "Current Outstanding",
+      "outstandingHint": "Total billable amount pending settlement",
+      "creditLimit": "Credit Limit",
+      "available": "Available Credit",
+      "overLimit": "Over credit limit",
+      "rate": "Daily Rate",
+      "yearly": "Yearly",
+      "tax": "Tax"
     },
     "columns": {
       "date": "Date",
@@ -1001,7 +1003,8 @@
       "net": "Net"
     },
     "errors": {
-      "load": "Failed to load billing transactions"
+      "load": "Failed to load billing transactions",
+      "loadConfig": "Failed to load billing configuration"
     }
   },
   "simInventory": {

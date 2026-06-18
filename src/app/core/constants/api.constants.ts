@@ -65,6 +65,7 @@ export const API_ENDPOINTS = {
     INVENTORY: '/SimActivation/sim-inventory',
     INVENTORY_UPDATE: '/SimActivation/sim-inventory-update',
     BILLING_TRANSACTIONS: '/SimBilling/transactions',
+    BILLING_CONFIG: '/SimBilling', // /{entityId}/config
   },
 };
 

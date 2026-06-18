@@ -6,7 +6,9 @@ import { PaginationMeta, RbacResponse } from '../../shared/models/rbac.model';
 import { TableQueryParams } from '../../shared/models/table-query.model';
 import { toQueryRecord } from '../../shared/utils/table-query.util';
 import {
+  BillingConfig,
   BillingTransaction,
+  parseBillingConfig,
   parseBillingTransaction,
 } from '../../shared/models/billing.model';
 
@@ -18,6 +20,14 @@ export interface BillingTransactionsResult {
 @Injectable({ providedIn: 'root' })
 export class BillingService {
   private readonly http = inject(HttpClient);
+
+  fetchConfig(entityId: string): Observable<BillingConfig> {
+    return this.http
+      .get<RbacResponse<Record<string, unknown>>>(
+        `${API_ENDPOINTS.SIM.BILLING_CONFIG}/${entityId}/config`,
+      )
+      .pipe(map((res) => parseBillingConfig(res.data ?? {})));
+  }
 
   fetchTransactions(query: TableQueryParams = {}): Observable<BillingTransactionsResult> {
     const record = toQueryRecord({

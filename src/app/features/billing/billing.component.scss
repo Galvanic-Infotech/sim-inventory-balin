@@ -52,13 +52,14 @@
 
   &--accent {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
     color: #fff;
     border-color: transparent;
     box-shadow: var(--shadow-lg);
+    grid-column: span 2;
 
     .billing-card__label {
       color: rgba(255, 255, 255, 0.78);
@@ -66,13 +67,57 @@
 
     .billing-card__value {
       color: #fff;
-      font-size: var(--font-xl);
+      font-size: var(--font-2xl);
       letter-spacing: -0.02em;
     }
 
     .billing-card__hint {
       color: rgba(255, 255, 255, 0.7);
     }
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+
+  &__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.18);
+    font-size: var(--font-xs);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: #fff;
+  }
+
+  &__bar {
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.18);
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  &__bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.7) 100%);
+    border-radius: var(--radius-full);
+    transition: width 0.4s ease;
+  }
+
+  &__skel {
+    display: inline-block;
+    width: 200px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, rgba(255,255,255,0.15) 25%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.15) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
   }
 
   &__icon {
@@ -169,4 +214,9 @@
     background: var(--color-success-bg);
     color: var(--color-success);
   }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }

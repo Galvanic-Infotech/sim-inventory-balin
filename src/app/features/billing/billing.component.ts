@@ -10,18 +10,13 @@ import { PaginationMeta } from '../../shared/models/rbac.model';
 import { TableQueryParams } from '../../shared/models/table-query.model';
 import { tableQueryFromLazyEvent } from '../../shared/utils/table-query.util';
 import {
+  BillingConfig,
   BillingTransaction,
+  availableCredit,
+  creditUtilisationPct,
   isCredit,
   transactionNet,
 } from '../../shared/models/billing.model';
-
-interface Summary {
-  totalDebited: number;
-  totalCredited: number;
-  totalTax: number;
-  avgActivatedSims: number;
-  latestRate: number;
-}
 
 @Component({
   selector: 'app-billing',
@@ -42,11 +37,23 @@ export class BillingComponent {
   readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 10 });
   readonly tableFirst = signal(0);
 
+  readonly config = signal<BillingConfig | null>(null);
+  readonly configLoading = signal(false);
+  readonly configError = signal('');
+
+  readonly availableCredit = computed(() => {
+    const c = this.config();
+    return c ? availableCredit(c) : 0;
+  });
+  readonly utilisationPct = computed(() => {
+    const c = this.config();
+    return c ? creditUtilisationPct(c) : 0;
+  });
+
   readonly totalRecords = computed(() => this.pagination()?.totalCount ?? 0);
 
-  readonly summary = computed<Summary>(() => this.buildSummary(this.items()));
-
   private fetchGen = 0;
+  private configGen = 0;
   private tableReady = false;
   private lastQuerySig = '';
 
@@ -55,11 +62,37 @@ export class BillingComponent {
 
   constructor() {
     effect(() => {
-      this.auth.entityId();
+      const eid = this.auth.entityId();
       this.lastQuerySig = '';
       this.tableFirst.set(0);
       this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
-      // Don't fetch here — PrimeNG re-emits onLazyLoad when [first] resets.
+      // Don't fetch transactions here — PrimeNG re-emits onLazyLoad when [first] resets.
+      if (eid) {
+        this.fetchConfig(eid);
+      } else {
+        this.config.set(null);
+      }
+    });
+  }
+
+  fetchConfig(entityId?: string): void {
+    const eid = entityId ?? this.auth.entityId();
+    if (!eid) return;
+    const gen = ++this.configGen;
+    this.configLoading.set(true);
+    this.configError.set('');
+    this.billing.fetchConfig(eid).subscribe({
+      next: (cfg) => {
+        if (gen !== this.configGen) return;
+        this.configLoading.set(false);
+        this.config.set(cfg);
+      },
+      error: (err) => {
+        if (gen !== this.configGen) return;
+        this.configLoading.set(false);
+        this.config.set(null);
+        this.configError.set(extractApiError(err, this.i18n.instant('billing.errors.loadConfig')));
+      },
     });
   }
 
@@ -96,32 +129,4 @@ export class BillingComponent {
     });
   }
 
-  private buildSummary(items: BillingTransaction[]): Summary {
-    if (!items.length) {
-      return {
-        totalDebited: 0,
-        totalCredited: 0,
-        totalTax: 0,
-        avgActivatedSims: 0,
-        latestRate: 0,
-      };
-    }
-    let debited = 0;
-    let credited = 0;
-    let tax = 0;
-    let activated = 0;
-    for (const t of items) {
-      debited += t.debitedAmount;
-      credited += t.creditedAmount;
-      tax += t.taxAmount;
-      activated += t.totalActivatedSims;
-    }
-    return {
-      totalDebited: debited,
-      totalCredited: credited,
-      totalTax: tax,
-      avgActivatedSims: Math.round(activated / items.length),
-      latestRate: items[0].dailyRate,
-    };
-  }
 }

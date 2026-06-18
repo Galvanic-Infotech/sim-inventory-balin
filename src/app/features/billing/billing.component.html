@@ -7,39 +7,67 @@
     <p class="billing__subtitle">{{ 'billing.subtitle' | translate }}</p>
   </div>
 
-  <!-- Summary tiles -->
+  @if (configError()) {
+    <div class="alert alert-danger">
+      <span class="material-icons">error</span> {{ configError() }}
+      <button class="btn btn-ghost" (click)="fetchConfig()">{{ 'common.retry' | translate }}</button>
+    </div>
+  }
+
+  <!-- Account summary tiles -->
   <section class="billing__summary">
     <article class="billing-card billing-card--accent">
-      <span class="billing-card__label">{{ 'billing.summary.pageDebited' | translate }}</span>
-      <span class="billing-card__value">{{ summary().totalDebited | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
-      <span class="billing-card__hint">{{ 'billing.summary.thisPage' | translate }}</span>
+      <div class="billing-card__head">
+        <span class="billing-card__label">{{ 'billing.summary.outstanding' | translate }}</span>
+        <span class="billing-card__pill">{{ utilisationPct() | number:'1.0-1' }}% used</span>
+      </div>
+      @if (configLoading() && !config()) {
+        <span class="billing-card__skel"></span>
+      } @else {
+        <span class="billing-card__value">{{ config()?.currentOutstanding ?? 0 | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+      }
+      <div class="billing-card__bar">
+        <div class="billing-card__bar-fill" [style.width.%]="utilisationPct()"></div>
+      </div>
+      <span class="billing-card__hint">{{ 'billing.summary.outstandingHint' | translate }}</span>
     </article>
-    <article class="billing-card">
-      <div class="billing-card__icon" style="background: var(--color-success-bg); color: var(--color-success)">
-        <span class="material-icons">savings</span>
-      </div>
-      <div>
-        <span class="billing-card__label">{{ 'billing.summary.pageCredited' | translate }}</span>
-        <span class="billing-card__value billing-card__value--md">{{ summary().totalCredited | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
-      </div>
-    </article>
-    <article class="billing-card">
-      <div class="billing-card__icon" style="background: var(--color-warning-bg); color: var(--color-warning)">
-        <span class="material-icons">receipt</span>
-      </div>
-      <div>
-        <span class="billing-card__label">{{ 'billing.summary.pageTax' | translate }}</span>
-        <span class="billing-card__value billing-card__value--md">{{ summary().totalTax | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
-      </div>
-    </article>
+
     <article class="billing-card">
       <div class="billing-card__icon" style="background: var(--color-primary-soft); color: var(--color-primary)">
-        <span class="material-icons">sim_card</span>
+        <span class="material-icons">credit_score</span>
       </div>
       <div>
-        <span class="billing-card__label">{{ 'billing.summary.avgSims' | translate }}</span>
-        <span class="billing-card__value billing-card__value--md">{{ summary().avgActivatedSims | number }}</span>
-        <span class="billing-card__hint">{{ 'billing.summary.rate' | translate }}: {{ summary().latestRate | currency:'INR':'symbol-narrow':'1.4-4' }}</span>
+        <span class="billing-card__label">{{ 'billing.summary.creditLimit' | translate }}</span>
+        <span class="billing-card__value billing-card__value--md">{{ config()?.creditLimit ?? 0 | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+    </article>
+
+    <article class="billing-card">
+      <div class="billing-card__icon" [style.background]="availableCredit() >= 0 ? 'var(--color-success-bg)' : 'var(--color-danger-bg)'" [style.color]="availableCredit() >= 0 ? 'var(--color-success)' : 'var(--color-danger)'">
+        <span class="material-icons">{{ availableCredit() >= 0 ? 'account_balance_wallet' : 'warning' }}</span>
+      </div>
+      <div>
+        <span class="billing-card__label">{{ 'billing.summary.available' | translate }}</span>
+        <span class="billing-card__value billing-card__value--md" [style.color]="availableCredit() >= 0 ? 'var(--color-text-primary)' : 'var(--color-danger)'">
+          {{ availableCredit() | currency:'INR':'symbol-narrow':'1.2-2' }}
+        </span>
+        @if (availableCredit() < 0) {
+          <span class="billing-card__hint" style="color: var(--color-danger)">{{ 'billing.summary.overLimit' | translate }}</span>
+        }
+      </div>
+    </article>
+
+    <article class="billing-card">
+      <div class="billing-card__icon" style="background: var(--color-warning-bg); color: var(--color-warning)">
+        <span class="material-icons">payments</span>
+      </div>
+      <div>
+        <span class="billing-card__label">{{ 'billing.summary.rate' | translate }}</span>
+        <span class="billing-card__value billing-card__value--md">{{ config()?.dailyRate ?? 0 | currency:'INR':'symbol-narrow':'1.4-4' }}</span>
+        <span class="billing-card__hint">
+          {{ 'billing.summary.yearly' | translate }}: {{ config()?.yearlyAmount ?? 0 | currency:'INR':'symbol-narrow':'1.2-2' }}
+          · {{ 'billing.summary.tax' | translate }} {{ config()?.taxRate ?? 0 | number:'1.0-2' }}%
+        </span>
       </div>
     </article>
   </section>
