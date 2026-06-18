@@ -1,0 +1,52 @@
+<div class="dialog-backdrop" (click)="close(false)" aria-hidden="true">
+  <aside class="dialog-card" role="dialog" aria-modal="true" aria-labelledby="gen-title" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h3 id="gen-title">
+        <span class="material-icons" style="vertical-align: middle; color: var(--color-primary); margin-right: 8px">play_circle</span>
+        {{ 'billing.generate.title' | translate }}
+      </h3>
+      <button type="button" class="btn btn-ghost" [disabled]="saving()" (click)="close(false)" [attr.aria-label]="'common.close' | translate">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      @if (entityName()) {
+        <div class="assign-entity-banner" style="margin-bottom: var(--space-md)">
+          <span class="material-icons">business</span>
+          <strong>{{ entityName() }}</strong>
+        </div>
+      }
+
+      @if (error()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ error() }}
+        </div>
+      }
+      @if (successMsg()) {
+        <div class="alert alert-success">
+          <span class="material-icons">check_circle</span> {{ successMsg() }}
+        </div>
+      }
+
+      <p class="text-muted" style="margin-bottom: var(--space-md)">
+        {{ 'billing.generate.hint' | translate }}
+      </p>
+
+      <div class="form-group">
+        <label>{{ 'billing.generate.date' | translate }} *</label>
+        <input class="form-control" type="date" [(ngModel)]="date" [max]="maxDate" />
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-outline" [disabled]="saving()" (click)="close(false)">
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button type="button" class="btn btn-primary" [disabled]="saving()" (click)="submit()">
+        @if (saving()) { <span class="spinner"></span> } @else { <span class="material-icons">play_arrow</span> }
+        {{ 'billing.generate.submit' | translate }}
+      </button>
+    </div>
+  </aside>
+</div>

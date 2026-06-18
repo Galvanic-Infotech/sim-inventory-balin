@@ -13,11 +13,23 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { RbacEntity, RbacEntityType, PaginationMeta, EntityTypeResponseData } from '../../../shared/models/rbac.model';
 import { TableQueryParams } from '../../../shared/models/table-query.model';
 import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util';
+import { BillingConfigDrawerComponent } from '../../../shared/components/billing-config-drawer/billing-config-drawer.component';
+import { BillingCreditDialogComponent } from '../../../shared/components/billing-credit-dialog/billing-credit-dialog.component';
+import { BillingGenerateDialogComponent } from '../../../shared/components/billing-generate-dialog/billing-generate-dialog.component';
 
 @Component({
   selector: 'app-entities-tab',
   standalone: true,
-  imports: [FormsModule, TableModule, InputTextModule, SearchBarComponent, TranslatePipe],
+  imports: [
+    FormsModule,
+    TableModule,
+    InputTextModule,
+    SearchBarComponent,
+    TranslatePipe,
+    BillingConfigDrawerComponent,
+    BillingCreditDialogComponent,
+    BillingGenerateDialogComponent,
+  ],
   templateUrl: './entities-tab.component.html',
 })
 export class EntitiesTabComponent {
@@ -89,6 +101,35 @@ export class EntitiesTabComponent {
   readonly totalRecords = computed(() => this.pagination()?.totalCount ?? 0);
 
   readonly createEntityTypeId = signal('');
+
+  readonly billingEntity = signal<RbacEntity | null>(null);
+  readonly creditEntity = signal<RbacEntity | null>(null);
+  readonly generateEntity = signal<RbacEntity | null>(null);
+
+  openBillingDrawer(entity: RbacEntity): void {
+    this.billingEntity.set(entity);
+  }
+
+  closeBillingDrawer(saved: boolean): void {
+    this.billingEntity.set(null);
+    if (saved) this.fetch();
+  }
+
+  openCreditDialog(entity: RbacEntity): void {
+    this.creditEntity.set(entity);
+  }
+
+  closeCreditDialog(_saved: boolean): void {
+    this.creditEntity.set(null);
+  }
+
+  openGenerateDialog(entity: RbacEntity): void {
+    this.generateEntity.set(entity);
+  }
+
+  closeGenerateDialog(_saved: boolean): void {
+    this.generateEntity.set(null);
+  }
 
   name = '';
   description = '';

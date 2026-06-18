@@ -70,6 +70,7 @@ export interface RbacEntity {
   description: string;
   entityType?: { id: string; name: string };
   entityTypes?: { id: string; name: string }[];
+  isBillingEnabled?: boolean;
 }
 
 export interface CreateEntityRequest {

@@ -7,12 +7,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = auth.getToken();
 
   if (token) {
-    req = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-        'X-Entity-ID': auth.entityId(),
-      },
-    });
+    const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+    // Respect caller-set X-Entity-ID; only inject from auth state when absent.
+    if (!req.headers.has('X-Entity-ID')) {
+      headers['X-Entity-ID'] = auth.entityId();
+    }
+    req = req.clone({ setHeaders: headers });
   }
 
   return next(req);

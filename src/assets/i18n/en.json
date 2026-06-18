@@ -820,7 +820,12 @@
       "namePlaceholder": "{{label}} name",
       "currentTypes": "Current types",
       "searchTypes": "Search entity types...",
-      "noTypesMatch": "No entity types match"
+      "noTypesMatch": "No entity types match",
+      "billing": "Billing",
+      "billingEnabled": "Billing enabled",
+      "editBilling": "Edit billing config",
+      "addCredit": "Add credit",
+      "generateBill": "Generate bill"
     },
     "roles": {
       "title": "Roles",
@@ -1005,6 +1010,44 @@
     "errors": {
       "load": "Failed to load billing transactions",
       "loadConfig": "Failed to load billing configuration"
+    },
+    "credit": {
+      "title": "Add Credit",
+      "amount": "Amount (₹)",
+      "amountPlaceholder": "e.g. 5000",
+      "notes": "Notes",
+      "notesPlaceholder": "Reference / payment method / remarks",
+      "submit": "Add Credit",
+      "errors": {
+        "amount": "Amount must be greater than zero",
+        "save": "Failed to add credit"
+      }
+    },
+    "generate": {
+      "title": "Generate Bill",
+      "hint": "Generates the daily billing entry for the selected date for this entity.",
+      "date": "Date",
+      "submit": "Generate",
+      "errors": {
+        "date": "Pick a date",
+        "save": "Failed to generate bill"
+      }
+    },
+    "config": {
+      "title": "Billing Configuration",
+      "editTitle": "Edit configuration",
+      "yearlyAmount": "Yearly amount (₹)",
+      "yearInDays": "Year in days",
+      "taxRate": "Tax rate (%)",
+      "creditLimit": "Credit limit (₹)",
+      "derivedRate": "Computed daily rate",
+      "againstLimit": "Against credit limit",
+      "save": "Save changes",
+      "errors": {
+        "days": "Year in days must be greater than zero",
+        "negative": "Values cannot be negative",
+        "save": "Failed to save billing configuration"
+      }
     }
   },
   "simInventory": {

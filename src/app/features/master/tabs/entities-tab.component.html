@@ -62,13 +62,32 @@
         <td>{{ rowIndex + 1 }}</td>
         <td>{{ e.name }}</td>
         <td>{{ e.description }}</td>
-        <td><span class="chip" [title]="e.entityType?.name ?? ''">{{ shortName(e.entityType?.name) }}</span></td>
+        <td>
+          <span class="chip" [title]="e.entityType?.name ?? ''">{{ shortName(e.entityType?.name) }}</span>
+          @if (e.isBillingEnabled) {
+            <span class="chip chip--primary" style="margin-left: 6px" [title]="'master.entities.billingEnabled' | translate">
+              <span class="material-icons" style="font-size: 12px; vertical-align: middle; margin-right: 2px">receipt_long</span>
+              {{ 'master.entities.billing' | translate }}
+            </span>
+          }
+        </td>
         @if (canAssignType()) {
           <td>
             <div class="action-cell">
               <button class="btn btn-ghost" [title]="'master.entities.assignType' | translate" (click)="openAssignDialog(e)">
                 <span class="material-icons">category</span>
               </button>
+              @if (e.isBillingEnabled) {
+                <button class="btn btn-ghost" [title]="'master.entities.editBilling' | translate" (click)="openBillingDrawer(e)">
+                  <span class="material-icons" style="color: var(--color-primary)">receipt_long</span>
+                </button>
+                <button class="btn btn-ghost" [title]="'master.entities.addCredit' | translate" (click)="openCreditDialog(e)">
+                  <span class="material-icons" style="color: var(--color-success)">savings</span>
+                </button>
+                <button class="btn btn-ghost" [title]="'master.entities.generateBill' | translate" (click)="openGenerateDialog(e)">
+                  <span class="material-icons" style="color: var(--color-warning)">play_circle</span>
+                </button>
+              }
             </div>
           </td>
         }
@@ -237,4 +256,31 @@
         </button>
       </div>
   </aside>
+}
+
+<!-- Billing Config Drawer -->
+@if (billingEntity(); as be) {
+  <app-billing-config-drawer
+    [entityId]="be.id"
+    [entityName]="be.name"
+    (closed)="closeBillingDrawer($event)"
+  />
+}
+
+<!-- Add Credit Dialog -->
+@if (creditEntity(); as ce) {
+  <app-billing-credit-dialog
+    [entityId]="ce.id"
+    [entityName]="ce.name"
+    (closed)="closeCreditDialog($event)"
+  />
+}
+
+<!-- Generate Bill Dialog -->
+@if (generateEntity(); as ge) {
+  <app-billing-generate-dialog
+    [entityId]="ge.id"
+    [entityName]="ge.name"
+    (closed)="closeGenerateDialog($event)"
+  />
 }

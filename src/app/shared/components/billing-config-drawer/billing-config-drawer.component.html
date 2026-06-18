@@ -1,0 +1,95 @@
+<div class="drawer-backdrop" (click)="close(false)" aria-hidden="true"></div>
+<aside class="drawer-panel drawer-panel--wide" role="dialog" aria-modal="true" aria-labelledby="billing-cfg-title">
+  <div class="dialog-header">
+    <h3 id="billing-cfg-title">
+      <span class="material-icons" style="vertical-align: middle; color: var(--color-primary); margin-right: 8px">receipt_long</span>
+      {{ 'billing.config.title' | translate }}
+    </h3>
+    <button type="button" class="btn btn-ghost" (click)="close(false)" [disabled]="saving()" [attr.aria-label]="'common.close' | translate">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    @if (entityName()) {
+      <div class="assign-entity-banner" style="margin-bottom: var(--space-md)">
+        <span class="material-icons">business</span>
+        <strong>{{ entityName() }}</strong>
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="tab-loading"><div class="spinner spinner--dark spinner--lg"></div></div>
+    } @else {
+      @if (loadError()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ loadError() }}
+          <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+        </div>
+      }
+
+      @if (config(); as cfg) {
+        <div class="cfg-stats">
+          <div class="cfg-stat">
+            <span class="cfg-stat__label">{{ 'billing.summary.outstanding' | translate }}</span>
+            <strong>{{ cfg.currentOutstanding | currency:'INR':'symbol-narrow':'1.2-2' }}</strong>
+            <span class="cfg-stat__hint">{{ utilisation() | number:'1.0-1' }}% of limit</span>
+            <div class="cfg-bar"><div class="cfg-bar__fill" [style.width.%]="utilisation()"></div></div>
+          </div>
+          <div class="cfg-stat">
+            <span class="cfg-stat__label">{{ 'billing.summary.available' | translate }}</span>
+            <strong [style.color]="available() >= 0 ? 'var(--color-success)' : 'var(--color-danger)'">
+              {{ available() | currency:'INR':'symbol-narrow':'1.2-2' }}
+            </strong>
+            <span class="cfg-stat__hint">{{ 'billing.config.againstLimit' | translate }}</span>
+          </div>
+        </div>
+      }
+
+      @if (saveError()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ saveError() }}
+        </div>
+      }
+
+      <h4 class="cfg-section">{{ 'billing.config.editTitle' | translate }}</h4>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>{{ 'billing.config.yearlyAmount' | translate }} *</label>
+          <input class="form-control" type="number" min="0" step="0.01" [(ngModel)]="yearlyAmount" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'billing.config.yearInDays' | translate }} *</label>
+          <input class="form-control" type="number" min="1" step="1" [(ngModel)]="yearInDays" />
+        </div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>{{ 'billing.config.taxRate' | translate }} *</label>
+          <input class="form-control" type="number" min="0" max="100" step="0.01" [(ngModel)]="taxRate" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'billing.config.creditLimit' | translate }} *</label>
+          <input class="form-control" type="number" min="0" step="0.01" [(ngModel)]="creditLimit" />
+        </div>
+      </div>
+
+      <div class="cfg-derived">
+        <span class="material-icons">calculate</span>
+        <span>{{ 'billing.config.derivedRate' | translate }}: <strong>{{ derivedDailyRate() | currency:'INR':'symbol-narrow':'1.4-4' }}</strong></span>
+      </div>
+    }
+  </div>
+
+  <div class="dialog-footer">
+    <button type="button" class="btn btn-outline" [disabled]="saving()" (click)="close(false)">
+      {{ 'common.cancel' | translate }}
+    </button>
+    <button type="button" class="btn btn-primary" [disabled]="saving() || loading() || !!loadError()" (click)="save()">
+      @if (saving()) { <span class="spinner"></span> } @else { <span class="material-icons">save</span> }
+      {{ 'billing.config.save' | translate }}
+    </button>
+  </div>
+</aside>
