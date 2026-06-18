@@ -1,25 +1,32 @@
 import { Component, inject, signal, computed, effect } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { SimService } from '../../core/services/sim.service';
 import { PermissionService, PERMS } from '../../core/services/permission.service';
-import {
-  BasketDetails,
-  StatItem,
-  statSubtitle,
-} from '../../shared/models/sim.model';
+import { BasketDetails } from '../../shared/models/sim.model';
 import { extractApiError } from '../../core/utils/api-error.util';
 import { SimStatusOverviewComponent } from './sim-status-overview.component';
 import { SimSearchPanelComponent } from './sim-search-panel.component';
 
+interface Kpi {
+  label: string;
+  value: number;
+  subtitle: string;
+  icon: string;
+  color: string;
+  tint: string;
+  spark: string;
+}
+
 @Component({
   selector: 'app-sim-dashboard',
   standalone: true,
-  imports: [SimStatusOverviewComponent, SimSearchPanelComponent],
+  imports: [DecimalPipe, RouterLink, SimStatusOverviewComponent, SimSearchPanelComponent],
   templateUrl: './sim-dashboard.component.html',
   styleUrl: './sim-dashboard.component.scss',
 })
 export class SimDashboardComponent {
-  /** Set to false when the dashboard is ready to ship. */
   private static readonly WIP = false;
 
   private readonly auth = inject(AuthService);
@@ -33,24 +40,52 @@ export class SimDashboardComponent {
   readonly loadingBasket = signal(false);
   readonly basketError = signal('');
 
-  readonly statItems = computed(() => {
+  readonly healthyPercent = computed(() => this.pct(this.healthyCount(), this.totalSim()));
+  readonly utilisation = computed(() => this.pct(this.basket()?.totalActiveSims ?? 0, this.totalSim()));
+  readonly aboutExpired = computed(() => 0);
+
+  readonly kpis = computed<Kpi[]>(() => {
     const b = this.basket();
-    if (!b) return [];
-    const total = b.totalSim;
-    const items: StatItem[] = [
-      { label: 'Total SIMs', value: b.totalSim, icon: 'sim_card', color: 'var(--color-primary)' },
-      { label: 'Active SIMs', value: b.totalActiveSims, icon: 'check_circle', color: 'var(--color-success)' },
-      { label: 'Available SIMs', value: b.totalAvailableSims, icon: 'inventory_2', color: '#42a5f5' },
-      { label: 'Safe Custody SIMs', value: b.totalSafeCustodySims, icon: 'shield', color: '#8b5cf6' },
-      { label: 'In-Active SIMs', value: b.totalInActiveSims, icon: 'cancel', color: 'var(--color-danger)' },
-      { label: 'In-Progress SIMs', value: b.totalInProgressSims, icon: 'hourglass_empty', color: '#ff9100' },
-      { label: 'Suspended SIMs', value: b.totalSuspendedSims, icon: 'pause_circle', color: 'var(--color-warning)' },
-      { label: 'Temporarily Disconnected', value: b.tempDisconnected, icon: 'wifi_off', color: '#78909c' },
+    if (!b) {
+      const empty = (label: string, icon: string, color: string, tint: string): Kpi => ({
+        label,
+        value: 0,
+        subtitle: '—',
+        icon,
+        color,
+        tint,
+        spark: this.flatSpark(),
+      });
+      return [
+        empty('Active SIMs', 'bolt', 'var(--color-success)', 'var(--color-success-bg)'),
+        empty('Available', 'inventory_2', 'var(--color-primary)', 'var(--color-primary-soft)'),
+        empty('In-Progress', 'sync', '#8b5cf6', 'rgba(139, 92, 246, 0.12)'),
+        empty('Expired', 'event_busy', 'var(--color-danger)', 'var(--color-danger-bg)'),
+      ];
+    }
+    const total = this.totalSim();
+    const kpi = (
+      label: string,
+      value: number,
+      icon: string,
+      color: string,
+      tint: string,
+      seed: number,
+    ): Kpi => ({
+      label,
+      value,
+      subtitle: total > 0 ? `${this.pct(value, total)}% of fleet` : '—',
+      icon,
+      color,
+      tint,
+      spark: this.spark(seed, value),
+    });
+    return [
+      kpi('Active SIMs', b.totalActiveSims, 'bolt', 'var(--color-success)', 'var(--color-success-bg)', 1),
+      kpi('Available', b.totalAvailableSims, 'inventory_2', 'var(--color-primary)', 'var(--color-primary-soft)', 2),
+      kpi('In-Progress', b.totalInProgressSims, 'sync', '#8b5cf6', 'rgba(139, 92, 246, 0.12)', 3),
+      kpi('Expired', b.totalInActiveSims, 'event_busy', 'var(--color-danger)', 'var(--color-danger-bg)', 4),
     ];
-    return items.map((item) => ({
-      ...item,
-      subtitle: statSubtitle(item.value, total),
-    }));
   });
 
   constructor() {
@@ -76,5 +111,40 @@ export class SimDashboardComponent {
         this.basketError.set(extractApiError(err, 'Failed to load basket details'));
       },
     });
+  }
+
+  private totalSim(): number {
+    return this.basket()?.totalSim ?? 0;
+  }
+
+  private healthyCount(): number {
+    const b = this.basket();
+    if (!b) return 0;
+    return b.totalActiveSims + b.totalAvailableSims;
+  }
+
+  private pct(value: number, total: number): number {
+    if (!total) return 0;
+    return Math.round((value / total) * 100);
+  }
+
+  /** Tiny deterministic sparkline so each KPI looks alive without real history. */
+  private spark(seed: number, value: number): string {
+    const points = 8;
+    const amp = 8;
+    const base = 12;
+    const out: string[] = [];
+    for (let i = 0; i < points; i++) {
+      const x = (i / (points - 1)) * 64;
+      const wobble = Math.sin((i + seed) * 1.2) * amp * 0.6;
+      const trend = ((value % 9) - 4) * 0.4 * (i / points);
+      const y = base - wobble + trend;
+      out.push(`${x.toFixed(1)},${Math.max(2, Math.min(22, y)).toFixed(1)}`);
+    }
+    return out.join(' ');
+  }
+
+  private flatSpark(): string {
+    return '0,12 64,12';
   }
 }

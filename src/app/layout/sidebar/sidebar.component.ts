@@ -46,6 +46,11 @@ export class SidebarComponent {
         route: '/sim-inventory',
         permission: PERMS.SIM_VIEW,
       },
+      {
+        label: t('layout.nav.billing'),
+        icon: 'receipt_long',
+        route: '/billing',
+      },
       { label: t('layout.nav.master'), icon: 'dataset', route: '/master' },
     ];
   });

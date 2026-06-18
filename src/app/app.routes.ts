@@ -40,6 +40,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'billing',
+        loadComponent: () =>
+          import('./features/billing/billing.component').then(
+            (m) => m.BillingComponent,
+          ),
+      },
+      {
         path: 'master',
         loadComponent: () =>
           import('./features/master/master.component').then(

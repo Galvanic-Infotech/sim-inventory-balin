@@ -100,6 +100,7 @@
     "nav": {
       "dashboard": "Dashboard",
       "simInventory": "SIM Inventory",
+      "billing": "Billing History",
       "master": "Master",
       "oem": "OEM",
       "devices": "Devices",
@@ -975,6 +976,33 @@
     "title": "Admin",
     "subtitle": "System administration",
     "comingSoon": "Admin panel coming soon"
+  },
+  "billing": {
+    "title": "Billing History",
+    "subtitle": "Daily SIM billing transactions, debits, credits and applied tax.",
+    "tableTitle": "Transactions",
+    "empty": "No transactions found",
+    "summary": {
+      "pageDebited": "Debited (this page)",
+      "pageCredited": "Credited (this page)",
+      "pageTax": "Tax (this page)",
+      "avgSims": "Avg active SIMs",
+      "thisPage": "Sum across visible rows",
+      "rate": "Daily rate"
+    },
+    "columns": {
+      "date": "Date",
+      "type": "Type",
+      "activeSims": "Active SIMs",
+      "rate": "Rate",
+      "debited": "Debited",
+      "tax": "Tax",
+      "credited": "Credited",
+      "net": "Net"
+    },
+    "errors": {
+      "load": "Failed to load billing transactions"
+    }
   },
   "simInventory": {
     "title": "SIM Inventory",

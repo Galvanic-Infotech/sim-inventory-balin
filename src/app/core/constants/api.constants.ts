@@ -64,6 +64,7 @@ export const API_ENDPOINTS = {
     SMS_WHITELIST_PATCH: '/SimActivation/patch-sms-whitelisting',
     INVENTORY: '/SimActivation/sim-inventory',
     INVENTORY_UPDATE: '/SimActivation/sim-inventory-update',
+    BILLING_TRANSACTIONS: '/SimBilling/transactions',
   },
 };
 

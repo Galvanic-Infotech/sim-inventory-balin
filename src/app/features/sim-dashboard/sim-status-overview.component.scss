@@ -2,9 +2,9 @@
   padding: var(--space-lg);
 
   &__title {
-    font-size: var(--font-md);
-    font-weight: 600;
-    margin: 0 0 var(--space-lg);
+    font-size: var(--font-base);
+    font-weight: 700;
+    margin: 0 0 var(--space-md);
     color: var(--color-text-primary);
   }
 
@@ -17,91 +17,103 @@
 
   &__donut-wrap {
     flex-shrink: 0;
+    padding: var(--space-sm);
   }
 
   &__donut {
-    width: 170px;
-    height: 170px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 8px 24px rgba(15, 46, 54, 0.06);
   }
 
   &__donut-hole {
-    width: 110px;
-    height: 110px;
+    width: 124px;
+    height: 124px;
     border-radius: 50%;
     background: var(--color-bg-card);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-xs);
+    gap: 2px;
   }
 
   &__donut-label {
     font-size: var(--font-xs);
     color: var(--color-text-muted);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
   }
 
   &__donut-value {
     font-size: var(--font-xl);
     font-weight: 700;
     color: var(--color-text-primary);
+    letter-spacing: -0.02em;
   }
 
   &__bars {
     flex: 1;
-    min-width: 240px;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   &__bar-row {
     display: grid;
-    grid-template-columns: 8px 140px 1fr 88px;
+    grid-template-columns: 10px 130px 1fr 88px;
     align-items: center;
     gap: var(--space-sm);
-    padding: 5px 0;
+    padding: 6px 0;
   }
 
   &__dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
   }
 
   &__bar-label {
     font-size: var(--font-sm);
-    color: var(--color-text-secondary);
+    color: var(--color-text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   &__bar-track {
-    height: 6px;
-    background: var(--color-bg-page);
-    border-radius: var(--radius-sm);
+    height: 8px;
+    background: var(--color-bg-subtle);
+    border-radius: var(--radius-full);
     overflow: hidden;
   }
 
   &__bar-fill {
     height: 100%;
-    border-radius: var(--radius-sm);
-    transition: width 0.3s ease;
+    border-radius: var(--radius-full);
+    transition: width 0.35s ease;
   }
 
   &__bar-value {
     font-size: var(--font-xs);
-    font-weight: 500;
+    font-weight: 600;
     color: var(--color-text-secondary);
     text-align: right;
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .status-overview__body {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .status-overview__bar-row {
+    grid-template-columns: 10px 110px 1fr 70px;
   }
 }

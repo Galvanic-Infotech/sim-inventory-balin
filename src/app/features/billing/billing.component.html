@@ -1,0 +1,132 @@
+<div class="billing">
+  <div class="billing__heading">
+    <div class="billing__eyebrow">
+      <span class="material-icons">receipt_long</span>
+      <span>{{ 'billing.title' | translate }}</span>
+    </div>
+    <p class="billing__subtitle">{{ 'billing.subtitle' | translate }}</p>
+  </div>
+
+  <!-- Summary tiles -->
+  <section class="billing__summary">
+    <article class="billing-card billing-card--accent">
+      <span class="billing-card__label">{{ 'billing.summary.pageDebited' | translate }}</span>
+      <span class="billing-card__value">{{ summary().totalDebited | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+      <span class="billing-card__hint">{{ 'billing.summary.thisPage' | translate }}</span>
+    </article>
+    <article class="billing-card">
+      <div class="billing-card__icon" style="background: var(--color-success-bg); color: var(--color-success)">
+        <span class="material-icons">savings</span>
+      </div>
+      <div>
+        <span class="billing-card__label">{{ 'billing.summary.pageCredited' | translate }}</span>
+        <span class="billing-card__value billing-card__value--md">{{ summary().totalCredited | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+    </article>
+    <article class="billing-card">
+      <div class="billing-card__icon" style="background: var(--color-warning-bg); color: var(--color-warning)">
+        <span class="material-icons">receipt</span>
+      </div>
+      <div>
+        <span class="billing-card__label">{{ 'billing.summary.pageTax' | translate }}</span>
+        <span class="billing-card__value billing-card__value--md">{{ summary().totalTax | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+    </article>
+    <article class="billing-card">
+      <div class="billing-card__icon" style="background: var(--color-primary-soft); color: var(--color-primary)">
+        <span class="material-icons">sim_card</span>
+      </div>
+      <div>
+        <span class="billing-card__label">{{ 'billing.summary.avgSims' | translate }}</span>
+        <span class="billing-card__value billing-card__value--md">{{ summary().avgActivatedSims | number }}</span>
+        <span class="billing-card__hint">{{ 'billing.summary.rate' | translate }}: {{ summary().latestRate | currency:'INR':'symbol-narrow':'1.4-4' }}</span>
+      </div>
+    </article>
+  </section>
+
+  <!-- Table -->
+  <section class="billing__panel">
+    <div class="billing__panel-head">
+      <h3>{{ 'billing.tableTitle' | translate }}</h3>
+      @if (pagination(); as pg) {
+        <span class="count-badge">{{ pg.totalCount }}</span>
+      }
+      <span class="spacer"></span>
+      <button class="btn btn-ghost" (click)="fetch()" [title]="'common.refresh' | translate">
+        <span class="material-icons">refresh</span>
+      </button>
+    </div>
+
+    @if (error()) {
+      <div class="alert alert-danger">
+        <span class="material-icons">error</span> {{ error() }}
+        <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+      </div>
+    } @else {
+      <p-table
+        [value]="items()"
+        [lazy]="true"
+        (onLazyLoad)="onLazyLoad($event)"
+        [paginator]="true"
+        [rows]="tableQuery().pageSize ?? 10"
+        [rowsPerPageOptions]="[10, 25, 50, 100]"
+        [totalRecords]="totalRecords()"
+        [loading]="loading()"
+        [first]="tableFirst()"
+        styleClass="app-table"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'billing.columns.date' | translate }}</th>
+            <th>{{ 'billing.columns.type' | translate }}</th>
+            <th class="num">{{ 'billing.columns.activeSims' | translate }}</th>
+            <th class="num">{{ 'billing.columns.rate' | translate }}</th>
+            <th class="num">{{ 'billing.columns.debited' | translate }}</th>
+            <th class="num">{{ 'billing.columns.tax' | translate }}</th>
+            <th class="num">{{ 'billing.columns.credited' | translate }}</th>
+            <th class="num">{{ 'billing.columns.net' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-t>
+          <tr>
+            <td>
+              <div class="cell-stack">
+                <span class="cell-primary">{{ t.date | date:'mediumDate' }}</span>
+                <span class="cell-sub">{{ t.createdAt | date:'HH:mm' }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="txn-chip" [class.txn-chip--credit]="isCredit(t)">
+                <span class="material-icons">{{ isCredit(t) ? 'arrow_downward' : 'arrow_upward' }}</span>
+                {{ t.transactionType }}
+              </span>
+            </td>
+            <td class="num">{{ t.totalActivatedSims | number }}</td>
+            <td class="num">{{ t.dailyRate | currency:'INR':'symbol-narrow':'1.4-4' }}</td>
+            <td class="num">{{ t.debitedAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</td>
+            <td class="num">
+              <span class="cell-sub">{{ t.taxRate | number:'1.0-2' }}%</span>
+              <div>{{ t.taxAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</div>
+            </td>
+            <td class="num">{{ t.creditedAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</td>
+            <td class="num">
+              <strong [style.color]="isCredit(t) ? 'var(--color-success)' : 'var(--color-text-primary)'">
+                {{ isCredit(t) ? '+' : '−' }}{{ net(t) | currency:'INR':'symbol-narrow':'1.2-2' }}
+              </strong>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">
+              <div class="tab-empty">
+                <span class="material-icons">receipt_long</span>
+                <p>{{ 'billing.empty' | translate }}</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </section>
+</div>
