@@ -1,0 +1,126 @@
+<div class="dialog-backdrop" (click)="close(false)" aria-hidden="true">
+  <aside
+    class="dialog-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="sim-inv-edit-title"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="dialog-header">
+      <h3 id="sim-inv-edit-title">
+        @if (isSingle()) {
+          {{ 'simInventory.edit.titleOne' | translate }}
+        } @else {
+          {{ 'simInventory.edit.titleMany' | translate: { count: targets().length } }}
+        }
+      </h3>
+      <button
+        type="button"
+        class="btn btn-ghost"
+        (click)="close(false)"
+        [disabled]="isSaving()"
+        [attr.aria-label]="'common.close' | translate"
+      >
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      @if (errorMsg()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ errorMsg() }}
+        </div>
+      }
+
+      @if (isSingle()) {
+        @let item = targets()[0];
+        <div class="detail-grid" style="margin-bottom: var(--space-md)">
+          <div class="detail-item">
+            <span class="detail-label">{{ 'simInventory.columns.iccid' | translate }}</span>
+            <span class="detail-value">{{ item.iccid }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'simInventory.columns.mobile' | translate }}</span>
+            <span class="detail-value">{{ item.mobileNo || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'simInventory.columns.status' | translate }}</span>
+            <span class="detail-value">{{ item.status }}</span>
+          </div>
+        </div>
+      } @else {
+        <div class="alert alert-info" style="margin-bottom: var(--space-md)">
+          <span class="material-icons">info</span>
+          {{ 'simInventory.edit.bulkNote' | translate: { count: targets().length } }}
+        </div>
+      }
+
+      <div class="form-group">
+        <label>{{ 'simInventory.edit.validTill' | translate }} *</label>
+        <input
+          class="form-control"
+          type="date"
+          [min]="minDate"
+          [ngModel]="validTill()"
+          (ngModelChange)="validTill.set($event)"
+        />
+      </div>
+
+      @if (isSingle()) {
+        <div class="form-group">
+          <label>{{ 'simInventory.edit.customerName' | translate }}</label>
+          <input
+            class="form-control"
+            maxlength="120"
+            [ngModel]="customerName()"
+            (ngModelChange)="customerName.set($event)"
+          />
+        </div>
+        <div class="form-group">
+          <label>{{ 'simInventory.edit.iotId' | translate }}</label>
+          <input
+            class="form-control"
+            maxlength="64"
+            [ngModel]="iotId()"
+            (ngModelChange)="iotId.set($event)"
+          />
+        </div>
+      }
+
+      <div class="form-group">
+        <label>{{ 'simInventory.edit.remarks' | translate }}</label>
+        <textarea
+          class="form-control"
+          rows="2"
+          maxlength="500"
+          [ngModel]="remarks()"
+          (ngModelChange)="remarks.set($event)"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <button
+        type="button"
+        class="btn btn-outline"
+        [disabled]="isSaving()"
+        (click)="close(false)"
+      >
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="isSaving()"
+        (click)="submit()"
+      >
+        @if (isSaving()) {
+          <span class="spinner"></span>
+        } @else {
+          <span class="material-icons">save</span>
+        }
+        {{ 'simInventory.edit.submit' | translate }}
+      </button>
+    </div>
+  </aside>
+</div>

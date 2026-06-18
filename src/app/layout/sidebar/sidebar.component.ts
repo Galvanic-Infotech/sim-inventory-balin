@@ -40,6 +40,12 @@ export class SidebarComponent {
         route: '/dashboard',
         permission: PERMS.SIM_DASHBOARD,
       },
+      {
+        label: t('layout.nav.simInventory'),
+        icon: 'sim_card',
+        route: '/sim-inventory',
+        permission: PERMS.SIM_VIEW,
+      },
       { label: t('layout.nav.master'), icon: 'dataset', route: '/master' },
     ];
   });

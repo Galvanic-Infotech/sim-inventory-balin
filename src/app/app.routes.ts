@@ -33,6 +33,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'sim-inventory',
+        loadComponent: () =>
+          import('./features/sim-inventory/sim-inventory.component').then(
+            (m) => m.SimInventoryComponent,
+          ),
+      },
+      {
         path: 'master',
         loadComponent: () =>
           import('./features/master/master.component').then(

@@ -62,6 +62,8 @@ export const API_ENDPOINTS = {
     RESUME: '/SimActivation/resume-temp-disconnected',
     SMS_WHITELIST_FETCH: '/SimActivation/fetch-sms-whitelisting',
     SMS_WHITELIST_PATCH: '/SimActivation/patch-sms-whitelisting',
+    INVENTORY: '/SimActivation/sim-inventory',
+    INVENTORY_UPDATE: '/SimActivation/sim-inventory-update',
   },
 };
 

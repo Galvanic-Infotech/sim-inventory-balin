@@ -1,0 +1,141 @@
+<div class="page-header">
+  <h1>{{ 'simInventory.title' | translate }}</h1>
+  <p>{{ 'simInventory.subtitle' | translate }}</p>
+</div>
+
+<div class="tab-toolbar">
+  <div class="tab-toolbar-left">
+    <h3>{{ 'simInventory.tableTitle' | translate }}</h3>
+    @if (pagination(); as pg) {
+      <span class="count-badge">{{ pg.totalCount }}</span>
+    }
+  </div>
+  <div class="tab-toolbar-right">
+    <select
+      class="form-control filter-select"
+      [ngModel]="status()"
+      (ngModelChange)="onStatusChange($event)"
+    >
+      @for (s of statusOptions; track s) {
+        <option [value]="s">{{ 'simInventory.status.' + s | translate }}</option>
+      }
+    </select>
+    <app-search-bar
+      [placeholder]="'simInventory.searchPlaceholder' | translate"
+      [initialValue]="searchTerm()"
+      (searchChange)="onSearchChange($event)"
+    />
+    <button class="btn btn-ghost" (click)="fetch()" [title]="'common.refresh' | translate">
+      <span class="material-icons">refresh</span>
+    </button>
+  </div>
+</div>
+
+@if (selectedCount() > 0) {
+  <div class="bulk-bar">
+    <span class="material-icons bulk-bar__icon">check_circle</span>
+    <strong>{{ selectedCount() }} {{ 'simInventory.selected' | translate }}</strong>
+    <button class="btn btn-ghost btn-sm" (click)="toggleSelectAllOnPage()">
+      {{ (allOnPageSelected() ? 'simInventory.unselectPage' : 'simInventory.selectPage') | translate }}
+    </button>
+    <span class="spacer"></span>
+    <button class="btn btn-outline" (click)="clearSelection()">
+      <span class="material-icons">close</span> {{ 'simInventory.clear' | translate }}
+    </button>
+    @if (canEditPerm()) {
+      <button class="btn btn-primary" (click)="openEditForSelection()">
+        <span class="material-icons">edit</span> {{ 'simInventory.editSelected' | translate }}
+      </button>
+    }
+  </div>
+}
+
+@if (error()) {
+  <div class="alert alert-danger">
+    <span class="material-icons">error</span> {{ error() }}
+    <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+  </div>
+} @else {
+  <p-table
+    [value]="items()"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [paginator]="true"
+    [rows]="tableQuery().pageSize ?? 10"
+    [rowsPerPageOptions]="[10, 25, 50, 100]"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [first]="tableFirst()"
+    sortMode="single"
+    styleClass="app-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 3rem">
+          <input
+            type="checkbox"
+            [checked]="allOnPageSelected()"
+            (change)="toggleSelectAllOnPage()"
+            [attr.aria-label]="'simInventory.selectPage' | translate"
+          />
+        </th>
+        <th>{{ 'simInventory.columns.iccid' | translate }}</th>
+        <th>{{ 'simInventory.columns.mobile' | translate }}</th>
+        <th>{{ 'simInventory.columns.status' | translate }}</th>
+        <th>{{ 'simInventory.columns.customer' | translate }}</th>
+        <th>{{ 'simInventory.columns.activated' | translate }}</th>
+        <th>{{ 'simInventory.columns.validTill' | translate }}</th>
+        @if (canEditPerm()) {
+          <th style="width: 6rem"></th>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-it>
+      <tr>
+        <td>
+          <input
+            type="checkbox"
+            [checked]="isSelected(it.itemId)"
+            (change)="toggleSelected(it)"
+          />
+        </td>
+        <td class="cell-mono">{{ it.iccid }}</td>
+        <td>{{ it.mobileNo || '—' }}</td>
+        <td>
+          @if (it.status) {
+            <span [class]="statusChipClass(it.status)">{{ statusLabel(it.status) }}</span>
+          } @else {
+            —
+          }
+        </td>
+        <td>{{ it.customerName || '—' }}</td>
+        <td>{{ fmtDate(it.activationAt) }}</td>
+        <td>{{ fmtDate(it.validTill) }}</td>
+        @if (canEditPerm()) {
+          <td>
+            <button class="btn btn-ghost btn-sm" (click)="openEditForRow(it)" [title]="'simInventory.editLabel' | translate">
+              <span class="material-icons">edit</span> {{ 'simInventory.editLabel' | translate }}
+            </button>
+          </td>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="canEditPerm() ? 8 : 7">
+          <div class="tab-empty">
+            <span class="material-icons">sim_card</span>
+            <p>{{ 'simInventory.empty' | translate }}</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+}
+
+@if (editTargets(); as targets) {
+  <app-sim-inventory-edit-dialog
+    [targets]="targets"
+    (closed)="closeEdit($event)"
+  />
+}

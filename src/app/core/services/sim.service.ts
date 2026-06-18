@@ -14,6 +14,18 @@ import {
   parseSimDetail,
   parseSmsWhitelisting,
 } from '../../shared/models/sim.model';
+import { PaginationMeta, RbacResponse } from '../../shared/models/rbac.model';
+import {
+  SimInventoryItem,
+  parseSimInventoryItem,
+} from '../../shared/models/sim-inventory.model';
+import { TableQueryParams } from '../../shared/models/table-query.model';
+import { toQueryRecord } from '../../shared/utils/table-query.util';
+
+export interface SimInventoryListResult {
+  items: SimInventoryItem[];
+  pagination: PaginationMeta | null;
+}
 
 @Injectable({ providedIn: 'root' })
 export class SimService {
@@ -42,6 +54,48 @@ export class SimService {
     remarks: string;
   }): Observable<void> {
     return this.post<void>(API_ENDPOINTS.SIM.ACTIVATION, payload);
+  }
+
+  updateSimInventory(
+    items: {
+      itemId: string;
+      customerName: string;
+      remarks: string;
+      iotId: string;
+      validTill: string;
+    }[],
+  ): Observable<void> {
+    return this.http
+      .put<RbacResponse<unknown>>(API_ENDPOINTS.SIM.INVENTORY_UPDATE, items)
+      .pipe(map(() => undefined));
+  }
+
+  fetchSimInventory(
+    query: TableQueryParams = {},
+  ): Observable<SimInventoryListResult> {
+    const params = toQueryRecord(
+      {
+        pageNumber: query.pageNumber ?? 1,
+        pageSize: query.pageSize ?? 10,
+        sortBy: query.sortBy ?? 'activationAt',
+        sortOrder: query.sortOrder ?? 'desc',
+        searchTerm: query.searchTerm,
+        status:
+          query.status && query.status !== 'All' ? query.status : undefined,
+      },
+    );
+    let httpParams = new HttpParams();
+    Object.entries(params).forEach(([k, v]) => (httpParams = httpParams.set(k, v)));
+    return this.http
+      .get<RbacResponse<Record<string, unknown>[]>>(API_ENDPOINTS.SIM.INVENTORY, {
+        params: httpParams,
+      })
+      .pipe(
+        map((res) => ({
+          items: (res.data ?? []).map(parseSimInventoryItem),
+          pagination: res.metadata?.pagination ?? null,
+        })),
+      );
   }
 
   tempDisconnect(iccid: string, mobileNo: string): Observable<void> {

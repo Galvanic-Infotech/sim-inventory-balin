@@ -90,6 +90,7 @@
     "toggleSidebar": "साइडबार टॉगल करें",
     "nav": {
       "dashboard": "डैशबोर्ड",
+      "simInventory": "सिम इन्वेंटरी",
       "master": "मास्टर",
       "oem": "OEM",
       "devices": "डिवाइस",
@@ -964,5 +965,54 @@
     "title": "एडमिन",
     "subtitle": "सिस्टम प्रशासन",
     "comingSoon": "एडमिन पैनल जल्द आ रहा है"
+  },
+  "simInventory": {
+    "title": "सिम इन्वेंटरी",
+    "subtitle": "अपनी इन्वेंटरी में सिम ब्राउज़, फ़िल्टर और सक्रिय करें",
+    "tableTitle": "सिम",
+    "searchPlaceholder": "ICCID / मोबाइल / ग्राहक खोजें…",
+    "empty": "कोई सिम नहीं मिला",
+    "editLabel": "संपादित करें",
+    "editSelected": "चयनित संपादित करें",
+    "selected": "चयनित",
+    "selectPage": "पृष्ठ चुनें",
+    "unselectPage": "पृष्ठ अचयनित करें",
+    "clear": "साफ़ करें",
+    "status": {
+      "All": "सभी",
+      "Active": "सक्रिय",
+      "Initial": "आरंभिक",
+      "Available": "उपलब्ध",
+      "Fitted": "फ़िट",
+      "InProgress": "प्रगति में",
+      "AboutExpired": "जल्द समाप्त",
+      "Expired": "समाप्त",
+      "TempDisconnect": "अस्थायी डिस्कनेक्ट"
+    },
+    "columns": {
+      "iccid": "ICCID",
+      "mobile": "मोबाइल",
+      "status": "स्थिति",
+      "customer": "ग्राहक",
+      "activated": "सक्रिय किया",
+      "validTill": "वैध तक"
+    },
+    "edit": {
+      "titleOne": "सिम संपादित करें",
+      "titleMany": "{{count}} सिम संपादित करें",
+      "bulkNote": "{{count}} चयनित सिम पर समान वैध तिथि और टिप्पणी लागू होगी।",
+      "validTill": "वैध तक",
+      "customerName": "ग्राहक का नाम",
+      "iotId": "IoT ID",
+      "remarks": "टिप्पणी",
+      "submit": "सहेजें",
+      "errors": {
+        "validTill": "वैध तिथि चुनें",
+        "generic": "सहेजना विफल"
+      }
+    },
+    "errors": {
+      "load": "सिम इन्वेंटरी लोड करने में विफल"
+    }
   }
 }

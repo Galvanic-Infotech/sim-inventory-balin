@@ -90,6 +90,7 @@
     "toggleSidebar": "Toggle sidebar",
     "nav": {
       "dashboard": "Dashboard",
+      "simInventory": "SIM Inventory",
       "master": "Master",
       "oem": "OEM",
       "devices": "Devices",
@@ -964,5 +965,54 @@
     "title": "Admin",
     "subtitle": "System administration",
     "comingSoon": "Admin panel coming soon"
+  },
+  "simInventory": {
+    "title": "SIM Inventory",
+    "subtitle": "Browse, filter and activate SIMs in your inventory",
+    "tableTitle": "SIMs",
+    "searchPlaceholder": "Search ICCID / mobile / customer…",
+    "empty": "No SIMs found",
+    "editLabel": "Edit",
+    "editSelected": "Edit Selected",
+    "selected": "selected",
+    "selectPage": "Select page",
+    "unselectPage": "Unselect page",
+    "clear": "Clear",
+    "status": {
+      "All": "All",
+      "Active": "Active",
+      "Initial": "Initial",
+      "Available": "Available",
+      "Fitted": "Fitted",
+      "InProgress": "In Progress",
+      "AboutExpired": "About to Expire",
+      "Expired": "Expired",
+      "TempDisconnect": "Temp Disconnected"
+    },
+    "columns": {
+      "iccid": "ICCID",
+      "mobile": "Mobile",
+      "status": "Status",
+      "customer": "Customer",
+      "activated": "Activated",
+      "validTill": "Valid Till"
+    },
+    "edit": {
+      "titleOne": "Edit SIM",
+      "titleMany": "Edit {{count}} SIMs",
+      "bulkNote": "Same Valid Till and Remarks will apply to all {{count}} selected SIMs.",
+      "validTill": "Valid Till",
+      "customerName": "Customer Name",
+      "iotId": "IoT ID",
+      "remarks": "Remarks",
+      "submit": "Save",
+      "errors": {
+        "validTill": "Pick a valid till date",
+        "generic": "Failed to save"
+      }
+    },
+    "errors": {
+      "load": "Failed to load SIM inventory"
+    }
   }
 }

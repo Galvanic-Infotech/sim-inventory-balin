@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, computed } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -18,19 +18,16 @@ import { LangSwitcherComponent } from '../../../shared/components/lang-switcher/
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly i18n = inject(TranslationService);
 
   readonly identifier = signal('');
   password = '';
-  captchaInput = '';
   showPassword = signal(false);
   loading = signal(false);
   errorMsg = signal('');
-  captcha = signal('');
-  readonly captchaRequired = signal(true);
 
   private readonly EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   private readonly MOBILE_RE = /^[6-9]\d{9}$/;
@@ -38,26 +35,6 @@ export class LoginComponent implements OnInit {
   readonly detectedMode = computed<LoginSearchBy>(() =>
     this.identifier().includes('@') ? 'email' : 'mobile',
   );
-
-  ngOnInit(): void {
-    const isLocalhost =
-      typeof window !== 'undefined' &&
-      (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
-      window.location.port === '4200';
-
-    this.captchaRequired.set(!isLocalhost);
-    if (this.captchaRequired()) this.refreshCaptcha();
-  }
-
-  refreshCaptcha(): void {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 5; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    this.captcha.set(code);
-    this.captchaInput = '';
-  }
 
   onSubmit(): void {
     const id = this.identifier().trim();
@@ -77,12 +54,6 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    if (this.captchaRequired() && this.captchaInput.trim().toUpperCase() !== this.captcha()) {
-      this.errorMsg.set(this.i18n.instant('auth.errors.invalidCaptcha'));
-      this.refreshCaptcha();
-      return;
-    }
-
     this.loading.set(true);
     this.errorMsg.set('');
 
@@ -98,7 +69,6 @@ export class LoginComponent implements OnInit {
         const msg = getApiResponseError(res, this.i18n.instant('auth.errors.invalidCredentials'));
         if (msg) {
           this.errorMsg.set(this.withAttempts(msg, extractAttemptsRemaining(res)));
-          this.refreshCaptcha();
           return;
         }
         this.router.navigate(['/dashboard']);
@@ -107,7 +77,6 @@ export class LoginComponent implements OnInit {
         this.loading.set(false);
         const msg = extractApiError(err, this.i18n.instant('auth.errors.loginFailed'));
         this.errorMsg.set(this.withAttempts(msg, extractAttemptsRemaining(err)));
-        this.refreshCaptcha();
       },
     });
   }
