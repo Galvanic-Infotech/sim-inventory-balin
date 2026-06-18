@@ -7,13 +7,6 @@
     <p class="billing__subtitle">{{ 'billing.subtitle' | translate }}</p>
   </div>
 
-  @if (configError()) {
-    <div class="alert alert-danger">
-      <span class="material-icons">error</span> {{ configError() }}
-      <button class="btn btn-ghost" (click)="fetchConfig()">{{ 'common.retry' | translate }}</button>
-    </div>
-  }
-
   <!-- Account summary tiles -->
   <section class="billing__summary">
     <article class="billing-card billing-card--accent">

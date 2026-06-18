@@ -66,7 +66,13 @@ export class BillingComponent {
       this.lastQuerySig = '';
       this.tableFirst.set(0);
       this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
-      // Don't fetch transactions here — PrimeNG re-emits onLazyLoad when [first] resets.
+      // Always refetch transactions on entity change.
+      // PrimeNG only re-emits onLazyLoad when [first] *changes* — if user was
+      // already on page 1, switching entity wouldn't trigger anything.
+      // The fetch() dedupe-by-signature blocks the PrimeNG echo when it does fire.
+      if (this.tableReady) {
+        this.fetch();
+      }
       if (eid) {
         this.fetchConfig(eid);
       } else {
