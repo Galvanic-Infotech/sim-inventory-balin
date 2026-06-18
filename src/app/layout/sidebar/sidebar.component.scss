@@ -1,7 +1,8 @@
 .sidebar {
   width: var(--sidebar-width);
   height: 100vh;
-  background: var(--color-bg-dark);
+  background: var(--color-bg-card);
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   transition: width 0.2s ease;
@@ -19,91 +20,169 @@
 .sidebar-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  min-height: 56px;
+  gap: 12px;
+  padding: 22px 20px;
+  min-height: 72px;
 
   .logo-icon {
-    font-size: 28px;
-    color: var(--color-primary-light);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    font-size: 22px;
     flex-shrink: 0;
   }
 
   .logo-text {
-    font-size: 1.25rem;
+    font-size: var(--font-base);
     font-weight: 700;
-    color: var(--color-text-light);
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
     white-space: nowrap;
   }
 
   .toggle-btn {
     margin-left: auto;
-    background: none;
-    border: none;
-    color: var(--color-text-muted);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
     cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
+    justify-content: center;
     flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+
+    .material-icons {
+      font-size: 18px;
+    }
 
     &:hover {
-      color: var(--color-text-light);
-      background: rgba(255, 255, 255, 0.08);
+      color: var(--color-primary);
+      background: var(--color-primary-soft);
     }
   }
 
   .collapsed & {
     justify-content: center;
-    padding: 16px 0;
+    padding: 22px 0;
 
-    .logo-icon {
+    .logo-text {
       display: none;
     }
 
     .toggle-btn {
-      margin-left: 0;
+      display: none;
     }
+  }
+}
+
+.sidebar-section-label {
+  padding: 12px 22px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+
+  .collapsed & {
+    text-align: center;
+    padding: 12px 0 8px;
   }
 }
 
 .sidebar-nav {
   flex: 1;
-  padding: 8px;
+  padding: 4px 12px 8px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: var(--color-text-muted);
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
   font-weight: 500;
-  transition: all 0.15s ease;
+  transition: background 0.15s, color 0.15s;
   white-space: nowrap;
 
   .nav-icon {
-    font-size: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-subtle);
+    color: var(--color-text-secondary);
+    font-size: 18px;
     flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
   }
 
   &:hover {
-    color: var(--color-text-light);
-    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-text-primary);
+    background: var(--color-bg-subtle);
+
+    .nav-icon {
+      color: var(--color-primary);
+    }
   }
 
   &.active {
-    color: #fff;
-    background: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-primary-soft);
+    font-weight: 600;
 
     .nav-icon {
+      background: var(--color-primary);
       color: #fff;
     }
+  }
+
+  .collapsed & {
+    justify-content: center;
+    padding: 10px 0;
+    gap: 0;
+
+    .nav-label {
+      display: none;
+    }
+  }
+}
+
+.sidebar-footer {
+  padding: 16px 22px 20px;
+  border-top: 1px solid var(--color-border-light);
+
+  small {
+    display: block;
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    line-height: 1.4;
+
+    &.brand {
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+  }
+
+  .collapsed & {
+    display: none;
   }
 }

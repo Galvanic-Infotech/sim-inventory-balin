@@ -11,6 +11,10 @@
     </button>
   </div>
 
+  @if (!collapsed()) {
+    <div class="sidebar-section-label">{{ 'layout.mainMenu' | translate }}</div>
+  }
+
   <nav class="sidebar-nav">
     @for (item of navItems(); track item.route) {
       <a
@@ -25,4 +29,11 @@
       </a>
     }
   </nav>
+
+  @if (!collapsed()) {
+    <div class="sidebar-footer">
+      <small class="brand">{{ 'layout.portalTitle' | translate }}</small>
+      <small>{{ 'auth.footerCopy' | translate }}</small>
+    </div>
+  }
 </aside>

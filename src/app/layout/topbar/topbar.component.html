@@ -1,6 +1,7 @@
 <header class="topbar">
   <div class="topbar-left">
-    <h2 class="page-title">{{ 'layout.portalTitle' | translate }}</h2>
+    <h2 class="page-title">{{ 'layout.welcome' | translate }}</h2>
+    <p class="page-greeting">{{ 'layout.welcomeBack' | translate: { name: userName() } }}</p>
   </div>
   <div class="topbar-right">
     <app-lang-switcher />

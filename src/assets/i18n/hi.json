@@ -94,6 +94,9 @@
     "appName": "बालिन",
     "portalTitle": "बालिन इन्वेंटरी पोर्टल",
     "toggleSidebar": "साइडबार टॉगल करें",
+    "mainMenu": "मुख्य मेनू",
+    "welcome": "वापसी पर स्वागत है",
+    "welcomeBack": "नमस्ते {{name}}, वापसी पर स्वागत है।",
     "nav": {
       "dashboard": "डैशबोर्ड",
       "simInventory": "सिम इन्वेंटरी",

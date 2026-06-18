@@ -94,6 +94,9 @@
     "appName": "Balin",
     "portalTitle": "Balin Inventory Portal",
     "toggleSidebar": "Toggle sidebar",
+    "mainMenu": "Main Menu",
+    "welcome": "Welcome back",
+    "welcomeBack": "Hi {{name}}, welcome back.",
     "nav": {
       "dashboard": "Dashboard",
       "simInventory": "SIM Inventory",
