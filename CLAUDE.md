@@ -1,4 +1,4 @@
-# VahanNewPortal
+# Balin Inventory Portal
 
 ## Stack
 Angular 21 | Tailwind CSS 4 | SCSS | Material Icons | Inter font | pnpm

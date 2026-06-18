@@ -15,13 +15,19 @@
     "sending": "Sending..."
   },
   "auth": {
-    "footerTag": "Secure. Reliable. Built for Governance.",
-    "footerCopy": "© 2026 Vahan Sathi. All rights reserved.",
+    "footerCopy": "© 2026 Balin Inventory Portal. All rights reserved.",
     "togglePassword": "Toggle password",
+    "brand": {
+      "heroTitle": "Smarter SIM inventory, in one place.",
+      "heroSubtitle": "Manage activations, track lifecycle and monitor every SIM across your fleet — all from a single secure portal.",
+      "feature1": "Role-based access and audit trails",
+      "feature2": "Bulk SIM activation in one click",
+      "feature3": "Real-time inventory insights"
+    },
     "refreshCaptcha": "Refresh captcha",
     "login": {
       "title": "Welcome Back",
-      "subtitle": "Sign in to continue to Vahan Sathi Admin Portal",
+      "subtitle": "Sign in to continue to Balin Inventory Portal",
       "identifier": "Mobile or Email",
       "identifierPlaceholder": "Enter mobile number or email",
       "password": "Password",
@@ -85,8 +91,8 @@
     }
   },
   "layout": {
-    "appName": "Vahan",
-    "portalTitle": "Vahan Portal",
+    "appName": "Balin",
+    "portalTitle": "Balin Inventory Portal",
     "toggleSidebar": "Toggle sidebar",
     "nav": {
       "dashboard": "Dashboard",

@@ -68,14 +68,14 @@ export const API_ENDPOINTS = {
 };
 
 export const STORAGE_KEYS = {
-  AUTH_TOKEN: 'vahan_portal_token',
-  RBAC_USER: 'vahan_portal_rbac_user',
-  SIDEBAR_COLLAPSED: 'vahan_portal_sidebar',
-  LANG: 'vahan_portal_lang',
+  AUTH_TOKEN: 'balin_portal_token',
+  RBAC_USER: 'balin_portal_rbac_user',
+  SIDEBAR_COLLAPSED: 'balin_portal_sidebar',
+  LANG: 'balin_portal_lang',
 };
 
 export const APP_CONFIG = {
-  APP_NAME: 'VahanNewPortal',
+  APP_NAME: 'Balin Inventory Portal',
   DEBOUNCE_MS: 200,
   MAX_RETRY_ATTEMPTS: 3,
   RETRY_DELAY_MS: 1_000,

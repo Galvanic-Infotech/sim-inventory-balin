@@ -1,86 +1,114 @@
-<div class="auth-page auth-page--plain">
-  <div class="auth-lang-switcher">
-    <app-lang-switcher />
-  </div>
-
-  <div class="auth-card">
-    <div class="auth-brand">
-      <span class="material-icons">verified_user</span>
+<div class="auth-page">
+  <aside class="auth-brand-panel" aria-hidden="true">
+    <div class="auth-brand-panel__logo">
+      <span class="brand-mark material-icons">directions_car</span>
+      {{ 'layout.appName' | translate }}
     </div>
 
-    <h2 class="auth-title">{{ 'auth.login.title' | translate }}</h2>
-    <p class="auth-subtitle">{{ 'auth.login.subtitle' | translate }}</p>
+    <div class="auth-brand-panel__hero">
+      <h1>{{ 'auth.brand.heroTitle' | translate }}</h1>
+      <p>{{ 'auth.brand.heroSubtitle' | translate }}</p>
+    </div>
 
-    @if (errorMsg()) {
-      <div class="alert alert-danger">
-        <span class="material-icons">error_outline</span>
-        {{ errorMsg() }}
-      </div>
-    }
-
-    <form (ngSubmit)="onSubmit()" autocomplete="on">
-      <div class="form-group">
-        <label for="identifier">{{ 'auth.login.identifier' | translate }}</label>
-        <div class="input-wrapper">
-          <span class="material-icons input-icon">
-            {{ detectedMode() === 'email' ? 'mail_outline' : 'person_outline' }}
-          </span>
-          <input
-            id="identifier"
-            type="text"
-            class="form-control form-control--icon-left"
-            [ngModel]="identifier()"
-            (ngModelChange)="identifier.set($event)"
-            name="identifier"
-            [placeholder]="'auth.login.identifierPlaceholder' | translate"
-            [attr.inputmode]="detectedMode() === 'email' ? 'email' : 'numeric'"
-            autocomplete="username"
-          />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="password">{{ 'auth.login.password' | translate }}</label>
-        <div class="input-wrapper">
-          <span class="material-icons input-icon">lock_outline</span>
-          <input
-            id="password"
-            [type]="showPassword() ? 'text' : 'password'"
-            class="form-control form-control--icon-left"
-            [(ngModel)]="password"
-            name="password"
-            [placeholder]="'auth.login.passwordPlaceholder' | translate"
-            autocomplete="current-password"
-          />
-          <button type="button" class="input-action" (click)="togglePassword()" [attr.aria-label]="'auth.togglePassword' | translate">
-            <span class="material-icons">
-              {{ showPassword() ? 'visibility_off' : 'visibility' }}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <div class="auth-link auth-link--right">
-        <a routerLink="/forgot-password">{{ 'auth.login.forgotPassword' | translate }}</a>
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-block auth-btn" [disabled]="loading()">
-        @if (loading()) {
-          <span class="spinner"></span>
-          {{ 'auth.login.signingIn' | translate }}
-        } @else {
-          {{ 'auth.login.signIn' | translate }}
-          <span class="material-icons">arrow_forward</span>
-        }
-      </button>
-    </form>
-
-    <div class="auth-footer">
-      <div class="footer-tag">
+    <div class="auth-brand-panel__features">
+      <div class="feature">
         <span class="material-icons">verified_user</span>
-        {{ 'auth.footerTag' | translate }}
+        {{ 'auth.brand.feature1' | translate }}
       </div>
-      <div class="footer-copy">{{ 'auth.footerCopy' | translate }}</div>
+      <div class="feature">
+        <span class="material-icons">sim_card</span>
+        {{ 'auth.brand.feature2' | translate }}
+      </div>
+      <div class="feature">
+        <span class="material-icons">insights</span>
+        {{ 'auth.brand.feature3' | translate }}
+      </div>
     </div>
-  </div>
+
+    <div class="auth-brand-panel__copy">{{ 'auth.footerCopy' | translate }}</div>
+  </aside>
+
+  <main class="auth-form-pane">
+    <div class="auth-lang-switcher">
+      <app-lang-switcher />
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="material-icons">verified_user</span>
+      </div>
+
+      <h2 class="auth-title">{{ 'auth.login.title' | translate }}</h2>
+      <p class="auth-subtitle">{{ 'auth.login.subtitle' | translate }}</p>
+
+      @if (errorMsg()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error_outline</span>
+          {{ errorMsg() }}
+        </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" autocomplete="on">
+        <div class="form-group">
+          <label for="identifier">{{ 'auth.login.identifier' | translate }}</label>
+          <div class="input-wrapper">
+            <span class="material-icons input-icon">
+              {{ detectedMode() === 'email' ? 'mail_outline' : 'person_outline' }}
+            </span>
+            <input
+              id="identifier"
+              type="text"
+              class="form-control form-control--icon-left"
+              [ngModel]="identifier()"
+              (ngModelChange)="identifier.set($event)"
+              name="identifier"
+              [placeholder]="'auth.login.identifierPlaceholder' | translate"
+              [attr.inputmode]="detectedMode() === 'email' ? 'email' : 'numeric'"
+              autocomplete="username"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">{{ 'auth.login.password' | translate }}</label>
+          <div class="input-wrapper">
+            <span class="material-icons input-icon">lock_outline</span>
+            <input
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              class="form-control form-control--icon-left"
+              [(ngModel)]="password"
+              name="password"
+              [placeholder]="'auth.login.passwordPlaceholder' | translate"
+              autocomplete="current-password"
+            />
+            <button type="button" class="input-action" (click)="togglePassword()" [attr.aria-label]="'auth.togglePassword' | translate">
+              <span class="material-icons">
+                {{ showPassword() ? 'visibility_off' : 'visibility' }}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-link auth-link--right">
+          <a routerLink="/forgot-password">{{ 'auth.login.forgotPassword' | translate }}</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block auth-btn" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span>
+            {{ 'auth.login.signingIn' | translate }}
+          } @else {
+            {{ 'auth.login.signIn' | translate }}
+            <span class="material-icons">arrow_forward</span>
+          }
+        </button>
+      </form>
+
+      <div class="auth-footer">
+       
+        <div class="footer-copy">{{ 'auth.footerCopy' | translate }}</div>
+      </div>
+    </div>
+  </main>
 </div>

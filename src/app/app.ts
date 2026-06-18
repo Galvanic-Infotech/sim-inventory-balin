@@ -10,6 +10,6 @@ import { SessionExpiredService } from './core/services/session-expired.service';
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('VahanNewPortal');
+  protected readonly title = signal('BalinInventoryPortal');
   protected readonly sessionExpired = inject(SessionExpiredService);
 }

@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "VahanNewPortal": {
+    "BalinInventoryPortal": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -96,10 +96,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "VahanNewPortal:build:production"
+              "buildTarget": "BalinInventoryPortal:build:production"
             },
             "development": {
-              "buildTarget": "VahanNewPortal:build:development"
+              "buildTarget": "BalinInventoryPortal:build:development"
             }
           },
           "defaultConfiguration": "development"

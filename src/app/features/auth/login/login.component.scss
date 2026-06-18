@@ -1,12 +1,1 @@
-.auth-page--plain {
-  justify-content: center;
-  background: var(--color-bg-page);
-
-  &::before {
-    display: none;
-  }
-
-  .auth-card {
-    margin-right: 0;
-  }
-}
+// Auth styling lives in styles.scss (.auth-*)
