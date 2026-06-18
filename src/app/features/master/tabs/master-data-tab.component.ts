@@ -24,6 +24,7 @@ import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util'
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { TranslationService } from '../../../core/services/translation.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { RowAction, RowActionsComponent } from '../../../shared/components/row-actions/row-actions.component';
 
 type Section =
   | 'simProviders'
@@ -45,7 +46,7 @@ interface SectionMeta {
 @Component({
   selector: 'app-master-data-tab',
   standalone: true,
-  imports: [FormsModule, TableModule, InputTextModule, SearchBarComponent, TranslatePipe],
+  imports: [FormsModule, TableModule, InputTextModule, SearchBarComponent, TranslatePipe, RowActionsComponent],
   templateUrl: './master-data-tab.component.html',
   styleUrl: './master-data-tab.component.scss',
 })
@@ -377,6 +378,46 @@ export class MasterDataTabComponent {
     }
 
     this.showDialog.set(true);
+  }
+
+  private editAction<T>(labelKey: string, onClick: (item: T) => void) {
+    return (item: T): RowAction[] => [
+      {
+        label: this.i18n.instant(labelKey),
+        icon: 'edit',
+        iconColor: 'var(--color-primary)',
+        onClick: () => onClick(item),
+      },
+    ];
+  }
+
+  readonly providerActions = this.editAction<SimCardProvider>(
+    'master.masterData.edit.simProvider',
+    (p) => this.openEditProvider(p),
+  );
+  readonly vehicleCategoryActions = this.editAction<VehicleCategory>(
+    'master.masterData.edit.vehicleCategory',
+    (c) => this.openEditVehicleCategory(c),
+  );
+  readonly testingAgencyActions = this.editAction<TestingAgency>(
+    'master.masterData.edit.testingAgency',
+    (a) => this.openEditTestingAgency(a),
+  );
+  readonly documentTypeActions = this.editAction<DocumentType>(
+    'master.masterData.edit.documentType',
+    (d) => this.openEditDocumentType(d),
+  );
+
+  entityTypeActions(et: RbacEntityType): RowAction[] {
+    if (!this.canAssignEtPerms()) return [];
+    return [
+      {
+        label: this.i18n.instant('master.masterData.editPerms'),
+        icon: 'edit',
+        iconColor: 'var(--color-primary)',
+        onClick: () => this.openAssignEtPerms(et),
+      },
+    ];
   }
 
   openEditProvider(provider: SimCardProvider): void {

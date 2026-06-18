@@ -16,6 +16,7 @@ import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util'
 import { BillingConfigDrawerComponent } from '../../../shared/components/billing-config-drawer/billing-config-drawer.component';
 import { BillingCreditDialogComponent } from '../../../shared/components/billing-credit-dialog/billing-credit-dialog.component';
 import { BillingGenerateDialogComponent } from '../../../shared/components/billing-generate-dialog/billing-generate-dialog.component';
+import { RowAction, RowActionsComponent } from '../../../shared/components/row-actions/row-actions.component';
 
 @Component({
   selector: 'app-entities-tab',
@@ -29,6 +30,7 @@ import { BillingGenerateDialogComponent } from '../../../shared/components/billi
     BillingConfigDrawerComponent,
     BillingCreditDialogComponent,
     BillingGenerateDialogComponent,
+    RowActionsComponent,
   ],
   templateUrl: './entities-tab.component.html',
 })
@@ -105,6 +107,41 @@ export class EntitiesTabComponent {
   readonly billingEntity = signal<RbacEntity | null>(null);
   readonly creditEntity = signal<RbacEntity | null>(null);
   readonly generateEntity = signal<RbacEntity | null>(null);
+
+  rowActions(e: RbacEntity): RowAction[] {
+    const t = (key: string) => this.i18n.instant(key);
+    const items: RowAction[] = [
+      {
+        label: t('master.entities.assignType'),
+        icon: 'category',
+        onClick: () => this.openAssignDialog(e),
+      },
+    ];
+    if (e.isBillingEnabled) {
+      items.push(
+        {
+          label: t('master.entities.editBilling'),
+          icon: 'receipt_long',
+          iconColor: 'var(--color-primary)',
+          dividerBefore: true,
+          onClick: () => this.openBillingDrawer(e),
+        },
+        {
+          label: t('master.entities.addCredit'),
+          icon: 'savings',
+          iconColor: 'var(--color-success)',
+          onClick: () => this.openCreditDialog(e),
+        },
+        {
+          label: t('master.entities.generateBill'),
+          icon: 'play_circle',
+          iconColor: 'var(--color-warning)',
+          onClick: () => this.openGenerateDialog(e),
+        },
+      );
+    }
+    return items;
+  }
 
   openBillingDrawer(entity: RbacEntity): void {
     this.billingEntity.set(entity);

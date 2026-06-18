@@ -71,29 +71,7 @@
         </td>
         @if (hasActions()) {
           <td>
-            <div class="action-cell">
-              @if (canAssignRole()) {
-                <button class="btn btn-ghost" [title]="'master.users.changeRole' | translate" (click)="openRoleDialog(u)">
-                  <span class="material-icons">swap_horiz</span>
-                </button>
-              }
-              @if (canBlock()) {
-                <button
-                  class="btn btn-ghost"
-                  [title]="(u.isActive ? 'master.users.blockUser' : 'master.users.unblockUser') | translate"
-                  [disabled]="togglingId() === u.id"
-                  (click)="openToggleConfirm(u)"
-                >
-                  @if (togglingId() === u.id) {
-                    <span class="spinner spinner--dark"></span>
-                  } @else {
-                    <span class="material-icons" [style.color]="u.isActive ? 'var(--color-danger)' : 'var(--color-success)'">
-                      {{ u.isActive ? 'block' : 'check_circle' }}
-                    </span>
-                  }
-                </button>
-              }
-            </div>
+            <app-row-actions [items]="rowActions(u)" [ariaLabel]="'master.common.action' | translate" />
           </td>
         }
       </tr>

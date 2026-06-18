@@ -53,12 +53,8 @@
         <td>{{ rowIndex + 1 }}</td>
         <td>{{ r.roleName }}</td>
         <td>{{ r.entityName ?? '—' }}</td>
-        <td class="action-cell">
-          @if (canAssignPerms()) {
-            <button class="btn btn-ghost btn-sm" (click)="openAssign(r)" [title]="'master.roles.editPerms' | translate">
-              <span class="material-icons">edit</span>
-            </button>
-          }
+        <td>
+          <app-row-actions [items]="rowActions(r)" [ariaLabel]="'master.common.action' | translate" />
         </td>
       </tr>
     </ng-template>

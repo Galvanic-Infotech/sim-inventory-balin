@@ -19,6 +19,7 @@ import {
   formatInventoryDate,
 } from '../../shared/models/sim-inventory.model';
 import { ActivateDialogComponent } from './activate-dialog.component';
+import { RowAction, RowActionsComponent } from '../../shared/components/row-actions/row-actions.component';
 
 @Component({
   selector: 'app-sim-inventory',
@@ -30,6 +31,7 @@ import { ActivateDialogComponent } from './activate-dialog.component';
     SearchBarComponent,
     TranslatePipe,
     ActivateDialogComponent,
+    RowActionsComponent,
   ],
   templateUrl: './sim-inventory.component.html',
   styleUrl: './sim-inventory.component.scss',
@@ -202,6 +204,17 @@ export class SimInventoryComponent {
       this.clearSelection();
       this.fetch();
     }
+  }
+
+  rowActions(item: SimInventoryItem): RowAction[] {
+    return [
+      {
+        label: this.i18n.instant('simInventory.editLabel'),
+        icon: 'edit',
+        iconColor: 'var(--color-primary)',
+        onClick: () => this.openEditForRow(item),
+      },
+    ];
   }
 
   userFullName(item: SimInventoryItem): string {

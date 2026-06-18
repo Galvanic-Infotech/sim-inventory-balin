@@ -113,9 +113,7 @@
         <td>{{ fmtDate(it.validTill) }}</td>
         @if (canEditPerm()) {
           <td>
-            <button class="btn btn-ghost btn-sm" (click)="openEditForRow(it)" [title]="'simInventory.editLabel' | translate">
-              <span class="material-icons">edit</span> {{ 'simInventory.editLabel' | translate }}
-            </button>
+            <app-row-actions [items]="rowActions(it)" />
           </td>
         }
       </tr>

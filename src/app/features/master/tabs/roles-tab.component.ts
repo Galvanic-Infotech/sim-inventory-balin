@@ -12,11 +12,12 @@ import { TableQueryParams } from '../../../shared/models/table-query.model';
 import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { RowAction, RowActionsComponent } from '../../../shared/components/row-actions/row-actions.component';
 
 @Component({
   selector: 'app-roles-tab',
   standalone: true,
-  imports: [FormsModule, TableModule, InputTextModule, SearchBarComponent, TranslatePipe],
+  imports: [FormsModule, TableModule, InputTextModule, SearchBarComponent, TranslatePipe, RowActionsComponent],
   templateUrl: './roles-tab.component.html',
 })
 export class RolesTabComponent {
@@ -133,6 +134,18 @@ export class RolesTabComponent {
         this.dialogError.set(extractApiError(err, this.i18n.instant('master.errors.createRole')));
       },
     });
+  }
+
+  rowActions(r: RbacRole): RowAction[] {
+    if (!this.canAssignPerms()) return [];
+    return [
+      {
+        label: this.i18n.instant('master.roles.editPerms'),
+        icon: 'edit',
+        iconColor: 'var(--color-primary)',
+        onClick: () => this.openAssign(r),
+      },
+    ];
   }
 
   openAssign(role: RbacRole): void {

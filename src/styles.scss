@@ -512,6 +512,117 @@ table.table {
   gap: 4px;
 }
 
+// ── Row kebab actions menu ──
+.row-actions {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+
+  &__btn {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+    .material-icons {
+      font-size: 18px;
+    }
+
+    &:hover {
+      background: var(--color-bg-subtle);
+      color: var(--color-text-primary);
+    }
+
+    &--open {
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
+      border-color: var(--color-primary-light);
+    }
+  }
+
+  &__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+  }
+
+  &__menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 100;
+    min-width: 200px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    text-align: left;
+    font-size: var(--font-sm);
+    font-family: var(--font-family);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.12s;
+
+    .material-icons {
+      font-size: 18px;
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+
+    &:hover:not(:disabled) {
+      background: var(--color-bg-subtle);
+    }
+
+    &--danger {
+      color: var(--color-danger);
+
+      .material-icons {
+        color: var(--color-danger);
+      }
+
+      &:hover:not(:disabled) {
+        background: var(--color-danger-bg);
+      }
+    }
+
+    &--disabled,
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__divider {
+    height: 1px;
+    background: var(--color-border-light);
+    margin: 4px 6px;
+  }
+}
+
 // ── Detail grid (label / value pairs) ──
 .detail-grid {
   display: grid;

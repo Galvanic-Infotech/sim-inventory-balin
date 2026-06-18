@@ -106,10 +106,8 @@
                   {{ statusLabel(p.isActive) }}
                 </span>
               </td>
-              <td class="action-cell">
-                <button class="btn btn-ghost btn-sm" [title]="'master.masterData.edit.simProvider' | translate" (click)="openEditProvider(p)">
-                  <span class="material-icons">edit</span>
-                </button>
+              <td>
+                <app-row-actions [items]="providerActions(p)" [ariaLabel]="'master.common.action' | translate" />
               </td>
             </tr>
           </ng-template>
@@ -159,10 +157,8 @@
                   {{ statusLabel(c.isActive) }}
                 </span>
               </td>
-              <td class="action-cell">
-                <button class="btn btn-ghost btn-sm" [title]="'master.masterData.edit.vehicleCategory' | translate" (click)="openEditVehicleCategory(c)">
-                  <span class="material-icons">edit</span>
-                </button>
+              <td>
+                <app-row-actions [items]="vehicleCategoryActions(c)" [ariaLabel]="'master.common.action' | translate" />
               </td>
             </tr>
           </ng-template>
@@ -203,10 +199,8 @@
               <td>{{ rowIndex + 1 }}</td>
               <td>{{ a.testingAgencyId }}</td>
               <td>{{ a.testingAgencyName }}</td>
-              <td class="action-cell">
-                <button class="btn btn-ghost btn-sm" [title]="'master.masterData.edit.testingAgency' | translate" (click)="openEditTestingAgency(a)">
-                  <span class="material-icons">edit</span>
-                </button>
+              <td>
+                <app-row-actions [items]="testingAgencyActions(a)" [ariaLabel]="'master.common.action' | translate" />
               </td>
             </tr>
           </ng-template>
@@ -251,10 +245,8 @@
                   {{ d.isRequired ? ('master.common.required' | translate) : '—' }}
                 </span>
               </td>
-              <td class="action-cell">
-                <button class="btn btn-ghost btn-sm" [title]="'master.masterData.edit.documentType' | translate" (click)="openEditDocumentType(d)">
-                  <span class="material-icons">edit</span>
-                </button>
+              <td>
+                <app-row-actions [items]="documentTypeActions(d)" [ariaLabel]="'master.common.action' | translate" />
               </td>
             </tr>
           </ng-template>
@@ -298,12 +290,8 @@
               <td>{{ rowIndex + 1 }}</td>
               <td>{{ et.name }}</td>
               <td>{{ et.description ?? '—' }}</td>
-              <td class="action-cell">
-                @if (canAssignEtPerms()) {
-                  <button class="btn btn-ghost btn-sm" (click)="openAssignEtPerms(et)" [title]="'master.masterData.editPerms' | translate">
-                    <span class="material-icons">edit</span>
-                  </button>
-                }
+              <td>
+                <app-row-actions [items]="entityTypeActions(et)" [ariaLabel]="'master.common.action' | translate" />
               </td>
             </tr>
           </ng-template>

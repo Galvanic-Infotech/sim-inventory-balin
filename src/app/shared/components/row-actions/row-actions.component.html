@@ -1,0 +1,38 @@
+<div class="row-actions">
+  <button
+    type="button"
+    class="row-actions__btn"
+    [class.row-actions__btn--open]="open()"
+    [attr.aria-label]="ariaLabel()"
+    [attr.aria-haspopup]="true"
+    [attr.aria-expanded]="open()"
+    (click)="toggle($event)"
+  >
+    <span class="material-icons">more_vert</span>
+  </button>
+
+  @if (open()) {
+    <div class="row-actions__backdrop" (click)="close()"></div>
+    <div class="row-actions__menu" role="menu">
+      @for (item of items(); track item.label) {
+        @if (item.dividerBefore) {
+          <div class="row-actions__divider"></div>
+        }
+        <button
+          type="button"
+          class="row-actions__item"
+          [class.row-actions__item--danger]="item.danger"
+          [class.row-actions__item--disabled]="item.disabled"
+          [disabled]="item.disabled"
+          role="menuitem"
+          (click)="invoke(item, $event)"
+        >
+          @if (item.icon) {
+            <span class="material-icons" [style.color]="item.iconColor || null">{{ item.icon }}</span>
+          }
+          {{ item.label }}
+        </button>
+      }
+    </div>
+  }
+</div>

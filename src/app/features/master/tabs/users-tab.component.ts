@@ -14,11 +14,12 @@ import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util'
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { PasswordStrengthFieldComponent } from '../../../shared/components/password-strength-field/password-strength-field.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { RowAction, RowActionsComponent } from '../../../shared/components/row-actions/row-actions.component';
 
 @Component({
   selector: 'app-users-tab',
   standalone: true,
-  imports: [FormsModule, TableModule, InputTextModule, SearchBarComponent, PasswordStrengthFieldComponent, TranslatePipe],
+  imports: [FormsModule, TableModule, InputTextModule, SearchBarComponent, PasswordStrengthFieldComponent, TranslatePipe, RowActionsComponent],
   templateUrl: './users-tab.component.html',
 })
 export class UsersTabComponent {
@@ -334,6 +335,31 @@ export class UsersTabComponent {
         this.toggleError.set(extractApiError(err, this.i18n.instant('master.errors.toggleUser')));
       },
     });
+  }
+
+  rowActions(u: RbacUser): RowAction[] {
+    const t = (key: string) => this.i18n.instant(key);
+    const items: RowAction[] = [];
+    if (this.canAssignRole()) {
+      items.push({
+        label: t('master.users.changeRole'),
+        icon: 'swap_horiz',
+        iconColor: 'var(--color-primary)',
+        onClick: () => this.openRoleDialog(u),
+      });
+    }
+    if (this.canBlock()) {
+      items.push({
+        label: t(u.isActive ? 'master.users.blockUser' : 'master.users.unblockUser'),
+        icon: u.isActive ? 'block' : 'check_circle',
+        danger: !!u.isActive,
+        iconColor: u.isActive ? undefined : 'var(--color-success)',
+        disabled: this.togglingId() === u.id,
+        dividerBefore: this.canAssignRole(),
+        onClick: () => this.openToggleConfirm(u),
+      });
+    }
+    return items;
   }
 
   private resetForm(): void {
