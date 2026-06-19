@@ -97,6 +97,9 @@
     "mainMenu": "मुख्य मेनू",
     "welcome": "वापसी पर स्वागत है",
     "welcomeBack": "नमस्ते {{name}}, वापसी पर स्वागत है।",
+    "greetingMorning": "सुप्रभात, {{name}}",
+    "greetingAfternoon": "नमस्कार, {{name}}",
+    "greetingEvening": "शुभ संध्या, {{name}}",
     "nav": {
       "dashboard": "डैशबोर्ड",
       "simInventory": "सिम इन्वेंटरी",

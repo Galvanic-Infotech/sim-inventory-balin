@@ -1,51 +1,65 @@
 <header class="topbar">
-  <div class="topbar-left">
-    <h2 class="page-title">{{ 'layout.welcome' | translate }}</h2>
-    <p class="page-greeting">{{ 'layout.welcomeBack' | translate: { name: userName() } }}</p>
+  <div class="topbar-context">
+    <div class="page-badge" aria-hidden="true">
+      <span class="material-icons">{{ pageMeta().icon }}</span>
+    </div>
+    <div class="topbar-titles">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <span class="breadcrumb-root">{{ 'layout.appName' | translate }}</span>
+        <span class="material-icons breadcrumb-sep">chevron_right</span>
+        <span class="breadcrumb-current">{{ pageMeta().title }}</span>
+      </nav>
+      <p class="page-greeting">{{ greeting() }}</p>
+    </div>
   </div>
-  <div class="topbar-right">
-    <app-lang-switcher />
 
-    <!-- Entity Switcher -->
+  <div class="action-cluster">
+    <div class="action-cluster__item">
+      <app-lang-switcher />
+    </div>
+
     @if (canSwitchEntity()) {
-      @if (!auth.entities().length && !auth.loadingEntities()) {
-        <!-- No entities to switch — show static label -->
-        <div class="entity-switcher">
-          <span class="entity-btn entity-btn--static">
+      <div class="action-cluster__divider" aria-hidden="true"></div>
+      <div class="action-cluster__item entity-switcher">
+        @if (!auth.entities().length && !auth.loadingEntities()) {
+          <span class="cluster-btn cluster-btn--static" [title]="auth.selectedEntityName()">
             <span class="material-icons">business</span>
-            <span class="entity-name">{{ auth.selectedEntityName() }}</span>
+            <span class="cluster-label entity-name">{{ auth.selectedEntityName() }}</span>
           </span>
-        </div>
-      } @else {
-        <div class="entity-switcher">
+        } @else {
           <button
-            class="entity-btn"
+            type="button"
+            class="cluster-btn"
             [class.switched]="auth.isEntitySwitched()"
-            (click)="toggleEntityMenu()"
+            [title]="auth.selectedEntityName()"
+            (click)="toggleEntityMenu(); showUserMenu.set(false)"
           >
             <span class="material-icons">business</span>
-            <span class="entity-name">{{ auth.selectedEntityName() }}</span>
-            <span class="material-icons entity-arrow">unfold_more</span>
+            <span class="cluster-label entity-name">{{ auth.selectedEntityName() }}</span>
+            <span class="material-icons cluster-chevron">expand_more</span>
           </button>
 
           @if (showEntityMenu()) {
-            <div class="entity-backdrop" (click)="showEntityMenu.set(false)"></div>
-            <div class="entity-menu">
-              <div class="entity-menu-head">{{ 'layout.switchEntity' | translate }}</div>
+            <div class="dropdown-backdrop" (click)="showEntityMenu.set(false)"></div>
+            <div class="dropdown-panel entity-panel">
+              <div class="dropdown-head">{{ 'layout.switchEntity' | translate }}</div>
 
-              <!-- Search -->
-              <div class="entity-search">
+              <div class="dropdown-search">
                 <span class="material-icons">search</span>
                 <input
-                  class="entity-search-input"
+                  class="dropdown-search-input"
                   [placeholder]="'layout.searchEntities' | translate"
                   [ngModel]="entitySearch()"
                   (ngModelChange)="entitySearch.set($event)"
                 />
               </div>
 
-              <!-- My Entity (default) -->
-              <button class="entity-card" [class.active]="!auth.isEntitySwitched()" (click)="selectEntity(null)">
+              <button
+                type="button"
+                class="entity-card"
+                [class.active]="!auth.isEntitySwitched()"
+                (click)="selectEntity(null)"
+              >
                 <span class="entity-card-icon"><span class="material-icons">apartment</span></span>
                 <div class="entity-card-meta">
                   <strong>{{ auth.profile()?.entity?.name ?? ('layout.myEntity' | translate) }}</strong>
@@ -57,17 +71,24 @@
               </button>
 
               @if (auth.loadingEntities()) {
-                <div class="entity-loading">
+                <div class="dropdown-loading">
                   <div class="spinner spinner--dark"></div>
                 </div>
               } @else if (!filteredEntities().length) {
-                <div class="entity-loading">
-                  <span style="color: var(--color-text-muted); font-size: var(--font-xs)">{{ 'layout.noEntitiesFound' | translate }}</span>
+                <div class="dropdown-loading">
+                  <span class="dropdown-empty">{{ 'layout.noEntitiesFound' | translate }}</span>
                 </div>
               } @else {
                 @for (e of filteredEntities(); track e.id) {
-                  <button class="entity-card" [class.active]="auth.entityId() === e.id && auth.isEntitySwitched()" (click)="selectEntity(e.id)">
-                    <span class="entity-card-icon"><span class="material-icons">{{ entityIcon(e.entityType?.name) }}</span></span>
+                  <button
+                    type="button"
+                    class="entity-card"
+                    [class.active]="auth.entityId() === e.id && auth.isEntitySwitched()"
+                    (click)="selectEntity(e.id)"
+                  >
+                    <span class="entity-card-icon">
+                      <span class="material-icons">{{ entityIcon(e.entityType?.name) }}</span>
+                    </span>
                     <div class="entity-card-meta">
                       <strong>{{ e.name }}</strong>
                       @if (e.entityType?.name) {
@@ -82,28 +103,28 @@
               }
             </div>
           }
-        </div>
-      }
+        }
+      </div>
     }
 
-    <!-- User Menu -->
-    <div class="user-menu-wrapper">
-      <button class="user-btn" (click)="toggleUserMenu()">
-        <span class="user-avatar">
-          <span class="material-icons">person</span>
-        </span>
-        <span class="user-name">{{ userName() }}</span>
-        <span class="material-icons user-arrow">expand_more</span>
+    <div class="action-cluster__divider" aria-hidden="true"></div>
+
+    <div class="action-cluster__item user-menu-wrapper">
+      <button
+        type="button"
+        class="user-avatar-btn"
+        [attr.aria-label]="userName()"
+        (click)="toggleUserMenu()"
+      >
+        <span class="user-avatar">{{ userInitials() }}</span>
       </button>
 
       @if (showUserMenu()) {
-        <div class="entity-backdrop" (click)="showUserMenu.set(false)"></div>
-        <div class="entity-menu user-dropdown">
-          <div class="user-dropdown-header">
-            <span class="user-avatar user-avatar--lg">
-              <span class="material-icons">person</span>
-            </span>
-            <div class="user-dropdown-info">
+        <div class="dropdown-backdrop" (click)="showUserMenu.set(false)"></div>
+        <div class="dropdown-panel user-panel">
+          <div class="user-panel-header">
+            <span class="user-avatar user-avatar--lg">{{ userInitials() }}</span>
+            <div class="user-panel-info">
               <strong>{{ userName() }}</strong>
               @if (auth.profile()?.role?.name) {
                 <small>{{ auth.profile()?.role?.name }}</small>
@@ -113,13 +134,13 @@
               }
             </div>
           </div>
-          <div class="entity-divider"></div>
-          <button class="entity-option" (click)="goToProfile()">
+          <div class="dropdown-divider"></div>
+          <button type="button" class="dropdown-option" (click)="goToProfile()">
             <span class="material-icons">manage_accounts</span>
             <span>{{ 'layout.profilePassword' | translate }}</span>
           </button>
-          <div class="entity-divider"></div>
-          <button class="entity-option user-logout-option" (click)="logout()">
+          <div class="dropdown-divider"></div>
+          <button type="button" class="dropdown-option dropdown-option--danger" (click)="logout()">
             <span class="material-icons">logout</span>
             <span>{{ 'layout.logout' | translate }}</span>
           </button>

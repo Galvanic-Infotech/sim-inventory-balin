@@ -97,6 +97,9 @@
     "mainMenu": "Main Menu",
     "welcome": "Welcome back",
     "welcomeBack": "Hi {{name}}, welcome back.",
+    "greetingMorning": "Good morning, {{name}}",
+    "greetingAfternoon": "Good afternoon, {{name}}",
+    "greetingEvening": "Good evening, {{name}}",
     "nav": {
       "dashboard": "Dashboard",
       "simInventory": "SIM Inventory",
