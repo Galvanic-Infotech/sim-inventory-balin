@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { TranslationService } from '../../core/services/translation.service';
@@ -20,6 +20,16 @@ export class ProfileComponent {
 
   readonly userName = this.auth.userName;
   readonly profile = this.auth.profile;
+
+  readonly userInitials = computed(() => {
+    const name = (this.auth.userName() || '').trim();
+    if (!name) return '?';
+    const parts = name.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  });
 
   oldPassword = '';
   newPassword = signal('');

@@ -4,7 +4,7 @@
 />
 
 <div class="main-area" [class.sidebar-collapsed]="sidebarCollapsed()">
-  <app-topbar />
+<app-topbar [class.sidebar-collapsed]="sidebarCollapsed()" />
   <main class="content">
     <router-outlet />
   </main>

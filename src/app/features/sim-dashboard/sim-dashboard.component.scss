@@ -28,7 +28,7 @@
   .sim-dashboard__aside {
     flex: 3;
     position: sticky;
-    top: var(--space-md);
+    top: calc(var(--topbar-height) + var(--space-md));
   }
 }
 

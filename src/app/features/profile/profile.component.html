@@ -1,133 +1,140 @@
 <div class="profile-page">
-  <div class="page-header">
-    <h1>{{ 'profile.title' | translate }}</h1>
-    <p>{{ 'profile.subtitle' | translate }}</p>
+  <div class="profile-page__heading">
+    <div class="profile-page__eyebrow">
+      <span class="material-icons">manage_accounts</span>
+      <span>{{ 'profile.title' | translate }}</span>
+    </div>
+    <p class="profile-page__subtitle">{{ 'profile.subtitle' | translate }}</p>
   </div>
 
-  <div class="card profile-card">
-    <div class="profile-avatar">
-      <span class="material-icons">person</span>
+  <div class="profile-page__layout">
+    <div class="profile-page__main">
+      <div class="card profile-card">
+        <div class="profile-avatar">{{ userInitials() }}</div>
+        <div class="profile-info">
+          <h2>{{ userName() }}</h2>
+          <div class="profile-chips">
+            @if (profile()?.role?.name) {
+              <span class="chip chip--primary">{{ profile()?.role?.name }}</span>
+            }
+            @if (profile()?.entity?.entityType?.name) {
+              <span class="chip">{{ profile()?.entity?.entityType?.name }}</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (profile()) {
+        <div class="card profile-details">
+          <h3 class="section-title">
+            <span class="material-icons">badge</span>
+            {{ 'profile.accountDetails' | translate }}
+          </h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">{{ 'profile.email' | translate }}</span>
+              <span class="detail-value">{{ profile()?.email }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">{{ 'profile.mobile' | translate }}</span>
+              <span class="detail-value">{{ profile()?.mobileNumber }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">{{ 'profile.role' | translate }}</span>
+              <span class="detail-value">{{ profile()?.role?.name }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">{{ 'profile.entity' | translate }}</span>
+              <span class="detail-value">{{ profile()?.entity?.name }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">{{ 'profile.entityType' | translate }}</span>
+              <span class="detail-value">{{ profile()?.entity?.entityType?.name }}</span>
+            </div>
+          </div>
+        </div>
+      }
     </div>
-    <div class="profile-info">
-      <h2>{{ userName() }}</h2>
-      <div class="profile-chips">
-        @if (profile()?.role?.name) {
-          <span class="chip chip--primary">{{ profile()?.role?.name }}</span>
-        }
-        @if (profile()?.entity?.entityType?.name) {
-          <span class="chip">{{ profile()?.entity?.entityType?.name }}</span>
-        }
-      </div>
-    </div>
-  </div>
 
-  @if (profile()) {
-    <div class="card profile-details">
-      <h3 class="section-title">
-        <span class="material-icons">badge</span>
-        {{ 'profile.accountDetails' | translate }}
-      </h3>
-      <div class="detail-grid">
-        <div class="detail-item">
-          <span class="detail-label">{{ 'profile.email' | translate }}</span>
-          <span class="detail-value">{{ profile()?.email }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">{{ 'profile.mobile' | translate }}</span>
-          <span class="detail-value">{{ profile()?.mobileNumber }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">{{ 'profile.role' | translate }}</span>
-          <span class="detail-value">{{ profile()?.role?.name }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">{{ 'profile.entity' | translate }}</span>
-          <span class="detail-value">{{ profile()?.entity?.name }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">{{ 'profile.entityType' | translate }}</span>
-          <span class="detail-value">{{ profile()?.entity?.entityType?.name }}</span>
-        </div>
-      </div>
-    </div>
-  }
-
-  <div class="card">
-    <h3 class="section-title">
-      <span class="material-icons">lock</span>
-      {{ 'profile.changePassword' | translate }}
-    </h3>
-
-    @if (error()) {
-      <div class="alert alert-danger">
-        <span class="material-icons">error</span>
-        {{ error() }}
-      </div>
-    }
-
-    @if (success()) {
-      <div class="alert alert-success">
-        <span class="material-icons">check_circle</span>
-        {{ success() }}
-      </div>
-    }
-
-    <div class="password-form">
-      <div class="form-group">
-        <label>{{ 'profile.currentPassword' | translate }}</label>
-        <div class="input-wrapper">
-          <span class="material-icons input-icon">lock</span>
-          <input
-            [type]="showOld() ? 'text' : 'password'"
-            class="form-control form-control--icon-left"
-            [placeholder]="'profile.currentPasswordPlaceholder' | translate"
-            [(ngModel)]="oldPassword"
-          />
-          <button type="button" class="input-action" (click)="showOld.update(v => !v)">
-            <span class="material-icons">{{ showOld() ? 'visibility_off' : 'visibility' }}</span>
-          </button>
-        </div>
-      </div>
-
-      <app-password-strength-field
-        [label]="'profile.newPassword' | translate"
-        icon="lock_reset"
-        [placeholder]="'profile.newPasswordPlaceholder' | translate"
-        inputName="newPassword"
-        [password]="newPassword()"
-        (passwordChange)="newPassword.set($event)"
-        (generated)="confirmPassword = $event"
-      />
-
-      <div class="form-group">
-        <label>{{ 'profile.confirmPassword' | translate }}</label>
-        <div class="input-wrapper">
-          <span class="material-icons input-icon">lock_reset</span>
-          <input
-            [type]="showConfirm() ? 'text' : 'password'"
-            class="form-control form-control--icon-left"
-            [placeholder]="'profile.confirmPasswordPlaceholder' | translate"
-            [(ngModel)]="confirmPassword"
-          />
-          <button type="button" class="input-action" (click)="showConfirm.update(v => !v)">
-            <span class="material-icons">{{ showConfirm() ? 'visibility_off' : 'visibility' }}</span>
-          </button>
-        </div>
-      </div>
-
-      <button
-        class="btn btn-primary"
-        [disabled]="changing()"
-        (click)="changePassword()"
-      >
-        @if (changing()) {
-          <div class="spinner"></div>
-          {{ 'profile.changing' | translate }}
-        } @else {
+    <div class="profile-page__aside">
+      <div class="card profile-password">
+        <h3 class="section-title">
           <span class="material-icons">lock</span>
-          {{ 'profile.changePasswordBtn' | translate }}
+          {{ 'profile.changePassword' | translate }}
+        </h3>
+
+        @if (error()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span>
+            {{ error() }}
+          </div>
         }
-      </button>
+
+        @if (success()) {
+          <div class="alert alert-success">
+            <span class="material-icons">check_circle</span>
+            {{ success() }}
+          </div>
+        }
+
+        <div class="password-form">
+          <div class="form-group">
+            <label>{{ 'profile.currentPassword' | translate }}</label>
+            <div class="input-wrapper">
+              <span class="material-icons input-icon">lock</span>
+              <input
+                [type]="showOld() ? 'text' : 'password'"
+                class="form-control form-control--icon-left"
+                [placeholder]="'profile.currentPasswordPlaceholder' | translate"
+                [(ngModel)]="oldPassword"
+              />
+              <button type="button" class="input-action" (click)="showOld.update(v => !v)">
+                <span class="material-icons">{{ showOld() ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <app-password-strength-field
+            [label]="'profile.newPassword' | translate"
+            icon="lock_reset"
+            [placeholder]="'profile.newPasswordPlaceholder' | translate"
+            inputName="newPassword"
+            [password]="newPassword()"
+            (passwordChange)="newPassword.set($event)"
+            (generated)="confirmPassword = $event"
+          />
+
+          <div class="form-group">
+            <label>{{ 'profile.confirmPassword' | translate }}</label>
+            <div class="input-wrapper">
+              <span class="material-icons input-icon">lock_reset</span>
+              <input
+                [type]="showConfirm() ? 'text' : 'password'"
+                class="form-control form-control--icon-left"
+                [placeholder]="'profile.confirmPasswordPlaceholder' | translate"
+                [(ngModel)]="confirmPassword"
+              />
+              <button type="button" class="input-action" (click)="showConfirm.update(v => !v)">
+                <span class="material-icons">{{ showConfirm() ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <button
+            class="btn btn-primary"
+            [disabled]="changing()"
+            (click)="changePassword()"
+          >
+            @if (changing()) {
+              <div class="spinner"></div>
+              {{ 'profile.changing' | translate }}
+            } @else {
+              <span class="material-icons">lock</span>
+              {{ 'profile.changePasswordBtn' | translate }}
+            }
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
