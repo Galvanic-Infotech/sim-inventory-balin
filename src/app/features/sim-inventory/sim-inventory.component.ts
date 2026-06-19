@@ -53,11 +53,11 @@ export class SimInventoryComponent {
   readonly tableQuery = signal<TableQueryParams>({
     pageNumber: 1,
     pageSize: 10,
-    status: 'Initial',
+    status: 'All',
   });
   readonly tableFirst = signal(0);
   readonly searchTerm = signal('');
-  readonly status = signal<string>('Initial');
+  readonly status = signal<string>('All');
 
   readonly totalRecords = computed(() => this.pagination()?.totalCount ?? 0);
 
@@ -83,9 +83,9 @@ export class SimInventoryComponent {
     effect(() => {
       this.auth.entityId();
       this.searchTerm.set('');
-      this.status.set('Initial');
+      this.status.set('All');
       this.tableFirst.set(0);
-      this.tableQuery.set({ pageNumber: 1, pageSize: 10, status: 'Initial' });
+      this.tableQuery.set({ pageNumber: 1, pageSize: 10, status: 'All' });
       this.clearSelection();
       if (this.tableReady) {
         this.fetch();

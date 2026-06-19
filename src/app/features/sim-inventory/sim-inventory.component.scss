@@ -1,6 +1,63 @@
-:host {
-  display: block;
-  padding: var(--space-lg);
+.sim-inventory {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.sim-inventory__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sim-inventory__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+
+  .material-icons {
+    font-size: 18px;
+    color: var(--color-primary);
+  }
+}
+
+.sim-inventory__subtitle {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.sim-inventory__panel {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+  overflow: hidden;
+}
+
+.sim-inventory__panel-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  padding: var(--space-sm) 0 var(--space-md);
+
+  h3 {
+    font-size: var(--font-base);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .spacer {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .cell-mono {
@@ -13,6 +70,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  flex-wrap: wrap;
   padding: 10px var(--space-md);
   background: var(--color-primary-bg);
   border: 1px solid var(--color-primary-light);
@@ -26,6 +84,7 @@
 
   .spacer {
     flex: 1;
+    min-width: 0;
   }
 
   strong {
@@ -47,4 +106,16 @@
 input[type='checkbox'] {
   accent-color: var(--color-primary);
   cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .sim-inventory__panel {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+  }
+
+  .sim-inventory__panel-head {
+    .spacer {
+      display: none;
+    }
+  }
 }
