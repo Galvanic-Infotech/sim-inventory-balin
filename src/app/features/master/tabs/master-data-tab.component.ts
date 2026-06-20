@@ -20,7 +20,7 @@ import {
   PaginationMeta,
 } from '../../../shared/models/rbac.model';
 import { TableQueryParams } from '../../../shared/models/table-query.model';
-import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util';
+import { tableQueryFromLazyEvent, tableQuerySignature, isDuplicateTableFetch, trackEntityIdChange } from '../../../shared/utils/table-query.util';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { TranslationService } from '../../../core/services/translation.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
@@ -149,6 +149,8 @@ export class MasterDataTabComponent {
   private fetchGen = 0;
   /** True after the table has fired its first lazy-load (avoids duplicate init fetch). */
   private tableReady = false;
+  private lastQuerySig = '';
+  private prevEntityId: string | undefined;
 
   createName = '';
   createCode = '';
@@ -176,15 +178,18 @@ export class MasterDataTabComponent {
       },
     });
     effect(() => {
-      this.auth.entityId();
+      const eid = this.auth.entityId();
+      const { changed, next } = trackEntityIdChange(this.prevEntityId, eid);
+      this.prevEntityId = next;
+      if (!changed) return;
+
+      this.lastQuerySig = '';
       this.searchTerm.set('');
       this.tableFirst.set(0);
       this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
       this.showPermDialog.set(false);
       if (this.tableReady) {
         this.fetchSection(this.activeSection(), { pageNumber: 1, pageSize: 10 });
-      } else if (this.activeSection() === 'entityTypes') {
-        this.fetchSection('entityTypes', { pageNumber: 1, pageSize: 10 });
       }
     });
   }
@@ -226,6 +231,14 @@ export class MasterDataTabComponent {
         return;
       }
     }
+
+    const sig = tableQuerySignature(q, {
+      section: sec,
+      stateId: this.filterStateId(),
+      districtId: this.filterDistrictId(),
+    });
+    if (isDuplicateTableFetch(sig, this.lastQuerySig, this.loading())) return;
+    this.lastQuerySig = sig;
 
     this.loading.set(true);
     this.error.set('');

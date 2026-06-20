@@ -8,7 +8,7 @@ import { extractApiError } from '../../core/utils/api-error.util';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { PaginationMeta } from '../../shared/models/rbac.model';
 import { TableQueryParams } from '../../shared/models/table-query.model';
-import { tableQueryFromLazyEvent } from '../../shared/utils/table-query.util';
+import { tableQueryFromLazyEvent, tableQuerySignature, isDuplicateTableFetch, trackEntityIdChange } from '../../shared/utils/table-query.util';
 import {
   BillingConfig,
   BillingTransaction,
@@ -56,6 +56,7 @@ export class BillingComponent {
   private configGen = 0;
   private tableReady = false;
   private lastQuerySig = '';
+  private prevEntityId: string | undefined;
 
   readonly isCredit = isCredit;
   readonly net = transactionNet;
@@ -63,16 +64,20 @@ export class BillingComponent {
   constructor() {
     effect(() => {
       const eid = this.auth.entityId();
-      this.lastQuerySig = '';
-      this.tableFirst.set(0);
-      this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
-      // Always refetch transactions on entity change.
-      // PrimeNG only re-emits onLazyLoad when [first] *changes* — if user was
-      // already on page 1, switching entity wouldn't trigger anything.
-      // The fetch() dedupe-by-signature blocks the PrimeNG echo when it does fire.
-      if (this.tableReady) {
-        this.fetch();
+      const { changed, next } = trackEntityIdChange(this.prevEntityId, eid);
+      this.prevEntityId = next;
+
+      if (changed) {
+        this.lastQuerySig = '';
+        this.tableFirst.set(0);
+        this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
+        // PrimeNG only re-emits onLazyLoad when [first] *changes* — if user was
+        // already on page 1, switching entity wouldn't trigger anything.
+        if (this.tableReady) {
+          this.fetch();
+        }
       }
+
       if (eid) {
         this.fetchConfig(eid);
       } else {
@@ -112,8 +117,8 @@ export class BillingComponent {
 
   fetch(query?: TableQueryParams): void {
     const q: TableQueryParams = { ...this.tableQuery(), ...query };
-    const sig = `${q.pageNumber}|${q.pageSize}|${q.sortBy ?? ''}|${q.sortOrder ?? ''}|${q.searchTerm ?? ''}`;
-    if (sig === this.lastQuerySig && this.loading()) return;
+    const sig = tableQuerySignature(q);
+    if (isDuplicateTableFetch(sig, this.lastQuerySig, this.loading())) return;
     this.lastQuerySig = sig;
     const gen = ++this.fetchGen;
     this.loading.set(true);

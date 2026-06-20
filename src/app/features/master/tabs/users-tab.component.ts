@@ -10,7 +10,7 @@ import { extractApiError, getApiResponseError } from '../../../core/utils/api-er
 import { isStrongPassword } from '../../../core/utils/password-strength.util';
 import { RbacUser, RbacRole, PaginationMeta } from '../../../shared/models/rbac.model';
 import { TableQueryParams } from '../../../shared/models/table-query.model';
-import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util';
+import { tableQueryFromLazyEvent, tableQuerySignature, isDuplicateTableFetch, trackEntityIdChange } from '../../../shared/utils/table-query.util';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { PasswordStrengthFieldComponent } from '../../../shared/components/password-strength-field/password-strength-field.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
@@ -40,6 +40,8 @@ export class UsersTabComponent {
   private fetchGen = 0;
   /** True after the table has fired its first lazy-load (avoids duplicate init fetch). */
   private tableReady = false;
+  private lastQuerySig = '';
+  private prevEntityId: string | undefined;
 
   readonly users = signal<RbacUser[]>([]);
   readonly loading = signal(false);
@@ -82,7 +84,12 @@ export class UsersTabComponent {
 
   constructor() {
     effect(() => {
-      this.auth.entityId();
+      const eid = this.auth.entityId();
+      const { changed, next } = trackEntityIdChange(this.prevEntityId, eid);
+      this.prevEntityId = next;
+      if (!changed) return;
+
+      this.lastQuerySig = '';
       this.searchTerm.set('');
       this.tableFirst.set(0);
       this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
@@ -111,6 +118,9 @@ export class UsersTabComponent {
     const eid = this.auth.entityId();
     if (!eid) return;
     const q = { ...this.tableQuery(), searchTerm: this.searchTerm(), ...query };
+    const sig = tableQuerySignature(q);
+    if (isDuplicateTableFetch(sig, this.lastQuerySig, this.loading())) return;
+    this.lastQuerySig = sig;
     const gen = ++this.fetchGen;
     this.loading.set(true);
     this.error.set('');

@@ -11,7 +11,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SearchBarComponent } from '../../shared/components/search-bar/search-bar.component';
 import { PaginationMeta } from '../../shared/models/rbac.model';
 import { TableQueryParams } from '../../shared/models/table-query.model';
-import { tableQueryFromLazyEvent } from '../../shared/utils/table-query.util';
+import { tableQueryFromLazyEvent, tableQuerySignature, isDuplicateTableFetch, trackEntityIdChange } from '../../shared/utils/table-query.util';
 import { itemStatusChipClass, itemStatusLabel } from '../../shared/models/item-status.model';
 import {
   SIM_INVENTORY_STATUSES,
@@ -74,6 +74,8 @@ export class SimInventoryComponent {
 
   private fetchGen = 0;
   private tableReady = false;
+  private lastQuerySig = '';
+  private prevEntityId: string | undefined;
 
   readonly statusLabel = itemStatusLabel;
   readonly statusChipClass = itemStatusChipClass;
@@ -81,12 +83,19 @@ export class SimInventoryComponent {
 
   constructor() {
     effect(() => {
-      this.auth.entityId();
+      const eid = this.auth.entityId();
+      const { changed, next } = trackEntityIdChange(this.prevEntityId, eid);
+      this.prevEntityId = next;
+      if (!changed) return;
+
+      this.lastQuerySig = '';
       this.searchTerm.set('');
       this.status.set('All');
       this.tableFirst.set(0);
       this.tableQuery.set({ pageNumber: 1, pageSize: 10, status: 'All' });
       this.clearSelection();
+      // PrimeNG only re-emits onLazyLoad when [first] changes — if the user was
+      // already on page 1, switching entity would not trigger a lazy load.
       if (this.tableReady) {
         this.fetch();
       }
@@ -127,6 +136,9 @@ export class SimInventoryComponent {
       status: this.status(),
       ...query,
     };
+    const sig = tableQuerySignature(q);
+    if (isDuplicateTableFetch(sig, this.lastQuerySig, this.loading())) return;
+    this.lastQuerySig = sig;
     const gen = ++this.fetchGen;
     this.loading.set(true);
     this.error.set('');

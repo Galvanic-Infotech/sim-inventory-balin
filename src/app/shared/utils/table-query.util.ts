@@ -49,3 +49,40 @@ export function toQueryRecord(
   }
   return params;
 }
+
+/** Stable key for deduping identical in-flight lazy-table requests. */
+export function tableQuerySignature(
+  query: TableQueryParams,
+  extra: Record<string, string | undefined> = {},
+): string {
+  const base = [
+    query.pageNumber ?? 1,
+    query.pageSize ?? 10,
+    query.sortBy ?? '',
+    query.sortOrder ?? '',
+    query.searchTerm ?? '',
+    query.status ?? '',
+  ].join('|');
+  const extraPart = Object.keys(extra)
+    .sort()
+    .map((k) => `${k}:${extra[k] ?? ''}`)
+    .join('|');
+  return extraPart ? `${base}|${extraPart}` : base;
+}
+
+/** Skip when PrimeNG lazy-load and entity effect fire the same query together. */
+export function isDuplicateTableFetch(
+  sig: string,
+  lastSig: string,
+  loading: boolean,
+): boolean {
+  return sig === lastSig && loading;
+}
+
+/** True only after entityId has changed from a previously seen value (not on first run). */
+export function trackEntityIdChange(
+  prev: string | undefined,
+  current: string,
+): { changed: boolean; next: string } {
+  return { changed: prev !== undefined && prev !== current, next: current };
+}

@@ -12,7 +12,7 @@ import { extractApiError, getApiResponseError } from '../../../core/utils/api-er
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { RbacEntity, RbacEntityType, PaginationMeta, EntityTypeResponseData } from '../../../shared/models/rbac.model';
 import { TableQueryParams } from '../../../shared/models/table-query.model';
-import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util';
+import { tableQueryFromLazyEvent, tableQuerySignature, isDuplicateTableFetch, trackEntityIdChange } from '../../../shared/utils/table-query.util';
 import { BillingConfigDrawerComponent } from '../../../shared/components/billing-config-drawer/billing-config-drawer.component';
 import { BillingCreditDialogComponent } from '../../../shared/components/billing-credit-dialog/billing-credit-dialog.component';
 import { BillingGenerateDialogComponent } from '../../../shared/components/billing-generate-dialog/billing-generate-dialog.component';
@@ -58,6 +58,8 @@ export class EntitiesTabComponent {
   private fetchGen = 0;
   /** True after the table has fired its first lazy-load (avoids duplicate init fetch). */
   private tableReady = false;
+  private lastQuerySig = '';
+  private prevEntityId: string | undefined;
 
   readonly entities = signal<RbacEntity[]>([]);
   readonly entityTypes = signal<RbacEntityType[]>([]);
@@ -177,17 +179,24 @@ export class EntitiesTabComponent {
 
   constructor() {
     effect(() => {
-      this.auth.entityId();
-      this.searchTerm.set('');
-      this.filterTypeId.set('');
-      this.tableFirst.set(0);
-      this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
-      this.showAssignDialog.set(false);
-      this.showDialog.set(false);
-      this.loadEntityTypes();
-      if (this.tableReady) {
-        this.fetch({ pageNumber: 1, pageSize: 10 });
+      const eid = this.auth.entityId();
+      const { changed, next } = trackEntityIdChange(this.prevEntityId, eid);
+      this.prevEntityId = next;
+
+      if (changed) {
+        this.lastQuerySig = '';
+        this.searchTerm.set('');
+        this.filterTypeId.set('');
+        this.tableFirst.set(0);
+        this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
+        this.showAssignDialog.set(false);
+        this.showDialog.set(false);
+        if (this.tableReady) {
+          this.fetch({ pageNumber: 1, pageSize: 10 });
+        }
       }
+
+      this.loadEntityTypes();
     });
   }
 
@@ -215,6 +224,9 @@ export class EntitiesTabComponent {
   fetch(query?: TableQueryParams): void {
     const q = { ...this.tableQuery(), searchTerm: this.searchTerm(), ...query };
     const typeId = this.filterTypeId() || undefined;
+    const sig = tableQuerySignature(q, { typeId });
+    if (isDuplicateTableFetch(sig, this.lastQuerySig, this.loading())) return;
+    this.lastQuerySig = sig;
     const gen = ++this.fetchGen;
     this.loading.set(true);
     this.error.set('');
