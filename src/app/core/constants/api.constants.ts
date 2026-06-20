@@ -64,10 +64,10 @@ export const API_ENDPOINTS = {
     SMS_WHITELIST_PATCH: '/SimActivation/patch-sms-whitelisting',
     INVENTORY: '/SimActivation/sim-inventory',
     INVENTORY_UPDATE: '/SimActivation/sim-inventory-update',
-    BILLING_TRANSACTIONS: '/SimBilling/transactions',
-    BILLING_CONFIG: '/SimBilling', // /{entityId}/config
-    BILLING_CREDIT: '/SimBilling', // /{entityId}/credit
-    BILLING_GENERATE: '/SimBilling/generate', // ?date=YYYY-MM-DD
+    BILLING_TRANSACTIONS: '/Billing/transactions',
+    BILLING_CONFIG: '/Billing', // /{entityId}/config
+    BILLING_CREDIT: '/Billing', // /{entityId}/credit
+    BILLING_GENERATE: '/Billing/generate', // ?date=YYYY-MM-DD
   },
 };
 
