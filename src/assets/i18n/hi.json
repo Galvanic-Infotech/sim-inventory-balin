@@ -105,6 +105,7 @@
       "simInventory": "सिम इन्वेंटरी",
       "billing": "बिलिंग इतिहास",
       "master": "मास्टर",
+      "onboarding": "ऑनबोर्डिंग",
       "oem": "OEM",
       "devices": "डिवाइस",
       "fitment": "फिटमेंट",
@@ -1100,6 +1101,58 @@
     },
     "errors": {
       "load": "सिम इन्वेंटरी लोड करने में विफल"
+    }
+  },
+  "onboarding": {
+    "title": "ग्राहक ऑनबोर्डिंग",
+    "subtitle": "एक स्वचालित प्रवाह में नया OEM इकाई, एडमिन भूमिका और पहला उपयोगकर्ता बनाएं।",
+    "noPermission": "ऑनबोर्डिंग चलाने के लिए इकाई, भूमिका, अनुमति और उपयोगकर्ता बनाने की पहुंच आवश्यक है।",
+    "formTitle": "नए ग्राहक का विवरण",
+    "parentHint": "इकाई इसके अंतर्गत बनाई जाएगी: {{name}}",
+    "fields": {
+      "entityName": "इकाई का नाम",
+      "firstName": "पहला नाम",
+      "lastName": "अंतिम नाम",
+      "email": "ईमेल",
+      "mobile": "मोबाइल",
+      "password": "पासवर्ड",
+      "entityType": "इकाई प्रकार",
+      "roleName": "एडमिन भूमिका का नाम"
+    },
+    "placeholders": {
+      "entityName": "जैसे Acme Fleet Services",
+      "firstName": "पहला नाम",
+      "lastName": "अंतिम नाम",
+      "email": "admin@company.com",
+      "mobile": "10 अंकों का मोबाइल",
+      "password": "मजबूत पासवर्ड"
+    },
+    "generatePassword": "मजबूत पासवर्ड बनाएं",
+    "loadingEntityTypes": "इकाई प्रकार लोड हो रहे हैं…",
+    "advanced": "उन्नत विकल्प",
+    "run": "ऑनबोर्डिंग चलाएं",
+    "running": "चल रहा है…",
+    "startAnother": "एक और ऑनबोर्ड करें",
+    "progressTitle": "प्रगति",
+    "successTitle": "ऑनबोर्डिंग पूर्ण",
+    "successHint": "पासवर्ड सुरक्षित रूप से नए एडमिन के साथ साझा करें। वे ईमेल या मोबाइल से साइन इन कर सकते हैं।",
+    "automatesTitle": "यह स्वचालित करता है",
+    "automates": {
+      "createEntity": "OEM इकाई बनाएं (WL_CUSTOMER प्रकार)",
+      "createRole": "नई इकाई पर Admin भूमिका बनाएं",
+      "assignPerms": "Admin को सभी इकाई अनुमतियाँ दें",
+      "createUser": "एडमिन उपयोगकर्ता खाता बनाएं"
+    },
+    "steps": {
+      "resolveEntityType": "इकाई प्रकार खोजें",
+      "createEntity": "इकाई बनाएं",
+      "createRole": "एडमिन भूमिका बनाएं",
+      "assignPermissions": "सभी अनुमतियाँ दें",
+      "createUser": "उपयोगकर्ता बनाएं"
+    },
+    "errors": {
+      "failed": "ऑनबोर्डिंग विफल",
+      "loadEntityTypes": "इकाई प्रकार लोड करने में विफल"
     }
   }
 }

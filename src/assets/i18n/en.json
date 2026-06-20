@@ -105,6 +105,7 @@
       "simInventory": "SIM Inventory",
       "billing": "Billing History",
       "master": "Master",
+      "onboarding": "Onboarding",
       "oem": "OEM",
       "devices": "Devices",
       "fitment": "Fitment",
@@ -1100,6 +1101,58 @@
     },
     "errors": {
       "load": "Failed to load SIM inventory"
+    }
+  },
+  "onboarding": {
+    "title": "Customer Onboarding",
+    "subtitle": "Create a new OEM entity, admin role, and first user in one automated flow.",
+    "noPermission": "You need entity, role, permission, and user create access to run onboarding.",
+    "formTitle": "New customer details",
+    "parentHint": "Entity will be created under: {{name}}",
+    "fields": {
+      "entityName": "Entity name",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "mobile": "Mobile",
+      "password": "Password",
+      "entityType": "Entity type",
+      "roleName": "Admin role name"
+    },
+    "placeholders": {
+      "entityName": "e.g. Acme Fleet Services",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "admin@company.com",
+      "mobile": "10-digit mobile",
+      "password": "Strong password"
+    },
+    "generatePassword": "Generate strong password",
+    "loadingEntityTypes": "Loading entity types…",
+    "advanced": "Advanced options",
+    "run": "Run onboarding",
+    "running": "Running…",
+    "startAnother": "Onboard another",
+    "progressTitle": "Progress",
+    "successTitle": "Onboarding complete",
+    "successHint": "Share the password securely with the new admin. They can sign in with email or mobile.",
+    "automatesTitle": "This automates",
+    "automates": {
+      "createEntity": "Create OEM entity (WL_CUSTOMER type)",
+      "createRole": "Create Admin role on the new entity",
+      "assignPerms": "Assign all entity permissions to Admin",
+      "createUser": "Create the admin user account"
+    },
+    "steps": {
+      "resolveEntityType": "Resolve entity type",
+      "createEntity": "Create entity",
+      "createRole": "Create admin role",
+      "assignPermissions": "Assign all permissions",
+      "createUser": "Create user"
+    },
+    "errors": {
+      "failed": "Onboarding failed",
+      "loadEntityTypes": "Failed to load entity types"
     }
   }
 }

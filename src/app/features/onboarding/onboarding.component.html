@@ -1,0 +1,243 @@
+<div class="onboarding">
+  <div class="page-header">
+    <h1>{{ 'onboarding.title' | translate }}</h1>
+    <p>{{ 'onboarding.subtitle' | translate }}</p>
+  </div>
+
+  @if (!canRun()) {
+    <div class="card card--centered">
+      <span class="material-icons onboarding__lock">lock</span>
+      <p class="text-muted">{{ 'onboarding.noPermission' | translate }}</p>
+    </div>
+  } @else {
+    <div class="onboarding__grid">
+      <section class="card onboarding__form">
+        <h2>{{ 'onboarding.formTitle' | translate }}</h2>
+        <p class="onboarding__hint">{{ 'onboarding.parentHint' | translate:{ name: parentEntityName() } }}</p>
+
+        <div class="form-group">
+          <label for="entityName">{{ 'onboarding.fields.entityName' | translate }}</label>
+          <input
+            id="entityName"
+            class="form-control"
+            [ngModel]="entityName()"
+            (ngModelChange)="entityName.set($event)"
+            [placeholder]="'onboarding.placeholders.entityName' | translate"
+            [disabled]="running()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="entityTypeId">{{ 'onboarding.fields.entityType' | translate }} *</label>
+          @if (loadingEntityTypes()) {
+            <div class="onboarding__type-loading">
+              <span class="spinner spinner--dark"></span>
+              <span>{{ 'onboarding.loadingEntityTypes' | translate }}</span>
+            </div>
+          } @else if (entityTypesError()) {
+            <div class="alert alert-danger onboarding__type-error">
+              <span class="material-icons">error</span>
+              {{ entityTypesError() }}
+              <button type="button" class="btn btn-ghost btn-sm" (click)="loadEntityTypes()">
+                {{ 'common.retry' | translate }}
+              </button>
+            </div>
+          } @else {
+            <select
+              id="entityTypeId"
+              class="form-control"
+              [ngModel]="entityTypeId()"
+              (ngModelChange)="entityTypeId.set($event)"
+              [disabled]="running()"
+            >
+              <option value="">{{ 'master.common.selectType' | translate }}</option>
+              @for (t of entityTypes(); track t.id) {
+                <option [value]="t.id" [title]="t.description ?? ''">{{ shortName(t.name) }}</option>
+              }
+            </select>
+          }
+        </div>
+
+        <div class="onboarding__row">
+          <div class="form-group">
+            <label for="firstName">{{ 'onboarding.fields.firstName' | translate }}</label>
+            <input
+              id="firstName"
+              class="form-control"
+              [ngModel]="firstName()"
+              (ngModelChange)="firstName.set($event)"
+              [placeholder]="'onboarding.placeholders.firstName' | translate"
+              [disabled]="running()"
+            />
+          </div>
+          <div class="form-group">
+            <label for="lastName">{{ 'onboarding.fields.lastName' | translate }}</label>
+            <input
+              id="lastName"
+              class="form-control"
+              [ngModel]="lastName()"
+              (ngModelChange)="lastName.set($event)"
+              [placeholder]="'onboarding.placeholders.lastName' | translate"
+              [disabled]="running()"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">{{ 'onboarding.fields.email' | translate }}</label>
+          <input
+            id="email"
+            class="form-control"
+            type="email"
+            [ngModel]="email()"
+            (ngModelChange)="onEmailChange($event)"
+            [placeholder]="'onboarding.placeholders.email' | translate"
+            [disabled]="running()"
+          />
+          @if (emailStatus() === 'taken') {
+            <small class="onboarding__field-error">{{ 'master.users.emailTaken' | translate }}</small>
+          } @else if (emailStatus() === 'invalid') {
+            <small class="onboarding__field-error">{{ 'master.users.emailInvalid' | translate }}</small>
+          } @else if (emailStatus() === 'available') {
+            <small class="onboarding__field-ok">{{ 'master.users.emailAvailable' | translate }}</small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="mobile">{{ 'onboarding.fields.mobile' | translate }}</label>
+          <input
+            id="mobile"
+            class="form-control"
+            inputmode="numeric"
+            maxlength="10"
+            [ngModel]="mobile()"
+            (ngModelChange)="onMobileChange($event)"
+            [placeholder]="'onboarding.placeholders.mobile' | translate"
+            [disabled]="running()"
+          />
+          @if (mobileStatus() === 'taken') {
+            <small class="onboarding__field-error">{{ 'master.users.mobileTaken' | translate }}</small>
+          } @else if (mobileStatus() === 'invalid') {
+            <small class="onboarding__field-error">{{ 'master.users.mobileInvalid' | translate }}</small>
+          } @else if (mobileStatus() === 'available') {
+            <small class="onboarding__field-ok">{{ 'master.users.mobileAvailable' | translate }}</small>
+          }
+        </div>
+
+        <app-password-strength-field
+          [label]="'onboarding.fields.password' | translate"
+          [placeholder]="'onboarding.placeholders.password' | translate"
+          [password]="password()"
+          (passwordChange)="password.set($event)"
+        />
+
+        @if (!password()) {
+          <button type="button" class="btn btn-ghost onboarding__gen-pwd" (click)="generatePassword()" [disabled]="running()">
+            <span class="material-icons">auto_fix_high</span>
+            {{ 'onboarding.generatePassword' | translate }}
+          </button>
+        }
+
+        <details class="onboarding__advanced">
+          <summary>{{ 'onboarding.advanced' | translate }}</summary>
+          <div class="form-group">
+            <label for="roleName">{{ 'onboarding.fields.roleName' | translate }}</label>
+            <input
+              id="roleName"
+              class="form-control"
+              [(ngModel)]="roleName"
+              [disabled]="running()"
+            />
+          </div>
+        </details>
+
+        @if (error()) {
+          <div class="alert alert-danger">
+            <span class="material-icons">error</span>
+            {{ error() }}
+          </div>
+        }
+
+        <div class="onboarding__actions">
+          @if (result()) {
+            <button type="button" class="btn btn-ghost" (click)="reset()">
+              {{ 'onboarding.startAnother' | translate }}
+            </button>
+          } @else {
+            <button type="button" class="btn btn-primary" (click)="run()" [disabled]="!canSubmit()">
+              @if (running()) {
+                <span class="spinner spinner--light"></span>
+                {{ 'onboarding.running' | translate }}
+              } @else {
+                <span class="material-icons">rocket_launch</span>
+                {{ 'onboarding.run' | translate }}
+              }
+            </button>
+          }
+        </div>
+      </section>
+
+      <aside class="onboarding__side">
+        <section class="card">
+          <h3>{{ 'onboarding.progressTitle' | translate }}</h3>
+          <ol class="onboarding__steps">
+            @for (step of steps(); track step.key) {
+              <li class="onboarding__step" [class]="'onboarding__step--' + step.status">
+                <span class="material-icons onboarding__step-icon">{{ stepIcon(step.status) }}</span>
+                <div>
+                  <strong>{{ step.labelKey | translate }}</strong>
+                  @if (step.detail) {
+                    <small>{{ step.detail }}</small>
+                  }
+                </div>
+              </li>
+            }
+          </ol>
+        </section>
+
+        @if (result(); as res) {
+          <section class="card onboarding__success">
+            <div class="onboarding__success-head">
+              <span class="material-icons">celebration</span>
+              <h3>{{ 'onboarding.successTitle' | translate }}</h3>
+            </div>
+            <dl class="onboarding__summary">
+              <div>
+                <dt>{{ 'onboarding.fields.entityName' | translate }}</dt>
+                <dd>{{ res.entityName }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'onboarding.fields.email' | translate }}</dt>
+                <dd>{{ res.email }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'onboarding.fields.roleName' | translate }}</dt>
+                <dd>{{ res.roleName }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'onboarding.fields.password' | translate }}</dt>
+                <dd class="onboarding__password-row">
+                  <code>{{ res.password }}</code>
+                  <button type="button" class="btn btn-ghost btn-sm" (click)="copyPassword()">
+                    <span class="material-icons">content_copy</span>
+                  </button>
+                </dd>
+              </div>
+            </dl>
+            <p class="onboarding__hint">{{ 'onboarding.successHint' | translate }}</p>
+          </section>
+        } @else {
+          <section class="card onboarding__info">
+            <h3>{{ 'onboarding.automatesTitle' | translate }}</h3>
+            <ul>
+              <li>{{ 'onboarding.automates.createEntity' | translate }}</li>
+              <li>{{ 'onboarding.automates.createRole' | translate }}</li>
+              <li>{{ 'onboarding.automates.assignPerms' | translate }}</li>
+              <li>{{ 'onboarding.automates.createUser' | translate }}</li>
+            </ul>
+          </section>
+        }
+      </aside>
+    </div>
+  }
+</div>

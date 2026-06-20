@@ -139,6 +139,7 @@ export interface RbacEntityType {
   id: string;
   name: string;
   description?: string;
+  menuName?: string;
   permissions?: RbacPermission[];
 }
 

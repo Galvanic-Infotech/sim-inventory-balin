@@ -52,6 +52,12 @@ export class SidebarComponent {
         route: '/billing',
       },
       { label: t('layout.nav.master'), icon: 'dataset', route: '/master' },
+      {
+        label: t('layout.nav.onboarding'),
+        icon: 'rocket_launch',
+        route: '/onboarding',
+        permission: PERMS.ENTITY_CREATE,
+      },
     ];
   });
 

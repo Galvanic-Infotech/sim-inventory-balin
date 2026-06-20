@@ -54,6 +54,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'onboarding',
+        loadComponent: () =>
+          import('./features/onboarding/onboarding.component').then(
+            (m) => m.OnboardingComponent,
+          ),
+      },
+      {
         path: 'profile',
         loadComponent: () =>
           import('./features/profile/profile.component').then(
