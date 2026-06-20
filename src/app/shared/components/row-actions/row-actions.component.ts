@@ -1,4 +1,4 @@
-import { Component, HostListener, input, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, inject, input, signal } from '@angular/core';
 
 export interface RowAction {
   /** Visible label */
@@ -29,10 +29,26 @@ export class RowActionsComponent {
   readonly ariaLabel = input<string>('Row actions');
 
   readonly open = signal(false);
+  readonly dropUp = signal(false);
+
+  private readonly host = inject(ElementRef<HTMLElement>);
+  private static readonly MENU_HEIGHT_ESTIMATE = 220;
 
   toggle(ev?: Event): void {
     ev?.stopPropagation();
-    this.open.update((v) => !v);
+    const next = !this.open();
+    if (next) {
+      const btn = this.host.nativeElement.querySelector('.row-actions__btn') as HTMLElement | null;
+      const rect = btn?.getBoundingClientRect();
+      const itemCount = this.items().length;
+      const estHeight = Math.min(
+        RowActionsComponent.MENU_HEIGHT_ESTIMATE,
+        itemCount * 38 + 12,
+      );
+      const spaceBelow = rect ? window.innerHeight - rect.bottom : Infinity;
+      this.dropUp.set(rect ? spaceBelow < estHeight + 16 : false);
+    }
+    this.open.set(next);
   }
 
   close(): void {

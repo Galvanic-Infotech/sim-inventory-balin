@@ -570,6 +570,11 @@ table.table {
     display: flex;
     flex-direction: column;
     gap: 2px;
+
+    &--up {
+      top: auto;
+      bottom: calc(100% + 6px);
+    }
   }
 
   &__item {
