@@ -11,9 +11,12 @@ import { TableQueryParams } from '../../shared/models/table-query.model';
 import { tableQueryFromLazyEvent, tableQuerySignature, isDuplicateTableFetch, trackEntityIdChange } from '../../shared/utils/table-query.util';
 import {
   BillingConfig,
+  BillingProductType,
   BillingTransaction,
+  BILLING_PRODUCT_TYPES,
   availableCredit,
   creditUtilisationPct,
+  findBillingConfig,
   isCredit,
   transactionNet,
 } from '../../shared/models/billing.model';
@@ -37,9 +40,17 @@ export class BillingComponent {
   readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 10 });
   readonly tableFirst = signal(0);
 
-  readonly config = signal<BillingConfig | null>(null);
+  readonly configs = signal<BillingConfig[]>([]);
   readonly configLoading = signal(false);
   readonly configError = signal('');
+  readonly selectedProductType = signal<BillingProductType>(BillingProductType.Sim);
+
+  readonly productTypes = BILLING_PRODUCT_TYPES;
+  readonly BillingProductType = BillingProductType;
+
+  readonly config = computed(() =>
+    findBillingConfig(this.configs(), this.selectedProductType()),
+  );
 
   readonly availableCredit = computed(() => {
     const c = this.config();
@@ -49,6 +60,12 @@ export class BillingComponent {
     const c = this.config();
     return c ? creditUtilisationPct(c) : 0;
   });
+
+  readonly rateLabelKey = computed(() =>
+    this.selectedProductType() === BillingProductType.License
+      ? 'billing.summary.rateLicense'
+      : 'billing.summary.rateSim',
+  );
 
   readonly totalRecords = computed(() => this.pagination()?.totalCount ?? 0);
 
@@ -60,6 +77,7 @@ export class BillingComponent {
 
   readonly isCredit = isCredit;
   readonly net = transactionNet;
+  readonly findBillingConfig = findBillingConfig;
 
   constructor() {
     effect(() => {
@@ -81,7 +99,7 @@ export class BillingComponent {
       if (eid) {
         this.fetchConfig(eid);
       } else {
-        this.config.set(null);
+        this.configs.set([]);
       }
     });
   }
@@ -93,18 +111,32 @@ export class BillingComponent {
     this.configLoading.set(true);
     this.configError.set('');
     this.billing.fetchConfig(eid).subscribe({
-      next: (cfg) => {
+      next: (items) => {
         if (gen !== this.configGen) return;
         this.configLoading.set(false);
-        this.config.set(cfg);
+        this.configs.set(items);
+        if (!findBillingConfig(items, this.selectedProductType()) && items.length) {
+          this.selectedProductType.set(items[0].productType);
+        }
       },
       error: (err) => {
         if (gen !== this.configGen) return;
         this.configLoading.set(false);
-        this.config.set(null);
+        this.configs.set([]);
         this.configError.set(extractApiError(err, this.i18n.instant('billing.errors.loadConfig')));
       },
     });
+  }
+
+  selectProductType(type: BillingProductType): void {
+    if (this.selectedProductType() === type) return;
+    this.selectedProductType.set(type);
+    this.lastQuerySig = '';
+    this.tableFirst.set(0);
+    this.tableQuery.update((q) => ({ ...q, pageNumber: 1 }));
+    if (this.tableReady) {
+      this.fetch({ pageNumber: 1 });
+    }
   }
 
   onLazyLoad(event: TableLazyLoadEvent): void {
@@ -123,7 +155,7 @@ export class BillingComponent {
     const gen = ++this.fetchGen;
     this.loading.set(true);
     this.error.set('');
-    this.billing.fetchTransactions(q).subscribe({
+    this.billing.fetchTransactions(q, this.selectedProductType()).subscribe({
       next: (res) => {
         if (gen !== this.fetchGen) return;
         this.loading.set(false);

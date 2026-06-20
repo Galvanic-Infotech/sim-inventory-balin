@@ -4,6 +4,7 @@ import { BillingService } from '../../../core/services/billing.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import { extractApiError } from '../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { BillingProductType, BILLING_PRODUCT_TYPES } from '../../models/billing.model';
 
 @Component({
   selector: 'app-billing-generate-dialog',
@@ -20,6 +21,10 @@ export class BillingGenerateDialogComponent {
   readonly entityName = input<string>('');
 
   readonly closed = output<boolean>();
+
+  readonly productTypes = BILLING_PRODUCT_TYPES;
+  readonly BillingProductType = BillingProductType;
+  productType: BillingProductType = BillingProductType.Sim;
 
   date = this.defaultDate();
   readonly maxDate = this.defaultDate();
@@ -42,7 +47,7 @@ export class BillingGenerateDialogComponent {
     this.saving.set(true);
     this.error.set('');
     this.successMsg.set('');
-    this.billing.generateBill(date, this.entityId()).subscribe({
+    this.billing.generateBill(date, this.entityId(), this.productType).subscribe({
       next: (msg) => {
         this.saving.set(false);
         this.successMsg.set(msg);

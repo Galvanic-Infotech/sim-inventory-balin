@@ -47,9 +47,22 @@ export function transactionNet(t: BillingTransaction): number {
     : t.debitedAmount + t.taxAmount;
 }
 
+export const BillingProductType = {
+  Sim: 1,
+  License: 2,
+} as const;
+
+export type BillingProductType = (typeof BillingProductType)[keyof typeof BillingProductType];
+
+export const BILLING_PRODUCT_TYPES: BillingProductType[] = [
+  BillingProductType.Sim,
+  BillingProductType.License,
+];
+
 export interface BillingConfig {
   id: string;
   entityId: string;
+  productType: BillingProductType;
   yearlyAmount: number;
   yearInDays: number;
   dailyRate: number;
@@ -66,9 +79,13 @@ export function parseBillingConfig(json: Record<string, unknown>): BillingConfig
     const n = typeof v === 'number' ? v : Number(v);
     return Number.isFinite(n) ? n : 0;
   };
+  const rawType = num(json['productType']);
+  const productType =
+    rawType === BillingProductType.License ? BillingProductType.License : BillingProductType.Sim;
   return {
     id: String(json['id'] ?? ''),
     entityId: String(json['entityId'] ?? ''),
+    productType,
     yearlyAmount: num(json['yearlyAmount']),
     yearInDays: num(json['yearInDays']),
     dailyRate: num(json['dailyRate']),
@@ -78,6 +95,23 @@ export function parseBillingConfig(json: Record<string, unknown>): BillingConfig
     createdAt: String(json['createdAt'] ?? ''),
     updatedAt: String(json['updatedAt'] ?? ''),
   };
+}
+
+export function parseBillingConfigs(data: unknown): BillingConfig[] {
+  if (Array.isArray(data)) {
+    return data.map((item) => parseBillingConfig(item as Record<string, unknown>));
+  }
+  if (data && typeof data === 'object') {
+    return [parseBillingConfig(data as Record<string, unknown>)];
+  }
+  return [];
+}
+
+export function findBillingConfig(
+  configs: BillingConfig[],
+  productType: BillingProductType,
+): BillingConfig | null {
+  return configs.find((c) => c.productType === productType) ?? null;
 }
 
 export function availableCredit(c: BillingConfig): number {

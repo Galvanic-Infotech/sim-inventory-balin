@@ -25,6 +25,23 @@
       }
 
       <div class="form-group">
+        <label>{{ 'billing.config.productType' | translate }}</label>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap">
+          @for (type of productTypes; track type) {
+            <button
+              type="button"
+              class="btn"
+              [class.btn-primary]="productType === type"
+              [class.btn-outline]="productType !== type"
+              (click)="productType = type"
+            >
+              {{ ('billing.productType.' + (type === BillingProductType.Sim ? 'sim' : 'license')) | translate }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
         <label>{{ 'billing.credit.amount' | translate }} *</label>
         <input
           class="form-control"

@@ -7,8 +7,11 @@ import { extractApiError } from '../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import {
   BillingConfig,
+  BillingProductType,
+  BILLING_PRODUCT_TYPES,
   availableCredit,
   creditUtilisationPct,
+  findBillingConfig,
 } from '../../models/billing.model';
 
 @Component({
@@ -27,16 +30,25 @@ export class BillingConfigDrawerComponent {
 
   readonly closed = output<boolean>();
 
-  readonly config = signal<BillingConfig | null>(null);
+  readonly configs = signal<BillingConfig[]>([]);
+  readonly selectedProductType = signal<BillingProductType>(BillingProductType.Sim);
   readonly loading = signal(false);
   readonly loadError = signal('');
   readonly saving = signal(false);
   readonly saveError = signal('');
 
+  readonly productTypes = BILLING_PRODUCT_TYPES;
+  readonly BillingProductType = BillingProductType;
+  readonly findBillingConfig = findBillingConfig;
+
   yearlyAmount = 0;
   yearInDays = 365;
   taxRate = 18;
   creditLimit = 0;
+
+  readonly config = computed(() =>
+    findBillingConfig(this.configs(), this.selectedProductType()),
+  );
 
   readonly utilisation = computed(() => {
     const c = this.config();
@@ -66,20 +78,34 @@ export class BillingConfigDrawerComponent {
     this.loading.set(true);
     this.loadError.set('');
     this.billing.fetchConfig(eid).subscribe({
-      next: (cfg) => {
+      next: (items) => {
         this.loading.set(false);
-        this.config.set(cfg);
-        this.yearlyAmount = cfg.yearlyAmount;
-        this.yearInDays = cfg.yearInDays || 365;
-        this.taxRate = cfg.taxRate;
-        this.creditLimit = cfg.creditLimit;
+        this.configs.set(items);
+        if (!findBillingConfig(items, this.selectedProductType()) && items.length) {
+          this.selectedProductType.set(items[0].productType);
+        }
+        this.loadFormFromConfig(this.config());
       },
       error: (err) => {
         this.loading.set(false);
-        this.config.set(null);
+        this.configs.set([]);
         this.loadError.set(extractApiError(err, this.i18n.instant('billing.errors.loadConfig')));
       },
     });
+  }
+
+  selectProductType(type: BillingProductType): void {
+    this.selectedProductType.set(type);
+    this.loadFormFromConfig(findBillingConfig(this.configs(), type));
+    this.saveError.set('');
+  }
+
+  private loadFormFromConfig(cfg: BillingConfig | null): void {
+    if (!cfg) return;
+    this.yearlyAmount = cfg.yearlyAmount;
+    this.yearInDays = cfg.yearInDays || 365;
+    this.taxRate = cfg.taxRate;
+    this.creditLimit = cfg.creditLimit;
   }
 
   close(refresh: boolean): void {
@@ -101,6 +127,7 @@ export class BillingConfigDrawerComponent {
     this.saveError.set('');
     this.billing
       .updateConfig(this.entityId(), {
+        productType: this.selectedProductType(),
         yearlyAmount: Number(this.yearlyAmount),
         yearInDays: Number(this.yearInDays),
         taxRate: Number(this.taxRate),
@@ -109,7 +136,9 @@ export class BillingConfigDrawerComponent {
       .subscribe({
         next: (cfg) => {
           this.saving.set(false);
-          this.config.set(cfg);
+          this.configs.update((items) =>
+            items.map((item) => (item.productType === cfg.productType ? cfg : item)),
+          );
           this.closed.emit(true);
         },
         error: (err) => {

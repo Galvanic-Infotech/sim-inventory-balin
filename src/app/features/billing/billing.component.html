@@ -7,6 +7,21 @@
     <p class="billing__subtitle">{{ 'billing.subtitle' | translate }}</p>
   </div>
 
+  <!-- Product type tabs -->
+  <div class="billing__tabs">
+    @for (type of productTypes; track type) {
+      <button
+        type="button"
+        class="billing__tab"
+        [class.active]="selectedProductType() === type"
+        (click)="selectProductType(type)"
+      >
+        <span class="material-icons">{{ type === BillingProductType.Sim ? 'sim_card' : 'verified_user' }}</span>
+        {{ ('billing.productType.' + (type === BillingProductType.Sim ? 'sim' : 'license')) | translate }}
+      </button>
+    }
+  </div>
+
   <!-- Account summary tiles -->
   <section class="billing__summary">
     <article class="billing-card billing-card--accent">
@@ -55,7 +70,7 @@
         <span class="material-icons">payments</span>
       </div>
       <div>
-        <span class="billing-card__label">{{ 'billing.summary.rate' | translate }}</span>
+        <span class="billing-card__label">{{ rateLabelKey() | translate }}</span>
         <span class="billing-card__value billing-card__value--md">{{ config()?.dailyRate ?? 0 | currency:'INR':'symbol-narrow':'1.4-4' }}</span>
         <span class="billing-card__hint">
           {{ 'billing.summary.yearly' | translate }}: {{ config()?.yearlyAmount ?? 0 | currency:'INR':'symbol-narrow':'1.2-2' }}

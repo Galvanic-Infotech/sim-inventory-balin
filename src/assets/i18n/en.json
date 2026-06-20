@@ -997,9 +997,15 @@
       "creditLimit": "Credit Limit",
       "available": "Available Credit",
       "overLimit": "Over credit limit",
-      "rate": "Daily Rate per SIM",
+      "rate": "Daily Rate",
+      "rateSim": "Daily Rate per SIM",
+      "rateLicense": "Daily Rate per License",
       "yearly": "Yearly",
       "tax": "Tax"
+    },
+    "productType": {
+      "sim": "SIM",
+      "license": "License"
     },
     "columns": {
       "date": "Date",
@@ -1039,6 +1045,7 @@
     },
     "config": {
       "title": "Billing Configuration",
+      "productType": "Product type",
       "editTitle": "Edit configuration",
       "yearlyAmount": "Yearly amount (₹)",
       "yearInDays": "Year in days",
