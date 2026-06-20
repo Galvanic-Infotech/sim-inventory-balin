@@ -13,7 +13,15 @@
 
   @if (open()) {
     <div class="row-actions__backdrop" (click)="close()"></div>
-    <div class="row-actions__menu" [class.row-actions__menu--up]="dropUp()" role="menu">
+    <div
+      class="row-actions__menu"
+      [class.row-actions__menu--up]="dropUp()"
+      [style.top.px]="menuPos()?.top ?? null"
+      [style.bottom.px]="menuPos()?.bottom ?? null"
+      [style.left.px]="menuPos()?.left ?? null"
+      [style.right.px]="menuPos()?.right ?? null"
+      role="menu"
+    >
       @for (item of items(); track item.label) {
         @if (item.dividerBefore) {
           <div class="row-actions__divider"></div>
