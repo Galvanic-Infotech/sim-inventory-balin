@@ -996,7 +996,7 @@
       "creditLimit": "Credit Limit",
       "available": "Available Credit",
       "overLimit": "Over credit limit",
-      "rate": "Daily Rate",
+      "rate": "Daily Rate per SIM",
       "yearly": "Yearly",
       "tax": "Tax"
     },
@@ -1004,7 +1004,7 @@
       "date": "Date",
       "type": "Type",
       "activeSims": "Active SIMs",
-      "rate": "Rate",
+      "rate": "Rate per SIM",
       "debited": "Debited",
       "tax": "Tax",
       "credited": "Credited",
