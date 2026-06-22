@@ -1,4 +1,4 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, OnDestroy, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SimService } from '../../core/services/sim.service';
 import { PermissionService, PERMS } from '../../core/services/permission.service';
@@ -24,9 +24,10 @@ export type ValidTillPreset = '3months' | '6months' | '1year' | 'custom';
   templateUrl: './sim-search-panel.component.html',
   styleUrl: './sim-search-panel.component.scss',
 })
-export class SimSearchPanelComponent {
+export class SimSearchPanelComponent implements OnDestroy {
   private readonly sim = inject(SimService);
   readonly perm = inject(PermissionService);
+  private clearCountdownTimer: ReturnType<typeof setInterval> | null = null;
 
   readonly basketRefresh = output<void>();
 
@@ -45,6 +46,8 @@ export class SimSearchPanelComponent {
   readonly showConfirm = signal<'activate' | 'temp' | 'resume' | null>(null);
   readonly showSmsDialog = signal(false);
   readonly copiedToast = signal(false);
+  readonly clearCountdown = signal<number | null>(null);
+  readonly statusChecking = signal(false);
 
   // Activation form fields
   validTillPreset: ValidTillPreset = '1year';
@@ -59,7 +62,13 @@ export class SimSearchPanelComponent {
   readonly isActive = isSimActive;
   readonly isTempDisconnected = isSimTempDisconnected;
 
+  ngOnDestroy(): void {
+    this.stopClearCountdown();
+  }
+
   search(): void {
+    this.stopClearCountdown();
+
     const value = this.searchValue.trim();
     if (!value) return;
 
@@ -159,8 +168,12 @@ export class SimSearchPanelComponent {
         remarks: this.remarks.trim(),
       }).subscribe({
         next: () => {
+          this.actionLoading.set(false);
+          this.showConfirm.set(null);
+          this.basketRefresh.emit();
+          this.refreshSimDetail();
           this.actionSuccess.set('SIM activation initiated successfully.');
-          done();
+          this.startPostActivateCountdown();
         },
         error: (err) => {
           this.actionLoading.set(false);
@@ -202,5 +215,73 @@ export class SimSearchPanelComponent {
 
   statusClass(status: string): string {
     return itemStatusChipClass(status);
+  }
+
+  checkStatus(): void {
+    this.fetchSimDetail(false);
+  }
+
+  private refreshSimDetail(): void {
+    this.fetchSimDetail(true);
+  }
+
+  private fetchSimDetail(silent: boolean): void {
+    if (!silent && this.statusChecking()) return;
+
+    const value = this.searchValue.trim();
+    if (!value) return;
+
+    const filterType = resolveSimFilterType(value);
+    if (!filterType) return;
+
+    if (!silent) {
+      this.statusChecking.set(true);
+      this.searchError.set('');
+    }
+
+    this.sim.searchSim(filterType, value).subscribe({
+      next: (sim) => {
+        if (!silent) this.statusChecking.set(false);
+        this.simDetail.set(sim);
+      },
+      error: (err) => {
+        if (!silent) {
+          this.statusChecking.set(false);
+          this.searchError.set(extractApiError(err, 'Request failed'));
+        }
+      },
+    });
+  }
+
+  private startPostActivateCountdown(): void {
+    this.stopClearCountdown();
+    this.clearCountdown.set(10);
+
+    this.clearCountdownTimer = setInterval(() => {
+      const seconds = this.clearCountdown();
+      if (seconds === null || seconds <= 1) {
+        this.stopClearCountdown();
+        this.resetSearch();
+        return;
+      }
+      this.clearCountdown.set(seconds - 1);
+    }, 1000);
+  }
+
+  private stopClearCountdown(): void {
+    if (this.clearCountdownTimer) {
+      clearInterval(this.clearCountdownTimer);
+      this.clearCountdownTimer = null;
+    }
+    this.clearCountdown.set(null);
+  }
+
+  private resetSearch(): void {
+    this.searchValue = '';
+    this.hasSearched.set(false);
+    this.simDetail.set(null);
+    this.actionSuccess.set('');
+    this.searchError.set('');
+    this.actionError.set('');
   }
 }

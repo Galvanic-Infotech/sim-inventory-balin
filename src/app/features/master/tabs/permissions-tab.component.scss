@@ -1,0 +1,114 @@
+:host {
+  display: block;
+}
+
+.perm-groups--view {
+  gap: var(--space-md);
+}
+
+.perm-groups--view .perm-group {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow 0.15s ease;
+
+  &--open {
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.perm-groups--view .perm-group-header {
+  width: 100%;
+  border: none;
+  font-family: var(--font-family);
+  text-align: left;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg-card);
+
+  .perm-group--open & {
+    border-bottom: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-bg-page) 55%, var(--color-bg-card));
+  }
+
+  strong {
+    font-size: var(--font-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .count-badge {
+    min-width: 1.75rem;
+    text-align: center;
+    padding: 2px 8px;
+  }
+}
+
+.perm-groups--view .perm-group-header-left {
+  width: 100%;
+}
+
+.perm-table-wrap {
+  overflow-x: auto;
+}
+
+.perm-table {
+  margin: 0;
+
+  th {
+    padding: 10px var(--space-lg);
+    font-size: var(--font-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+    background: var(--color-bg-page);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  td {
+    padding: 14px var(--space-lg);
+    border-bottom: 1px solid var(--color-border-light);
+    vertical-align: top;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover td {
+    background: color-mix(in srgb, var(--color-primary-bg) 35%, transparent);
+  }
+
+  &__index {
+    width: 3rem;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--font-xs);
+  }
+
+  &__desc {
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    font-size: var(--font-sm);
+  }
+}
+
+.perm-key {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.perm-groups--view .perm-list-empty {
+  padding: var(--space-lg);
+  text-align: center;
+  border-top: none;
+}

@@ -36,22 +36,27 @@
 } @else {
   <div class="perm-groups perm-groups--view">
     @for (group of groups(); track group.id) {
-      <div class="perm-group">
-        <div class="perm-group-header" (click)="toggleGroup(group.id)">
+      <div class="perm-group" [class.perm-group--open]="expandedGroups().has(group.id)">
+        <button
+          type="button"
+          class="perm-group-header"
+          [attr.aria-expanded]="expandedGroups().has(group.id)"
+          (click)="toggleGroup(group.id)"
+        >
           <div class="perm-group-header-left">
             <span class="material-icons perm-group-arrow">
               {{ expandedGroups().has(group.id) ? 'expand_more' : 'chevron_right' }}
             </span>
             <strong>{{ group.name }}</strong>
-            <small class="text-muted">{{ group.permissions.length }}</small>
+            <span class="count-badge">{{ group.permissions.length }}</span>
           </div>
-        </div>
+        </button>
         @if (expandedGroups().has(group.id)) {
           @if (!group.permissions.length) {
             <div class="perm-list-empty">{{ 'master.common.noPermissionsInGroup' | translate }}</div>
           } @else {
-            <div class="table-wrapper">
-              <table class="table table--compact">
+            <div class="perm-table-wrap">
+              <table class="table table--compact perm-table">
                 <thead>
                   <tr>
                     <th>#</th>
@@ -62,9 +67,11 @@
                 <tbody>
                   @for (p of group.permissions; track p.id; let i = $index) {
                     <tr>
-                      <td>{{ i + 1 }}</td>
-                      <td>{{ p.name }}</td>
-                      <td>{{ p.description ?? '—' }}</td>
+                      <td class="perm-table__index">{{ i + 1 }}</td>
+                      <td>
+                        <code class="perm-key">{{ p.name }}</code>
+                      </td>
+                      <td class="perm-table__desc">{{ p.description ?? '—' }}</td>
                     </tr>
                   }
                 </tbody>

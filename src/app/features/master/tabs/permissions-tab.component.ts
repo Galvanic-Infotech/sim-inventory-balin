@@ -13,6 +13,7 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
   standalone: true,
   imports: [FormsModule, TranslatePipe],
   templateUrl: './permissions-tab.component.html',
+  styleUrl: './permissions-tab.component.scss',
 })
 export class PermissionsTabComponent {
   private readonly auth = inject(AuthService);

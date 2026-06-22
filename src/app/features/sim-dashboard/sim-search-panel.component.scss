@@ -56,6 +56,34 @@
   &__toast {
     margin-bottom: var(--space-sm);
   }
+
+  &__countdown {
+    display: block;
+    margin-top: var(--space-xs);
+    font-size: var(--font-xs);
+    opacity: 0.85;
+  }
+
+  &__success {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  &__check-status {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    font-size: var(--font-xs);
+    font-weight: 600;
+    background: var(--color-bg-card);
+
+    .material-icons {
+      font-size: 16px;
+    }
+  }
 }
 
 .sim-detail {

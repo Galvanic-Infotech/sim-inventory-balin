@@ -38,7 +38,25 @@
         <div class="alert alert-success sim-search__toast">Copied!</div>
       }
       @if (actionSuccess()) {
-        <div class="alert alert-success">{{ actionSuccess() }}</div>
+        <div class="alert alert-success sim-search__success">
+          {{ actionSuccess() }}
+          @if (clearCountdown(); as seconds) {
+            <span class="sim-search__countdown">Clearing search in {{ seconds }}s</span>
+            <button
+              type="button"
+              class="btn btn-outline sim-search__check-status"
+              [disabled]="statusChecking()"
+              (click)="checkStatus()"
+            >
+              @if (statusChecking()) {
+                <span class="spinner"></span>
+              } @else {
+                <span class="material-icons">refresh</span>
+              }
+              Check Status
+            </button>
+          }
+        </div>
       }
       <div class="sim-detail">
         <div class="sim-detail__header">
