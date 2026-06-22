@@ -17,6 +17,8 @@ import {
   availableCredit,
   billingProductTypeIcon,
   billingProductTypeLabelKey,
+  buildBillingChartDays,
+  buildBillingChartGeometry,
   creditUtilisationPct,
   findBillingConfig,
   isCredit,
@@ -71,6 +73,41 @@ export class BillingComponent {
 
   readonly totalRecords = computed(() => this.pagination()?.totalCount ?? 0);
 
+  readonly chartDays = computed(() => {
+    if ((this.tableQuery().pageNumber ?? 1) !== 1) return [];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return buildBillingChartDays(this.items(), 7, yesterday);
+  });
+
+  readonly chartGeometry = computed(() => buildBillingChartGeometry(this.chartDays()));
+
+  readonly chartTotal = computed(() =>
+    this.chartDays().reduce((sum, d) => sum + Math.abs(d.net), 0),
+  );
+
+  readonly chartHasData = computed(() =>
+    this.chartDays().some((d) => d.net !== 0),
+  );
+
+  readonly chartMaxValue = computed(() => {
+    const pts = this.chartGeometry().points;
+    return pts.length ? Math.max(...pts.map((p) => p.amount)) : 0;
+  });
+
+  readonly hoveredChartDate = signal<string | null>(null);
+
+  readonly hoveredChartPoint = computed(() => {
+    const date = this.hoveredChartDate();
+    if (!date) return null;
+    return this.chartGeometry().points.find((p) => p.date === date) ?? null;
+  });
+
+  readonly todayChartDate = computed(() => {
+    const days = this.chartDays();
+    return days.length ? days[days.length - 1].date : null;
+  });
+
   private fetchGen = 0;
   private configGen = 0;
   private tableReady = false;
@@ -93,8 +130,6 @@ export class BillingComponent {
         this.lastQuerySig = '';
         this.tableFirst.set(0);
         this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
-        // PrimeNG only re-emits onLazyLoad when [first] *changes* — if user was
-        // already on page 1, switching entity wouldn't trigger anything.
         if (this.tableReady) {
           this.fetch();
         }
@@ -151,6 +186,26 @@ export class BillingComponent {
     this.fetch(query);
   }
 
+  chartDayLabel(date: string): string {
+    const d = new Date(`${date}T00:00:00`);
+    return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' });
+  }
+
+  chartFullDate(date: string): string {
+    const d = new Date(`${date}T00:00:00`);
+    return d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
+  }
+
+  setHoveredChartDate(date: string | null): void {
+    this.hoveredChartDate.set(date);
+  }
+
+  refreshAll(): void {
+    this.lastQuerySig = '';
+    this.fetch();
+    this.fetchConfig();
+  }
+
   fetch(query?: TableQueryParams): void {
     const q: TableQueryParams = { ...this.tableQuery(), ...query };
     const sig = tableQuerySignature(q);
@@ -175,5 +230,4 @@ export class BillingComponent {
       },
     });
   }
-
 }

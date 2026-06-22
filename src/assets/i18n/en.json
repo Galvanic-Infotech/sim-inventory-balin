@@ -991,6 +991,11 @@
     "subtitle": "Daily SIM billing transactions, debits, credits and applied tax.",
     "tableTitle": "Transactions",
     "empty": "No transactions found",
+    "chart": {
+      "title": "Last 7 Days",
+      "total": "7-day volume",
+      "empty": "No transactions in the last 7 days"
+    },
     "summary": {
       "outstanding": "Current Outstanding",
       "outstandingHint": "Total billable amount pending settlement",

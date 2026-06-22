@@ -80,6 +80,114 @@
     </article>
   </section>
 
+  <!-- 7-day transaction chart -->
+  <section class="billing__panel billing__chart">
+    <div class="billing__panel-head">
+      <h3>{{ 'billing.chart.title' | translate }}</h3>
+      @if (chartHasData()) {
+        <span class="billing__chart-total">
+          {{ 'billing.chart.total' | translate }}:
+          <strong>{{ chartTotal() | currency:'INR':'symbol-narrow':'1.2-2' }}</strong>
+        </span>
+      }
+    </div>
+
+    @if (loading() && !items().length) {
+      <div class="billing__chart-skeleton" aria-hidden="true">
+        <div class="billing__chart-skel-line"></div>
+      </div>
+    } @else if (!chartHasData()) {
+      <div class="billing__chart-empty">
+        <span class="material-icons">show_chart</span>
+        <p>{{ 'billing.chart.empty' | translate }}</p>
+      </div>
+    } @else {
+      <div class="billing__chart-wrap">
+        <div class="billing__chart-yaxis">
+          <span>{{ chartMaxValue() | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+          <span>{{ (chartMaxValue() / 2) | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+          <span>{{ 0 | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+
+        <div class="billing__chart-plot" (mouseleave)="setHoveredChartDate(null)">
+          <svg class="billing__chart-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="billing-line-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.32" />
+                <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+
+            @for (tick of [0, 50, 100]; track tick) {
+              <line
+                class="billing__chart-grid"
+                x1="0" [attr.y1]="10 + tick * 0.86"
+                x2="100" [attr.y2]="10 + tick * 0.86"
+              />
+            }
+
+            <path class="billing__chart-area" [attr.d]="chartGeometry().areaPath" fill="url(#billing-line-fill)" />
+            <path class="billing__chart-line" [attr.d]="chartGeometry().linePath" />
+          </svg>
+
+          @if (hoveredChartPoint(); as hp) {
+            <span
+              class="billing__chart-hover-line"
+              [style.left.%]="hp.x"
+              aria-hidden="true"
+            ></span>
+          }
+
+          @for (pt of chartGeometry().points; track pt.date) {
+            <button
+              type="button"
+              class="billing__chart-point"
+              [class.billing__chart-point--credit]="pt.net > 0"
+              [class.billing__chart-point--empty]="pt.amount === 0"
+              [class.billing__chart-point--today]="pt.date === todayChartDate()"
+              [class.billing__chart-point--active]="pt.date === hoveredChartDate()"
+              [style.left.%]="pt.x"
+              [style.top.%]="pt.y"
+              (mouseenter)="setHoveredChartDate(pt.date)"
+              (focus)="setHoveredChartDate(pt.date)"
+              (blur)="setHoveredChartDate(null)"
+              [attr.aria-label]="chartDayLabel(pt.date) + ': ' + (pt.amount | currency:'INR':'symbol-narrow':'1.0-0')"
+            ></button>
+          }
+
+          @if (hoveredChartPoint(); as hp) {
+            <div
+              class="billing__chart-tooltip"
+              [class.billing__chart-tooltip--right]="hp.x < 30"
+              [class.billing__chart-tooltip--left]="hp.x > 70"
+              [style.left.%]="hp.x"
+              [style.top.%]="hp.y"
+            >
+              <span class="billing__chart-tooltip-date">{{ chartFullDate(hp.date) }}</span>
+              <span
+                class="billing__chart-tooltip-amount"
+                [class.billing__chart-tooltip-amount--credit]="hp.net > 0"
+                [class.billing__chart-tooltip-amount--debit]="hp.net < 0"
+              >
+                {{ hp.net > 0 ? '+' : (hp.net < 0 ? '−' : '') }}{{ hp.amount | currency:'INR':'symbol-narrow':'1.2-2' }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <div class="billing__chart-labels">
+          @for (pt of chartGeometry().points; track pt.date) {
+            <span
+              class="billing__chart-label"
+              [class.billing__chart-label--today]="pt.date === todayChartDate()"
+              [class.billing__chart-label--active]="pt.date === hoveredChartDate()"
+            >{{ chartDayLabel(pt.date) }}</span>
+          }
+        </div>
+      </div>
+    }
+  </section>
+
   <!-- Table -->
   <section class="billing__panel">
     <div class="billing__panel-head">
@@ -88,7 +196,7 @@
         <span class="count-badge">{{ pg.totalCount }}</span>
       }
       <span class="spacer"></span>
-      <button class="btn btn-ghost" (click)="fetch()" [title]="'common.refresh' | translate">
+      <button class="btn btn-ghost" (click)="refreshAll()" [title]="'common.refresh' | translate">
         <span class="material-icons">refresh</span>
       </button>
     </div>
