@@ -1,19 +1,19 @@
 <div class="card status-overview">
-  <h2 class="status-overview__title">SIM Status Overview</h2>
+  <h2 class="status-overview__title">{{ 'simDashboard.statusOverview.title' | translate }}</h2>
   <div class="status-overview__body">
     <div class="status-overview__donut-wrap">
       <div class="status-overview__donut" [style.background]="donutGradient()">
         <div class="status-overview__donut-hole">
-          <span class="status-overview__donut-label">Total SIMs</span>
+          <span class="status-overview__donut-label">{{ 'simDashboard.statusOverview.totalSims' | translate }}</span>
           <span class="status-overview__donut-value">{{ basket().totalSim }}</span>
         </div>
       </div>
     </div>
     <div class="status-overview__bars">
-      @for (seg of segments(); track seg.label) {
+      @for (seg of segments(); track seg.labelKey) {
         <div class="status-overview__bar-row">
           <span class="status-overview__dot" [style.background]="seg.color"></span>
-          <span class="status-overview__bar-label">{{ seg.label }}</span>
+          <span class="status-overview__bar-label">{{ seg.labelKey | translate }}</span>
           <div class="status-overview__bar-track">
             <div
               class="status-overview__bar-fill"

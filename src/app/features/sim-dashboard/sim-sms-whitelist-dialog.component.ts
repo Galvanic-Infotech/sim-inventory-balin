@@ -1,29 +1,31 @@
 import { Component, inject, input, output, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SimService } from '../../core/services/sim.service';
+import { TranslationService } from '../../core/services/translation.service';
 import { extractApiError } from '../../core/utils/api-error.util';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import {
   SmsWhitelisting,
   SmsWhitelistType,
   emptySmsWhitelisting,
 } from '../../shared/models/sim.model';
 
-const WHITELIST_TYPES: { value: SmsWhitelistType; label: string }[] = [
-  { value: null, label: 'None' },
-  { value: 'INCOMING', label: 'Incoming' },
-  { value: 'OUTGOING', label: 'Outgoing' },
-  { value: 'INCOMINGANDOUTGOING', label: 'Incoming & Outgoing' },
+const WHITELIST_TYPES: { value: SmsWhitelistType; labelKey: string }[] = [
+  { value: null, labelKey: 'simDashboard.smsWhitelist.none' },
+  { value: 'INCOMING', labelKey: 'simDashboard.smsWhitelist.incoming' },
+  { value: 'OUTGOING', labelKey: 'simDashboard.smsWhitelist.outgoing' },
+  { value: 'INCOMINGANDOUTGOING', labelKey: 'simDashboard.smsWhitelist.incomingOutgoing' },
 ];
 
 @Component({
   selector: 'app-sim-sms-whitelist-dialog',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, TranslatePipe],
   template: `
     <div class="dialog-backdrop" (click)="closed.emit()">
       <div class="dialog-card dialog-card--wide" (click)="$event.stopPropagation()">
         <div class="dialog-header">
-          <h2>SMS Whitelisting</h2>
+          <h2>{{ 'simDashboard.smsWhitelist.title' | translate }}</h2>
           <button type="button" class="btn btn-ghost" (click)="closed.emit()">
             <span class="material-icons">close</span>
           </button>
@@ -38,16 +40,16 @@ const WHITELIST_TYPES: { value: SmsWhitelistType; label: string }[] = [
           } @else {
             @if (data()?.basketName) {
               <p class="text-muted sms-meta">
-                Basket: {{ data()!.basketName }}
+                {{ 'simDashboard.smsWhitelist.basket' | translate }}: {{ data()!.basketName }}
                 @if (data()!.remainingOrderCount) {
-                  · Remaining orders: {{ data()!.remainingOrderCount }}
+                  · {{ 'simDashboard.smsWhitelist.remainingOrders' | translate }}: {{ data()!.remainingOrderCount }}
                 }
               </p>
             }
             @for (entry of entries(); track $index) {
               <div class="sms-row">
                 <div class="form-group">
-                  <label>Whitelist Number {{ $index + 1 }}</label>
+                  <label>{{ 'simDashboard.smsWhitelist.whitelistNumber' | translate: { index: $index + 1 } }}</label>
                   <input
                     class="form-control"
                     type="text"
@@ -57,14 +59,14 @@ const WHITELIST_TYPES: { value: SmsWhitelistType; label: string }[] = [
                   />
                 </div>
                 <div class="form-group">
-                  <label>Type</label>
+                  <label>{{ 'simDashboard.smsWhitelist.type' | translate }}</label>
                   <select
                     class="form-control"
                     [ngModel]="entry.type"
                     (ngModelChange)="updateType($index, $event)"
                   >
-                    @for (t of whitelistTypes; track t.label) {
-                      <option [ngValue]="t.value">{{ t.label }}</option>
+                    @for (t of whitelistTypes; track t.labelKey) {
+                      <option [ngValue]="t.value">{{ t.labelKey | translate }}</option>
                     }
                   </select>
                 </div>
@@ -74,12 +76,12 @@ const WHITELIST_TYPES: { value: SmsWhitelistType; label: string }[] = [
               <div class="alert alert-danger">{{ saveError() }}</div>
             }
             @if (saveSuccess()) {
-              <div class="alert alert-success">SMS whitelisting saved successfully.</div>
+              <div class="alert alert-success">{{ 'simDashboard.smsWhitelist.saved' | translate }}</div>
             }
           }
         </div>
         <div class="dialog-footer">
-          <button type="button" class="btn btn-outline" (click)="closed.emit()">Cancel</button>
+          <button type="button" class="btn btn-outline" (click)="closed.emit()">{{ 'common.cancel' | translate }}</button>
           <button
             type="button"
             class="btn btn-primary"
@@ -89,7 +91,7 @@ const WHITELIST_TYPES: { value: SmsWhitelistType; label: string }[] = [
             @if (saving()) {
               <span class="spinner"></span>
             }
-            Save
+            {{ 'simDashboard.smsWhitelist.save' | translate }}
           </button>
         </div>
       </div>
@@ -115,6 +117,7 @@ const WHITELIST_TYPES: { value: SmsWhitelistType; label: string }[] = [
 })
 export class SimSmsWhitelistDialogComponent {
   private readonly sim = inject(SimService);
+  private readonly i18n = inject(TranslationService);
 
   readonly iccid = input.required<string>();
   readonly closed = output<void>();
@@ -152,7 +155,9 @@ export class SimSmsWhitelistDialogComponent {
       },
       error: (err) => {
         this.loading.set(false);
-        this.error.set(extractApiError(err, 'Request failed'));
+        this.error.set(
+          extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
+        );
         this.data.set(emptySmsWhitelisting());
         this.entries.set(
           emptySmsWhitelisting().entries.map((e) => ({
@@ -184,7 +189,7 @@ export class SimSmsWhitelistDialogComponent {
     const d = this.data();
     const msisdn = d?.msisdn;
     if (!msisdn) {
-      this.saveError.set('MSISDN not available for this SIM.');
+      this.saveError.set(this.i18n.translate('simDashboard.smsWhitelist.errors.msisdnUnavailable'));
       return;
     }
     const e = this.entries();
@@ -211,7 +216,9 @@ export class SimSmsWhitelistDialogComponent {
         },
         error: (err) => {
           this.saving.set(false);
-          this.saveError.set(extractApiError(err, 'Request failed'));
+          this.saveError.set(
+            extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
+          );
         },
       });
   }

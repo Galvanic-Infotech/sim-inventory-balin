@@ -1,19 +1,19 @@
 @if (wip) {
   <div class="page-header">
-    <h1>Dashboard</h1>
+    <h1>{{ 'simDashboard.title' | translate }}</h1>
   </div>
   <div class="card card--centered">
     <span class="material-icons" style="font-size: 48px; color: var(--color-text-muted)">construction</span>
-    <p class="text-muted">Work in progress</p>
+    <p class="text-muted">{{ 'simDashboard.wip' | translate }}</p>
   </div>
 } @else if (!canView()) {
   <div class="page-header">
-    <h1>Dashboard</h1>
-    <p>Overview of SIM inventory and activation status</p>
+    <h1>{{ 'simDashboard.title' | translate }}</h1>
+    <p>{{ 'simDashboard.subtitle' | translate }}</p>
   </div>
   <div class="card card--centered">
     <span class="material-icons" style="font-size: 48px; color: var(--color-text-muted)">lock</span>
-    <p class="text-muted">You do not have permission to view the SIM dashboard.</p>
+    <p class="text-muted">{{ 'simDashboard.noPermission' | translate }}</p>
   </div>
 } @else {
   <div class="sim-dashboard__layout">
@@ -26,15 +26,15 @@
 
         <div class="hero-card__head">
           <div>
-            <span class="hero-card__eyebrow">SIM Fleet</span>
-            <h2 class="hero-card__title">Your Total Inventory</h2>
+            <span class="hero-card__eyebrow">{{ 'simDashboard.hero.eyebrow' | translate }}</span>
+            <h2 class="hero-card__title">{{ 'simDashboard.hero.title' | translate }}</h2>
           </div>
           <button
             type="button"
             class="hero-card__refresh"
             [disabled]="loadingBasket()"
             (click)="fetchBasket()"
-            title="Refresh"
+            [title]="'common.refresh' | translate"
           >
             <span class="material-icons" [class.spin]="loadingBasket()">refresh</span>
           </button>
@@ -45,39 +45,39 @@
             <span class="hero-card__count-skel"></span>
           } @else {
             <span class="hero-card__count-value">{{ basket()?.totalSim ?? 0 | number }}</span>
-            <span class="hero-card__count-suffix">SIMs</span>
+            <span class="hero-card__count-suffix">{{ 'simDashboard.hero.sims' | translate }}</span>
           }
         </div>
 
         <p class="hero-card__sub">
-          {{ healthyPercent() }}% healthy across active + available pools
+          {{ 'simDashboard.hero.healthySub' | translate: { percent: healthyPercent() } }}
         </p>
 
         <div class="hero-card__actions">
           <a class="hero-action" routerLink="/sim-inventory">
             <span class="material-icons">sim_card</span>
-            Inventory
+            {{ 'simDashboard.hero.inventory' | translate }}
           </a>
           <a class="hero-action" routerLink="/sim-inventory">
             <span class="material-icons">bolt</span>
-            Activate
+            {{ 'simDashboard.hero.activate' | translate }}
           </a>
           <a class="hero-action" routerLink="/master">
             <span class="material-icons">tune</span>
-            Manage
+            {{ 'simDashboard.hero.manage' | translate }}
           </a>
         </div>
       </section>
 
       <!-- KPI tiles -->
       <section class="kpi-grid">
-        @for (k of kpis(); track k.label) {
+        @for (k of kpis(); track k.labelKey) {
           <article class="kpi-tile">
             <div class="kpi-tile__icon" [style.background]="k.tint" [style.color]="k.color">
               <span class="material-icons">{{ k.icon }}</span>
             </div>
             <div class="kpi-tile__body">
-              <span class="kpi-tile__label">{{ k.label }}</span>
+              <span class="kpi-tile__label">{{ k.labelKey | translate }}</span>
               @if (loadingBasket() && !basket()) {
                 <span class="kpi-tile__skel"></span>
               } @else {
@@ -98,7 +98,7 @@
         <div class="alert alert-danger">
           <span class="material-icons">error</span>
           <span>{{ basketError() }}</span>
-          <button type="button" class="btn btn-outline" (click)="fetchBasket()">Retry</button>
+          <button type="button" class="btn btn-outline" (click)="fetchBasket()">{{ 'common.retry' | translate }}</button>
         </div>
       }
 
@@ -110,29 +110,29 @@
       <!-- Activity placeholder -->
       <section class="card insights-card">
         <div class="insights-card__head">
-          <h3>Live insights</h3>
-          <span class="chip chip--primary">Beta</span>
+          <h3>{{ 'simDashboard.insights.title' | translate }}</h3>
+          <span class="chip chip--primary">{{ 'simDashboard.insights.beta' | translate }}</span>
         </div>
         <div class="insights-card__grid">
           <div class="insight">
             <span class="material-icons insight__icon" style="background: var(--color-success-bg); color: var(--color-success)">trending_up</span>
             <div>
-              <strong>Activation throughput</strong>
-              <p>Most SIMs activated during business hours — peak between 11 AM &amp; 4 PM.</p>
+              <strong>{{ 'simDashboard.insights.activationTitle' | translate }}</strong>
+              <p>{{ 'simDashboard.insights.activationBody' | translate }}</p>
             </div>
           </div>
           <div class="insight">
             <span class="material-icons insight__icon" style="background: var(--color-warning-bg); color: var(--color-warning)">schedule</span>
             <div>
-              <strong>Expiring soon</strong>
-              <p>{{ aboutExpired() }} SIMs are about to expire. Renew them before they hit zero.</p>
+              <strong>{{ 'simDashboard.insights.expiringTitle' | translate }}</strong>
+              <p>{{ 'simDashboard.insights.expiringBody' | translate: { count: aboutExpired() } }}</p>
             </div>
           </div>
           <div class="insight">
             <span class="material-icons insight__icon" style="background: var(--color-primary-soft); color: var(--color-primary)">insights</span>
             <div>
-              <strong>Pool utilisation</strong>
-              <p>{{ utilisation() }}% of the inventory is in active use right now.</p>
+              <strong>{{ 'simDashboard.insights.utilisationTitle' | translate }}</strong>
+              <p>{{ 'simDashboard.insights.utilisationBody' | translate: { percent: utilisation() } }}</p>
             </div>
           </div>
         </div>

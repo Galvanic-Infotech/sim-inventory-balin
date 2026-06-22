@@ -1,9 +1,17 @@
 import { Component, input, computed } from '@angular/core';
-import { BasketDetails, ChartSegment } from '../../shared/models/sim.model';
+import { BasketDetails } from '../../shared/models/sim.model';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+
+interface OverviewSegment {
+  labelKey: string;
+  value: number;
+  color: string;
+}
 
 @Component({
   selector: 'app-sim-status-overview',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './sim-status-overview.component.html',
   styleUrl: './sim-status-overview.component.scss',
 })
@@ -29,15 +37,15 @@ export class SimStatusOverviewComponent {
     return `conic-gradient(${parts.join(', ')})`;
   });
 
-  private buildSegments(b: BasketDetails): ChartSegment[] {
+  private buildSegments(b: BasketDetails): OverviewSegment[] {
     return [
-      { label: 'Active', value: b.totalActiveSims, color: 'var(--color-success)' },
-      { label: 'Available', value: b.totalAvailableSims, color: '#42a5f5' },
-      { label: 'Temp Disconnected', value: b.tempDisconnected, color: '#78909c' },
-      { label: 'Safe Custody', value: b.totalSafeCustodySims, color: '#8b5cf6' },
-      { label: 'In-Active', value: b.totalInActiveSims, color: 'var(--color-danger)' },
-      { label: 'In-Progress', value: b.totalInProgressSims, color: '#ff9100' },
-      { label: 'Suspended', value: b.totalSuspendedSims, color: 'var(--color-warning)' },
+      { labelKey: 'simDashboard.status.active', value: b.totalActiveSims, color: 'var(--color-success)' },
+      { labelKey: 'simDashboard.status.available', value: b.totalAvailableSims, color: '#42a5f5' },
+      { labelKey: 'simDashboard.status.tempDisconnected', value: b.tempDisconnected, color: '#78909c' },
+      { labelKey: 'simDashboard.status.safeCustody', value: b.totalSafeCustodySims, color: '#8b5cf6' },
+      { labelKey: 'simDashboard.status.inactive', value: b.totalInActiveSims, color: 'var(--color-danger)' },
+      { labelKey: 'simDashboard.status.inProgress', value: b.totalInProgressSims, color: '#ff9100' },
+      { labelKey: 'simDashboard.status.suspended', value: b.totalSuspendedSims, color: 'var(--color-warning)' },
     ];
   }
 

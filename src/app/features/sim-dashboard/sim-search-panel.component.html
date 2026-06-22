@@ -1,12 +1,12 @@
 <div class="card sim-search">
   <div class="sim-search__header">
-    <h2>Search SIM</h2>
+    <h2>{{ 'simDashboard.search.title' | translate }}</h2>
     <div class="sim-search__input-row">
       <input
         class="form-control"
         type="text"
         inputmode="numeric"
-        placeholder="Enter SIM Number (ICCID)"
+        [placeholder]="'simDashboard.search.placeholder' | translate"
         [(ngModel)]="searchValue"
         (keyup.enter)="search()"
       />
@@ -23,7 +23,7 @@
         }
       </button>
     </div>
-    <span class="sim-search__hint">SIM/MSISDN NUMBER</span>
+    <span class="sim-search__hint">{{ 'simDashboard.search.hint' | translate }}</span>
   </div>
 
   <div class="sim-search__results">
@@ -35,13 +35,13 @@
       <div class="alert alert-danger">{{ searchError() }}</div>
     } @else if (simDetail(); as sim) {
       @if (copiedToast()) {
-        <div class="alert alert-success sim-search__toast">Copied!</div>
+        <div class="alert alert-success sim-search__toast">{{ 'simDashboard.search.copied' | translate }}</div>
       }
       @if (actionSuccess()) {
         <div class="alert alert-success sim-search__success">
           {{ actionSuccess() }}
           @if (clearCountdown(); as seconds) {
-            <span class="sim-search__countdown">Clearing search in {{ seconds }}s</span>
+            <span class="sim-search__countdown">{{ 'simDashboard.search.clearingIn' | translate: { seconds } }}</span>
             <button
               type="button"
               class="btn btn-outline sim-search__check-status"
@@ -53,28 +53,21 @@
               } @else {
                 <span class="material-icons">refresh</span>
               }
-              Check Status
+              {{ 'simDashboard.search.checkStatus' | translate }}
             </button>
           }
         </div>
       }
       <div class="sim-detail">
         <div class="sim-detail__header">
-          <h3>SIM Details</h3>
-          <span [class]="statusClass(sim.status)">{{ statusLabel(sim.status) }}</span>
+          <h3>{{ 'simDashboard.search.detailsTitle' | translate }}</h3>
+          <span [class]="statusClass(sim.status)">{{ translatedStatus(sim.status) }}</span>
         </div>
-        @for (field of [
-          { icon: 'sim_card', label: 'SIM Number (ICCID)', value: sim.iccid },
-          { icon: 'phone', label: 'SIM Phone', value: sim.simPhone },
-          { icon: 'numbers', label: 'Serial Number', value: sim.serialNumber },
-          { icon: 'info', label: 'Status', value: statusLabel(sim.status) },
-          { icon: 'calendar_today', label: 'Onboarded At', value: formatDate(sim.onboardedAt) },
-          { icon: 'check_circle', label: 'Activation At', value: formatDate(sim.activationAt) },
-        ]; track field.label) {
+        @for (field of detailFields(sim); track field.labelKey) {
           <div class="sim-detail__field">
             <span class="material-icons sim-detail__icon">{{ field.icon }}</span>
             <div>
-              <span class="sim-detail__label">{{ field.label }}</span>
+              <span class="sim-detail__label">{{ field.labelKey | translate }}</span>
               <div class="sim-detail__value-row">
                 <span class="sim-detail__value">{{ field.value }}</span>
                 @if (field.value !== '—') {
@@ -102,7 +95,7 @@
             [disabled]="actionLoading()"
             (click)="openConfirm('activate')"
           >
-            Activate SIM
+            {{ 'simDashboard.search.actions.activate' | translate }}
           </button>
         }
         @if (isActive(sim) && canTempSuspend()) {
@@ -112,7 +105,7 @@
             [disabled]="actionLoading()"
             (click)="openConfirm('temp')"
           >
-            Temp Deactivate
+            {{ 'simDashboard.search.actions.tempDeactivate' | translate }}
           </button>
         }
         @if (isTempDisconnected(sim) && canResume()) {
@@ -122,7 +115,7 @@
             [disabled]="actionLoading()"
             (click)="openConfirm('resume')"
           >
-            Resume Connection
+            {{ 'simDashboard.search.actions.resume' | translate }}
           </button>
         }
 
@@ -132,11 +125,11 @@
           (click)="showSmsDialog.set(true)"
         >
           <span class="material-icons">sms</span>
-          SMS Whitelisting
+          {{ 'simDashboard.search.actions.smsWhitelist' | translate }}
         </button>
       </div>
     } @else if (hasSearched()) {
-      <p class="sim-search__empty text-muted">No SIM found</p>
+      <p class="sim-search__empty text-muted">{{ 'simDashboard.search.noResult' | translate }}</p>
     }
   </div>
 </div>
@@ -148,9 +141,9 @@
         <div class="dialog-header">
           <h2>
             @switch (confirmType) {
-              @case ('activate') { Activate SIM }
-              @case ('temp') { Temp Deactivate }
-              @case ('resume') { Resume Connection }
+              @case ('activate') { {{ 'simDashboard.search.confirm.activateTitle' | translate }} }
+              @case ('temp') { {{ 'simDashboard.search.confirm.tempTitle' | translate }} }
+              @case ('resume') { {{ 'simDashboard.search.confirm.resumeTitle' | translate }} }
             }
           </h2>
           <button class="btn btn-ghost" (click)="closeConfirm()">
@@ -165,24 +158,24 @@
           }
 
           <div class="sim-confirm-fields">
-            <div><span class="text-muted">ICCID</span><strong>{{ sim.iccid }}</strong></div>
-            <div><span class="text-muted">SIM Phone</span><strong>{{ sim.simPhone }}</strong></div>
+            <div><span class="text-muted">{{ 'simInventory.columns.iccid' | translate }}</span><strong>{{ sim.iccid }}</strong></div>
+            <div><span class="text-muted">{{ 'simDashboard.search.fields.simPhone' | translate }}</span><strong>{{ sim.simPhone }}</strong></div>
           </div>
 
           @if (confirmType === 'activate') {
             <div class="activate-form">
               <div class="form-group">
-                <label>Valid Till *</label>
+                <label>{{ 'simDashboard.search.activateForm.validTill' | translate }}</label>
                 <select class="form-control" [(ngModel)]="validTillPreset">
-                  <option value="3months">3 Months</option>
-                  <option value="6months">6 Months</option>
-                  <option value="1year">1 Year</option>
-                  <option value="custom">Custom Date</option>
+                  <option value="3months">{{ 'simDashboard.search.activateForm.threeMonths' | translate }}</option>
+                  <option value="6months">{{ 'simDashboard.search.activateForm.sixMonths' | translate }}</option>
+                  <option value="1year">{{ 'simDashboard.search.activateForm.oneYear' | translate }}</option>
+                  <option value="custom">{{ 'simDashboard.search.activateForm.customDate' | translate }}</option>
                 </select>
               </div>
               @if (validTillPreset === 'custom') {
                 <div class="form-group">
-                  <label>Select Date *</label>
+                  <label>{{ 'simDashboard.search.activateForm.selectDate' | translate }}</label>
                   <input
                     class="form-control"
                     type="date"
@@ -192,38 +185,51 @@
                 </div>
               } @else {
                 <div class="form-group">
-                  <label>Computed Date</label>
+                  <label>{{ 'simDashboard.search.activateForm.computedDate' | translate }}</label>
                   <input class="form-control" [value]="computedValidTill" disabled />
                 </div>
               }
               <div class="form-group">
-                <label>IMEI</label>
-                <input class="form-control" [(ngModel)]="imei" placeholder="Enter IMEI number" />
+                <label>{{ 'simDashboard.search.activateForm.imei' | translate }}</label>
+                <input
+                  class="form-control"
+                  [(ngModel)]="imei"
+                  [placeholder]="'simDashboard.search.activateForm.imeiPlaceholder' | translate"
+                />
               </div>
               <div class="form-group">
-                <label>Customer Name</label>
-                <input class="form-control" [(ngModel)]="customerName" placeholder="Enter customer name" />
+                <label>{{ 'simDashboard.search.activateForm.customerName' | translate }}</label>
+                <input
+                  class="form-control"
+                  [(ngModel)]="customerName"
+                  [placeholder]="'simDashboard.search.activateForm.customerPlaceholder' | translate"
+                />
               </div>
               <div class="form-group">
-                <label>Remarks</label>
-                <textarea class="form-control" [(ngModel)]="remarks" rows="2" placeholder="Enter remarks (optional)"></textarea>
+                <label>{{ 'simDashboard.search.activateForm.remarks' | translate }}</label>
+                <textarea
+                  class="form-control"
+                  [(ngModel)]="remarks"
+                  rows="2"
+                  [placeholder]="'simDashboard.search.activateForm.remarksPlaceholder' | translate"
+                ></textarea>
               </div>
             </div>
           } @else {
             <p class="text-muted" style="margin-top: var(--space-md)">
               @switch (confirmType) {
                 @case ('temp') {
-                  Are you sure you want to temporarily deactivate this SIM?
+                  {{ 'simDashboard.search.confirm.tempMessage' | translate }}
                 }
                 @case ('resume') {
-                  Are you sure you want to resume this SIM connection?
+                  {{ 'simDashboard.search.confirm.resumeMessage' | translate }}
                 }
               }
             </p>
           }
         </div>
         <div class="dialog-footer">
-          <button type="button" class="btn btn-outline" (click)="closeConfirm()">Cancel</button>
+          <button type="button" class="btn btn-outline" (click)="closeConfirm()">{{ 'common.cancel' | translate }}</button>
           <button
             type="button"
             class="btn btn-primary"
@@ -232,9 +238,9 @@
           >
             @if (actionLoading()) { <span class="spinner"></span> }
             @switch (confirmType) {
-              @case ('activate') { Activate }
-              @case ('temp') { Deactivate }
-              @case ('resume') { Resume }
+              @case ('activate') { {{ 'simDashboard.search.confirm.activate' | translate }} }
+              @case ('temp') { {{ 'simDashboard.search.confirm.deactivate' | translate }} }
+              @case ('resume') { {{ 'simDashboard.search.confirm.resume' | translate }} }
             }
           </button>
         </div>

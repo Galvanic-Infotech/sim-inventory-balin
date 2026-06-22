@@ -4,13 +4,15 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { SimService } from '../../core/services/sim.service';
 import { PermissionService, PERMS } from '../../core/services/permission.service';
+import { TranslationService } from '../../core/services/translation.service';
 import { BasketDetails } from '../../shared/models/sim.model';
 import { extractApiError } from '../../core/utils/api-error.util';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SimStatusOverviewComponent } from './sim-status-overview.component';
 import { SimSearchPanelComponent } from './sim-search-panel.component';
 
 interface Kpi {
-  label: string;
+  labelKey: string;
   value: number;
   subtitle: string;
   icon: string;
@@ -22,7 +24,7 @@ interface Kpi {
 @Component({
   selector: 'app-sim-dashboard',
   standalone: true,
-  imports: [DecimalPipe, RouterLink, SimStatusOverviewComponent, SimSearchPanelComponent],
+  imports: [DecimalPipe, RouterLink, TranslatePipe, SimStatusOverviewComponent, SimSearchPanelComponent],
   templateUrl: './sim-dashboard.component.html',
   styleUrl: './sim-dashboard.component.scss',
 })
@@ -31,6 +33,7 @@ export class SimDashboardComponent {
 
   private readonly auth = inject(AuthService);
   private readonly sim = inject(SimService);
+  private readonly i18n = inject(TranslationService);
   readonly perm = inject(PermissionService);
 
   readonly wip = SimDashboardComponent.WIP;
@@ -45,10 +48,15 @@ export class SimDashboardComponent {
   readonly aboutExpired = computed(() => 0);
 
   readonly kpis = computed<Kpi[]>(() => {
+    this.i18n.lang();
+    this.i18n.revision();
+    const t = (key: string, params?: Record<string, string | number>) =>
+      this.i18n.translate(key, params);
+
     const b = this.basket();
     if (!b) {
-      const empty = (label: string, icon: string, color: string, tint: string): Kpi => ({
-        label,
+      const empty = (labelKey: string, icon: string, color: string, tint: string): Kpi => ({
+        labelKey,
         value: 0,
         subtitle: '—',
         icon,
@@ -57,34 +65,37 @@ export class SimDashboardComponent {
         spark: this.flatSpark(),
       });
       return [
-        empty('Active SIMs', 'bolt', 'var(--color-success)', 'var(--color-success-bg)'),
-        empty('Available', 'inventory_2', 'var(--color-primary)', 'var(--color-primary-soft)'),
-        empty('In-Progress', 'sync', '#8b5cf6', 'rgba(139, 92, 246, 0.12)'),
-        empty('Expired', 'event_busy', 'var(--color-danger)', 'var(--color-danger-bg)'),
+        empty('simDashboard.kpi.active', 'bolt', 'var(--color-success)', 'var(--color-success-bg)'),
+        empty('simDashboard.kpi.available', 'inventory_2', 'var(--color-primary)', 'var(--color-primary-soft)'),
+        empty('simDashboard.kpi.inProgress', 'sync', '#8b5cf6', 'rgba(139, 92, 246, 0.12)'),
+        empty('simDashboard.kpi.expired', 'event_busy', 'var(--color-danger)', 'var(--color-danger-bg)'),
       ];
     }
     const total = this.totalSim();
     const kpi = (
-      label: string,
+      labelKey: string,
       value: number,
       icon: string,
       color: string,
       tint: string,
       seed: number,
     ): Kpi => ({
-      label,
+      labelKey,
       value,
-      subtitle: total > 0 ? `${this.pct(value, total)}% of fleet` : '—',
+      subtitle:
+        total > 0
+          ? t('simDashboard.kpi.ofFleet', { percent: this.pct(value, total) })
+          : '—',
       icon,
       color,
       tint,
       spark: this.spark(seed, value),
     });
     return [
-      kpi('Active SIMs', b.totalActiveSims, 'bolt', 'var(--color-success)', 'var(--color-success-bg)', 1),
-      kpi('Available', b.totalAvailableSims, 'inventory_2', 'var(--color-primary)', 'var(--color-primary-soft)', 2),
-      kpi('In-Progress', b.totalInProgressSims, 'sync', '#8b5cf6', 'rgba(139, 92, 246, 0.12)', 3),
-      kpi('Expired', b.totalInActiveSims, 'event_busy', 'var(--color-danger)', 'var(--color-danger-bg)', 4),
+      kpi('simDashboard.kpi.active', b.totalActiveSims, 'bolt', 'var(--color-success)', 'var(--color-success-bg)', 1),
+      kpi('simDashboard.kpi.available', b.totalAvailableSims, 'inventory_2', 'var(--color-primary)', 'var(--color-primary-soft)', 2),
+      kpi('simDashboard.kpi.inProgress', b.totalInProgressSims, 'sync', '#8b5cf6', 'rgba(139, 92, 246, 0.12)', 3),
+      kpi('simDashboard.kpi.expired', b.totalInActiveSims, 'event_busy', 'var(--color-danger)', 'var(--color-danger-bg)', 4),
     ];
   });
 
@@ -108,7 +119,9 @@ export class SimDashboardComponent {
       },
       error: (err) => {
         this.loadingBasket.set(false);
-        this.basketError.set(extractApiError(err, 'Failed to load basket details'));
+        this.basketError.set(
+          extractApiError(err, this.i18n.translate('simDashboard.errors.loadBasket')),
+        );
       },
     });
   }

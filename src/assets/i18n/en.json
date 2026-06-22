@@ -1115,6 +1115,129 @@
       "load": "Failed to load SIM inventory"
     }
   },
+  "simDashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of SIM inventory and activation status",
+    "wip": "Work in progress",
+    "noPermission": "You do not have permission to view the SIM dashboard.",
+    "hero": {
+      "eyebrow": "SIM Fleet",
+      "title": "Your Total Inventory",
+      "sims": "SIMs",
+      "healthySub": "{{percent}}% healthy across active + available pools",
+      "inventory": "Inventory",
+      "activate": "Activate",
+      "manage": "Manage"
+    },
+    "kpi": {
+      "active": "Active SIMs",
+      "available": "Available",
+      "inProgress": "In-Progress",
+      "expired": "Expired",
+      "ofFleet": "{{percent}}% of fleet"
+    },
+    "insights": {
+      "title": "Live insights",
+      "beta": "Beta",
+      "activationTitle": "Activation throughput",
+      "activationBody": "Most SIMs activated during business hours — peak between 11 AM & 4 PM.",
+      "expiringTitle": "Expiring soon",
+      "expiringBody": "{{count}} SIMs are about to expire. Renew them before they hit zero.",
+      "utilisationTitle": "Pool utilisation",
+      "utilisationBody": "{{percent}}% of the inventory is in active use right now."
+    },
+    "statusOverview": {
+      "title": "SIM Status Overview",
+      "totalSims": "Total SIMs"
+    },
+    "status": {
+      "active": "Active",
+      "available": "Available",
+      "tempDisconnected": "Temp Disconnected",
+      "safeCustody": "Safe Custody",
+      "inactive": "In-Active",
+      "inProgress": "In-Progress",
+      "suspended": "Suspended"
+    },
+    "search": {
+      "title": "Search SIM",
+      "placeholder": "Enter SIM Number (ICCID)",
+      "hint": "SIM/MSISDN NUMBER",
+      "copied": "Copied!",
+      "clearingIn": "Clearing search in {{seconds}}s",
+      "checkStatus": "Check Status",
+      "detailsTitle": "SIM Details",
+      "noResult": "No SIM found",
+      "fields": {
+        "iccid": "SIM Number (ICCID)",
+        "simPhone": "SIM Phone",
+        "serialNumber": "Serial Number",
+        "status": "Status",
+        "onboardedAt": "Onboarded At",
+        "activationAt": "Activation At"
+      },
+      "actions": {
+        "activate": "Activate SIM",
+        "tempDeactivate": "Temp Deactivate",
+        "resume": "Resume Connection",
+        "smsWhitelist": "SMS Whitelisting"
+      },
+      "confirm": {
+        "activateTitle": "Activate SIM",
+        "tempTitle": "Temp Deactivate",
+        "resumeTitle": "Resume Connection",
+        "tempMessage": "Are you sure you want to temporarily deactivate this SIM?",
+        "resumeMessage": "Are you sure you want to resume this SIM connection?",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "resume": "Resume"
+      },
+      "activateForm": {
+        "validTill": "Valid Till *",
+        "threeMonths": "3 Months",
+        "sixMonths": "6 Months",
+        "oneYear": "1 Year",
+        "customDate": "Custom Date",
+        "selectDate": "Select Date *",
+        "computedDate": "Computed Date",
+        "imei": "IMEI",
+        "imeiPlaceholder": "Enter IMEI number",
+        "customerName": "Customer Name",
+        "customerPlaceholder": "Enter customer name",
+        "remarks": "Remarks",
+        "remarksPlaceholder": "Enter remarks (optional)"
+      },
+      "errors": {
+        "invalidNumber": "Enter a valid SIM number (899…) or MSISDN (57…)",
+        "invalidDate": "Please select a valid date",
+        "requestFailed": "Request failed"
+      },
+      "success": {
+        "activateInitiated": "SIM activation initiated successfully.",
+        "tempDeactivated": "SIM temporarily deactivated.",
+        "resumed": "SIM connection resumed."
+      }
+    },
+    "smsWhitelist": {
+      "title": "SMS Whitelisting",
+      "basket": "Basket",
+      "remainingOrders": "Remaining orders",
+      "whitelistNumber": "Whitelist Number {{index}}",
+      "type": "Type",
+      "none": "None",
+      "incoming": "Incoming",
+      "outgoing": "Outgoing",
+      "incomingOutgoing": "Incoming & Outgoing",
+      "saved": "SMS whitelisting saved successfully.",
+      "save": "Save",
+      "errors": {
+        "msisdnUnavailable": "MSISDN not available for this SIM."
+      }
+    },
+    "errors": {
+      "loadBasket": "Failed to load basket details"
+    }
+  },
   "onboarding": {
     "title": "Customer Onboarding",
     "subtitle": "Create a new OEM entity, admin role, and first user in one automated flow.",

@@ -1115,6 +1115,129 @@
       "load": "सिम इन्वेंटरी लोड करने में विफल"
     }
   },
+  "simDashboard": {
+    "title": "डैशबोर्ड",
+    "subtitle": "सिम इन्वेंटरी और सक्रियण स्थिति का अवलोकन",
+    "wip": "कार्य प्रगति में",
+    "noPermission": "आपके पास सिम डैशबोर्ड देखने की अनुमति नहीं है।",
+    "hero": {
+      "eyebrow": "सिम फ्लीट",
+      "title": "आपकी कुल इन्वेंटरी",
+      "sims": "सिम",
+      "healthySub": "सक्रिय + उपलब्ध पूल में {{percent}}% स्वस्थ",
+      "inventory": "इन्वेंटरी",
+      "activate": "सक्रिय करें",
+      "manage": "प्रबंधित करें"
+    },
+    "kpi": {
+      "active": "सक्रिय सिम",
+      "available": "उपलब्ध",
+      "inProgress": "प्रगति में",
+      "expired": "समाप्त",
+      "ofFleet": "फ्लीट का {{percent}}%"
+    },
+    "insights": {
+      "title": "लाइव अंतर्दृष्टि",
+      "beta": "बीटा",
+      "activationTitle": "सक्रियण थ्रूपुट",
+      "activationBody": "अधिकांश सिम व्यावसायिक घंटों में सक्रिय होते हैं — सुबह 11 बजे से शाम 4 बजे के बीच चरम।",
+      "expiringTitle": "जल्द समाप्त हो रहे",
+      "expiringBody": "{{count}} सिम जल्द समाप्त होंगे। शून्य होने से पहले नवीनीकरण करें।",
+      "utilisationTitle": "पूल उपयोग",
+      "utilisationBody": "इन्वेंटरी का {{percent}}% अभी सक्रिय उपयोग में है।"
+    },
+    "statusOverview": {
+      "title": "सिम स्थिति अवलोकन",
+      "totalSims": "कुल सिम"
+    },
+    "status": {
+      "active": "सक्रिय",
+      "available": "उपलब्ध",
+      "tempDisconnected": "अस्थायी डिस्कनेक्ट",
+      "safeCustody": "सुरक्षित हिरासत",
+      "inactive": "निष्क्रिय",
+      "inProgress": "प्रगति में",
+      "suspended": "निलंबित"
+    },
+    "search": {
+      "title": "सिम खोजें",
+      "placeholder": "सिम नंबर दर्ज करें (ICCID)",
+      "hint": "सिम/MSISDN नंबर",
+      "copied": "कॉपी हो गया!",
+      "clearingIn": "{{seconds}} सेकंड में खोज साफ़ होगी",
+      "checkStatus": "स्थिति जाँचें",
+      "detailsTitle": "सिम विवरण",
+      "noResult": "कोई सिम नहीं मिला",
+      "fields": {
+        "iccid": "सिम नंबर (ICCID)",
+        "simPhone": "सिम फ़ोन",
+        "serialNumber": "सीरियल नंबर",
+        "status": "स्थिति",
+        "onboardedAt": "ऑनबोर्ड तिथि",
+        "activationAt": "सक्रियण तिथि"
+      },
+      "actions": {
+        "activate": "सिम सक्रिय करें",
+        "tempDeactivate": "अस्थायी निष्क्रिय",
+        "resume": "कनेक्शन पुनः शुरू",
+        "smsWhitelist": "SMS व्हाइटलिस्टिंग"
+      },
+      "confirm": {
+        "activateTitle": "सिम सक्रिय करें",
+        "tempTitle": "अस्थायी निष्क्रिय",
+        "resumeTitle": "कनेक्शन पुनः शुरू",
+        "tempMessage": "क्या आप इस सिम को अस्थायी रूप से निष्क्रिय करना चाहते हैं?",
+        "resumeMessage": "क्या आप इस सिम का कनेक्शन पुनः शुरू करना चाहते हैं?",
+        "activate": "सक्रिय करें",
+        "deactivate": "निष्क्रिय करें",
+        "resume": "पुनः शुरू"
+      },
+      "activateForm": {
+        "validTill": "वैध तक *",
+        "threeMonths": "3 महीने",
+        "sixMonths": "6 महीने",
+        "oneYear": "1 वर्ष",
+        "customDate": "कस्टम तिथि",
+        "selectDate": "तिथि चुनें *",
+        "computedDate": "गणना की गई तिथि",
+        "imei": "IMEI",
+        "imeiPlaceholder": "IMEI नंबर दर्ज करें",
+        "customerName": "ग्राहक का नाम",
+        "customerPlaceholder": "ग्राहक का नाम दर्ज करें",
+        "remarks": "टिप्पणी",
+        "remarksPlaceholder": "टिप्पणी दर्ज करें (वैकल्पिक)"
+      },
+      "errors": {
+        "invalidNumber": "मान्य सिम नंबर (899…) या MSISDN (57…) दर्ज करें",
+        "invalidDate": "कृपया मान्य तिथि चुनें",
+        "requestFailed": "अनुरोध विफल"
+      },
+      "success": {
+        "activateInitiated": "सिम सक्रियण सफलतापूर्वक शुरू हुआ।",
+        "tempDeactivated": "सिम अस्थायी रूप से निष्क्रिय किया गया।",
+        "resumed": "सिम कनेक्शन पुनः शुरू हुआ।"
+      }
+    },
+    "smsWhitelist": {
+      "title": "SMS व्हाइटलिस्टिंग",
+      "basket": "बास्केट",
+      "remainingOrders": "शेष ऑर्डर",
+      "whitelistNumber": "व्हाइटलिस्ट नंबर {{index}}",
+      "type": "प्रकार",
+      "none": "कोई नहीं",
+      "incoming": "इनकमिंग",
+      "outgoing": "आउटगोइंग",
+      "incomingOutgoing": "इनकमिंग और आउटगोइंग",
+      "saved": "SMS व्हाइटलिस्टिंग सफलतापूर्वक सहेजी गई।",
+      "save": "सहेजें",
+      "errors": {
+        "msisdnUnavailable": "इस सिम के लिए MSISDN उपलब्ध नहीं है।"
+      }
+    },
+    "errors": {
+      "loadBasket": "बास्केट विवरण लोड करने में विफल"
+    }
+  },
   "onboarding": {
     "title": "ग्राहक ऑनबोर्डिंग",
     "subtitle": "एक स्वचालित प्रवाह में नया OEM इकाई, एडमिन भूमिका और पहला उपयोगकर्ता बनाएं।",

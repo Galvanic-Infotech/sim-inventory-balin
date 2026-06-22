@@ -2,30 +2,39 @@ import { Component, inject, OnDestroy, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SimService } from '../../core/services/sim.service';
 import { PermissionService, PERMS } from '../../core/services/permission.service';
+import { TranslationService } from '../../core/services/translation.service';
 import {
   SimDetail,
   resolveSimFilterType,
-  simStatusLabel,
   formatIstDateTime,
   isSimInitial,
   isSimActive,
   isSimTempDisconnected,
   itemStatusChipClass,
 } from '../../shared/models/sim.model';
+import { itemStatusLabel, normalizeItemStatus } from '../../shared/models/item-status.model';
 import { extractApiError } from '../../core/utils/api-error.util';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SimSmsWhitelistDialogComponent } from './sim-sms-whitelist-dialog.component';
 
 export type ValidTillPreset = '3months' | '6months' | '1year' | 'custom';
 
+interface DetailField {
+  icon: string;
+  labelKey: string;
+  value: string;
+}
+
 @Component({
   selector: 'app-sim-search-panel',
   standalone: true,
-  imports: [FormsModule, SimSmsWhitelistDialogComponent],
+  imports: [FormsModule, TranslatePipe, SimSmsWhitelistDialogComponent],
   templateUrl: './sim-search-panel.component.html',
   styleUrl: './sim-search-panel.component.scss',
 })
 export class SimSearchPanelComponent implements OnDestroy {
   private readonly sim = inject(SimService);
+  private readonly i18n = inject(TranslationService);
   readonly perm = inject(PermissionService);
   private clearCountdownTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -56,14 +65,31 @@ export class SimSearchPanelComponent implements OnDestroy {
   customerName = '';
   remarks = '';
 
-  readonly statusLabel = simStatusLabel;
-  readonly formatDate = formatIstDateTime;
   readonly isInitial = isSimInitial;
   readonly isActive = isSimActive;
   readonly isTempDisconnected = isSimTempDisconnected;
 
   ngOnDestroy(): void {
     this.stopClearCountdown();
+  }
+
+  detailFields(sim: SimDetail): DetailField[] {
+    return [
+      { icon: 'sim_card', labelKey: 'simDashboard.search.fields.iccid', value: sim.iccid },
+      { icon: 'phone', labelKey: 'simDashboard.search.fields.simPhone', value: sim.simPhone },
+      { icon: 'numbers', labelKey: 'simDashboard.search.fields.serialNumber', value: sim.serialNumber },
+      { icon: 'info', labelKey: 'simDashboard.search.fields.status', value: this.translatedStatus(sim.status) },
+      { icon: 'calendar_today', labelKey: 'simDashboard.search.fields.onboardedAt', value: formatIstDateTime(sim.onboardedAt) },
+      { icon: 'check_circle', labelKey: 'simDashboard.search.fields.activationAt', value: formatIstDateTime(sim.activationAt) },
+    ];
+  }
+
+  translatedStatus(status: string): string {
+    const normalized = normalizeItemStatus(status);
+    const key = `simInventory.status.${normalized}`;
+    const translated = this.i18n.translate(key);
+    if (translated !== key) return translated;
+    return itemStatusLabel(status);
   }
 
   search(): void {
@@ -74,7 +100,7 @@ export class SimSearchPanelComponent implements OnDestroy {
 
     const filterType = resolveSimFilterType(value);
     if (!filterType) {
-      this.searchError.set('Enter a valid SIM number (899…) or MSISDN (57…)');
+      this.searchError.set(this.i18n.translate('simDashboard.search.errors.invalidNumber'));
       this.hasSearched.set(true);
       this.simDetail.set(null);
       return;
@@ -93,7 +119,9 @@ export class SimSearchPanelComponent implements OnDestroy {
       },
       error: (err) => {
         this.searching.set(false);
-        this.searchError.set(extractApiError(err, 'Request failed'));
+        this.searchError.set(
+          extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
+        );
       },
     });
   }
@@ -157,7 +185,7 @@ export class SimSearchPanelComponent implements OnDestroy {
       const validTill = this.computedValidTill;
       if (!validTill) {
         this.actionLoading.set(false);
-        this.actionError.set('Please select a valid date');
+        this.actionError.set(this.i18n.translate('simDashboard.search.errors.invalidDate'));
         return;
       }
       this.sim.activateSim({
@@ -172,34 +200,40 @@ export class SimSearchPanelComponent implements OnDestroy {
           this.showConfirm.set(null);
           this.basketRefresh.emit();
           this.refreshSimDetail();
-          this.actionSuccess.set('SIM activation initiated successfully.');
+          this.actionSuccess.set(this.i18n.translate('simDashboard.search.success.activateInitiated'));
           this.startPostActivateCountdown();
         },
         error: (err) => {
           this.actionLoading.set(false);
-          this.actionError.set(extractApiError(err, 'Request failed'));
+          this.actionError.set(
+            extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
+          );
         },
       });
     } else if (type === 'temp') {
       this.sim.tempDisconnect(sim.iccid, sim.simPhone).subscribe({
         next: () => {
-          this.actionSuccess.set('SIM temporarily deactivated.');
+          this.actionSuccess.set(this.i18n.translate('simDashboard.search.success.tempDeactivated'));
           done();
         },
         error: (err) => {
           this.actionLoading.set(false);
-          this.actionError.set(extractApiError(err, 'Request failed'));
+          this.actionError.set(
+            extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
+          );
         },
       });
     } else {
       this.sim.resumeTempDisconnect(sim.iccid, sim.simPhone).subscribe({
         next: () => {
-          this.actionSuccess.set('SIM connection resumed.');
+          this.actionSuccess.set(this.i18n.translate('simDashboard.search.success.resumed'));
           done();
         },
         error: (err) => {
           this.actionLoading.set(false);
-          this.actionError.set(extractApiError(err, 'Request failed'));
+          this.actionError.set(
+            extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
+          );
         },
       });
     }
@@ -247,7 +281,9 @@ export class SimSearchPanelComponent implements OnDestroy {
       error: (err) => {
         if (!silent) {
           this.statusChecking.set(false);
-          this.searchError.set(extractApiError(err, 'Request failed'));
+          this.searchError.set(
+            extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
+          );
         }
       },
     });
