@@ -1,0 +1,282 @@
+<div class="fitment-stepper">
+  <!-- Stepper header -->
+  <div class="stepper-bar">
+    @for (s of steps(); track s.key; let i = $index) {
+      <div class="stepper-item"
+           [class.active]="currentStep() === s.key"
+           [class.done]="currentStep() > s.key"
+           (click)="goToStep(s.key)">
+        <div class="stepper-circle">
+          @if (currentStep() > s.key) {
+            <span class="material-icons">check</span>
+          } @else {
+            <span>{{ s.key }}</span>
+          }
+        </div>
+        <div class="stepper-meta">
+          <span class="stepper-label">{{ s.label }}</span>
+        </div>
+      </div>
+      @if (i < steps().length - 1) {
+        <div class="stepper-line" [class.done]="currentStep() > s.key"></div>
+      }
+    }
+  </div>
+
+  <!-- Step 1: Serial number -->
+  @if (currentStep() === 1) {
+    <div class="card stepper-card">
+      <h3>{{ 'fitment.create.enterSerialTitle' | translate }}</h3>
+      <p class="text-muted">{{ 'fitment.create.enterSerialHint' | translate }}</p>
+
+      <div class="form-group">
+        <label>{{ 'fitment.create.serialNumber' | translate }} *</label>
+        <input
+          type="text"
+          [(ngModel)]="serialNo"
+          class="form-control"
+          [placeholder]="'fitment.create.serialPlaceholder' | translate"
+          (keydown.enter)="fetchVehicle()"
+          autofocus
+        />
+      </div>
+
+      @if (step1Error()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ step1Error() }}
+        </div>
+      }
+
+      <div class="stepper-actions">
+        <button class="btn btn-ghost" (click)="cancel.emit()">{{ 'common.cancel' | translate }}</button>
+        <button class="btn btn-primary" [disabled]="step1Loading()" (click)="fetchVehicle()">
+          @if (step1Loading()) {
+            <span class="spinner"></span> {{ 'fitment.create.fetching' | translate }}
+          } @else {
+            <span class="material-icons">search</span> {{ 'fitment.create.fetchVehicle' | translate }}
+          }
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Step 2: Vehicle details + dropdowns -->
+  @if (currentStep() === 2) {
+    <div class="fitment-context">
+      <div class="fitment-context__item">
+        <span class="material-icons">qr_code_2</span>
+        <div>
+          <small>{{ 'fitment.create.serialNumber' | translate }}</small>
+          <strong>{{ serialNo }}</strong>
+        </div>
+      </div>
+      @if (itemImei()) {
+        <div class="fitment-context__item">
+          <span class="material-icons">memory</span>
+          <div>
+            <small>{{ 'fitment.create.imei' | translate }}</small>
+            <strong>{{ itemImei() }}</strong>
+          </div>
+        </div>
+      }
+      @if (itemSimProvider()) {
+        <div class="fitment-context__item">
+          <span class="material-icons">sim_card</span>
+          <div>
+            <small>{{ 'fitment.create.simProvider' | translate }}</small>
+            <strong>{{ itemSimProvider() }}</strong>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="card stepper-card">
+      <h3>{{ 'fitment.create.vehicleCustomerTitle' | translate }}</h3>
+      <p class="text-muted">{{ 'fitment.create.vehicleCustomerHint' | translate }}</p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>RTO *</label>
+          <select [(ngModel)]="form.rtoId" class="form-control" [disabled]="mastersLoading()">
+            <option value="">{{ 'fitment.create.selectRto' | translate }}</option>
+            @for (r of rtos(); track r.rto.id) {
+              <option [value]="r.rto.id">{{ r.rto.rtoCode }} — {{ r.rto.rtoName }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'fitment.create.vehicleCategory' | translate }} *</label>
+          <select [(ngModel)]="form.vehicleCategoryId" class="form-control" [disabled]="mastersLoading()">
+            <option value="">{{ 'fitment.create.selectCategory' | translate }}</option>
+            @for (c of categories(); track c.id) {
+              <option [value]="c.id">{{ c.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'fitment.create.vehicleRegNo' | translate }} *</label>
+          <input type="text" [(ngModel)]="form.vehicleRegistrationNo" class="form-control" readonly />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'fitment.create.chassisNo' | translate }} *</label>
+          <input type="text" [(ngModel)]="form.chassisNo" class="form-control" readonly />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'fitment.create.engineNo' | translate }} *</label>
+          <input type="text" [(ngModel)]="form.engineNo" class="form-control" readonly />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'fitment.create.manufacturingYear' | translate }}</label>
+          <input type="number" [(ngModel)]="form.mafYear" class="form-control" min="1990" max="2099" readonly />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'fitment.create.vehicleMake' | translate }}</label>
+          <input type="text" [(ngModel)]="form.vehicleMake" class="form-control" readonly />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'fitment.create.vehicleModel' | translate }}</label>
+          <input type="text" [(ngModel)]="form.vehicleModel" class="form-control" readonly />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'fitment.create.customerName' | translate }} *</label>
+          <input type="text" [(ngModel)]="form.customerName" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'fitment.create.mobileNo' | translate }} *</label>
+          <input
+            type="tel"
+            [(ngModel)]="form.mobileNo"
+            class="form-control"
+            maxlength="10"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            (keypress)="onlyDigits($event)"
+            (paste)="onPasteDigits($event)"
+          />
+        </div>
+
+        <div class="form-group form-group-wide">
+          <label>{{ 'fitment.list.address' | translate }}</label>
+          <textarea [(ngModel)]="form.address" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+
+      @if (step2Error()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ step2Error() }}
+        </div>
+      }
+
+      <div class="stepper-actions">
+        <button class="btn btn-ghost" (click)="currentStep.set(1)">
+          <span class="material-icons">arrow_back</span> {{ 'common.back' | translate }}
+        </button>
+        <button class="btn btn-primary" [disabled]="step2Loading()" (click)="submitFitment()">
+          @if (step2Loading()) {
+            <span class="spinner"></span> {{ 'fitment.create.creating' | translate }}
+          } @else {
+            {{ 'fitment.create.createFitment' | translate }} <span class="material-icons">arrow_forward</span>
+          }
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Step 3: OTP -->
+  @if (currentStep() === 3) {
+    <div class="fitment-context">
+      <div class="fitment-context__item">
+        <span class="material-icons">qr_code_2</span>
+        <div>
+          <small>{{ 'fitment.create.serialNumber' | translate }}</small>
+          <strong>{{ serialNo }}</strong>
+        </div>
+      </div>
+      @if (itemImei()) {
+        <div class="fitment-context__item">
+          <span class="material-icons">memory</span>
+          <div>
+            <small>{{ 'fitment.create.imei' | translate }}</small>
+            <strong>{{ itemImei() }}</strong>
+          </div>
+        </div>
+      }
+      @if (itemSimProvider()) {
+        <div class="fitment-context__item">
+          <span class="material-icons">sim_card</span>
+          <div>
+            <small>{{ 'fitment.create.simProvider' | translate }}</small>
+            <strong>{{ itemSimProvider() }}</strong>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="card stepper-card stepper-otp">
+      <div class="otp-head">
+        <div class="otp-badge">
+          <span class="material-icons">mark_email_read</span>
+        </div>
+        <h3>{{ 'fitment.otp.verifyTitle' | translate }}</h3>
+        <p class="otp-sub">
+          {{ 'fitment.otp.fitmentFor' | translate }} <strong>{{ createdFitment()?.fitmentNo }}</strong> {{ 'fitment.otp.fitmentCreated' | translate }}
+        </p>
+        <div class="otp-phone">+91 {{ createdFitment()?.mobileNo }}</div>
+      </div>
+
+      <div class="otp-input-group">
+        <app-otp-boxes
+          [length]="6"
+          [(value)]="otp"
+          (complete)="verifyOtp()"
+        />
+      </div>
+
+      <div class="otp-resend">
+        <span class="otp-resend__label">{{ 'fitment.otp.didntReceive' | translate }}</span>
+        <button
+          type="button"
+          class="btn btn-link"
+          [disabled]="!canResend()"
+          (click)="resendOtp()"
+        >
+          {{ resendLabel() }}
+        </button>
+      </div>
+
+      @if (otpSuccess()) {
+        <div class="alert alert-success">
+          <span class="material-icons">check_circle</span> {{ otpSuccess() }}
+        </div>
+      }
+
+      @if (step3Error()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ step3Error() }}
+        </div>
+      }
+
+      <div class="stepper-actions">
+        <button class="btn btn-ghost" (click)="skipOtp()">
+          {{ 'fitment.otp.skipForNow' | translate }}
+        </button>
+        <button class="btn btn-primary" [disabled]="step3Loading()" (click)="verifyOtp()">
+          @if (step3Loading()) {
+            <span class="spinner"></span> {{ 'common.verifying' | translate }}
+          } @else {
+            <span class="material-icons">verified</span> {{ 'fitment.otp.verifyTitle' | translate }}
+          }
+        </button>
+      </div>
+    </div>
+  }
+</div>

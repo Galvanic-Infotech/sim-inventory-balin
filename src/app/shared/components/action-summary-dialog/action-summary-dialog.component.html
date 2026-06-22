@@ -1,0 +1,69 @@
+@if (open()) {
+  <div class="dialog-backdrop" (click)="onCancel()" aria-hidden="true"></div>
+  <aside
+    class="dialog-card dialog-card--wide action-summary-dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="dialogTitleId"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="dialog-header">
+      <h3 [id]="dialogTitleId">{{ title() }}</h3>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="onCancel()" aria-label="Close">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      @if (error()) {
+        <div class="alert alert-danger action-summary-dialog__error">
+          <span class="material-icons">error</span> {{ error() }}
+        </div>
+      }
+
+      <dl class="action-summary-dialog__meta">
+        @for (row of rows(); track row.label) {
+          <div class="action-summary-dialog__row">
+            <dt>{{ row.label }}</dt>
+            <dd>{{ row.value }}</dd>
+          </div>
+        }
+      </dl>
+
+      @if (devices().length) {
+        <h4 class="action-summary-dialog__devices-title">
+          {{ devicesLabel() }}
+          <span class="count-badge">{{ devices().length }}</span>
+        </h4>
+        <ul class="action-summary-dialog__devices">
+          @for (d of devices(); track d.uid) {
+            <li>
+              <span class="action-summary-dialog__uid">{{ d.uid.trim() }}</span>
+              @if (d.imei) {
+                <span class="action-summary-dialog__meta-line">IMEI {{ d.imei }}</span>
+              }
+              @if (d.iccid) {
+                <span class="action-summary-dialog__meta-line">ICCID {{ d.iccid }}</span>
+              }
+              @if (d.status) {
+                <span class="action-summary-dialog__status">{{ d.status }}</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-ghost" [disabled]="loading()" (click)="onCancel()">
+        Cancel
+      </button>
+      <button type="button" class="btn btn-primary" [disabled]="loading()" (click)="onConfirm()">
+        @if (loading()) {
+          <span class="spinner spinner--xs"></span>
+        }
+        {{ confirmLabel() }}
+      </button>
+    </div>
+  </aside>
+}

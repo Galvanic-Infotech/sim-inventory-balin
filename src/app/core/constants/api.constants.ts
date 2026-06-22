@@ -54,6 +54,23 @@ export const API_ENDPOINTS = {
     FIRMWARE_UPLOAD: '/Firmware/upload',
     ENTITY_RTO: '/EntityRto',
     ENTITY_RTO_PARENT_POOL: '/EntityRto/by-logged-in-entity',
+    AIS_DEVICE_LIST: '/AisDevice/devices',
+    AIS_DEVICE_ENTITY_COUNT: '/AisDevice/entity-device-count',
+    AIS_DEVICE_INSTALLATION_GRAPH: '/AisDevice/installation-graph',
+    AIS_DEVICE_UPLOAD_TXT: '/AisDevice/upload-txt',
+    AIS_DEVICE_STATUS: '/aisdevice/status', // /{id}
+    AIS_DEVICE_MOVE: '/AisDevice/move',
+    AIS_DEVICE_MOVEMENT_SUMMARY: '/AisDevice/movement-summary',
+    AIS_DEVICE_BY_STATUS: '/AisDeviceInventory/devices-by-status',
+    AIS_DEVICE_ACTIVATE: '/AisDevice/activate',
+    FITMENT: '/Fitment',
+    FITMENT_LIST: '/Fitment/list',
+    FITMENT_VEHICLE_DETAILS: '/Fitment/get-vehicle-details', // /{serialNo}
+    FITMENT_VALIDATE_OTP: '/Fitment/validate-otp',
+    FITMENT_RESEND_OTP: '/Fitment/resend-otp',
+    FITMENT_INITIATE_OTP: '/Fitment/initiate-otp',
+    FITMENT_STATUS_COUNT: '/fitment/status-count',
+    FITMENT_GENERATE_CERTIFICATE: '/Fitment', // /{id}/generate-certificate
   },
   SIM: {
     BASKET: '/SimActivation/fetch_basket_details',

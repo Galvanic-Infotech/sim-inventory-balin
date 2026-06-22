@@ -51,6 +51,16 @@ export class SidebarComponent {
         icon: 'receipt_long',
         route: '/billing',
       },
+      {
+        label: t('layout.nav.devices'),
+        icon: 'memory',
+        route: '/devices',
+      },
+      {
+        label: t('layout.nav.fitment'),
+        icon: 'build',
+        route: '/fitment',
+      },
       { label: t('layout.nav.master'), icon: 'dataset', route: '/master' },
       {
         label: t('layout.nav.onboarding'),

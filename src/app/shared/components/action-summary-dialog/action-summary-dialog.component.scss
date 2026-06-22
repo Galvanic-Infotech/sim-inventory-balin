@@ -1,0 +1,99 @@
+.action-summary-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1002;
+}
+
+.action-summary-dialog__error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-sm);
+}
+
+.action-summary-dialog__meta {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-md);
+}
+
+.action-summary-dialog__row {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: var(--space-sm);
+  align-items: baseline;
+
+  dt {
+    margin: 0;
+    font-size: var(--font-xs);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  dd {
+    margin: 0;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+}
+
+.action-summary-dialog__devices-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-sm);
+  font-size: var(--font-sm);
+  font-weight: 700;
+}
+
+.action-summary-dialog__devices {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-page);
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-xs) var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--font-xs);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.action-summary-dialog__uid {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.action-summary-dialog__meta-line {
+  color: var(--color-text-secondary);
+}
+
+.action-summary-dialog__status {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill, 999px);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}

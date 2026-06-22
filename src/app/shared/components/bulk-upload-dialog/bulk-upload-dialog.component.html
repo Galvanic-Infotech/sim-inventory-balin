@@ -1,0 +1,115 @@
+@if (open()) {
+  <div class="drawer-backdrop" (click)="close()" aria-hidden="true"></div>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="device-upload-title">
+    <div class="dialog-header">
+      <h3 id="device-upload-title">Bulk Upload Devices</h3>
+      <button type="button" class="btn btn-ghost" (click)="close()" [disabled]="uploading()" aria-label="Close">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      @if (uploadError()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ uploadError() }}
+        </div>
+      }
+
+      <div class="bulk-upload-dialog__help">
+        <p class="text-muted">
+          Upload a pipe-delimited <code>.txt</code> file. One device per line. Processing runs in
+          the background — you can close this dialog right after submitting.
+        </p>
+        <pre class="bulk-upload-dialog__sample">DeviceType|SerialNumber|IMEI|ICCID|MM/YYYY|Code
+T6|GRL6T6I052600081811|868329089036778|89917441192224885071|05/2026|26</pre>
+      </div>
+
+      @if (optionsError()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ optionsError() }}
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="bulk-device-model">Device Model *</label>
+        @if (optionsLoading()) {
+          <span class="text-muted">Loading device models…</span>
+        } @else {
+          <select
+            id="bulk-device-model"
+            class="form-control"
+            [ngModel]="aisDeviceModelId()"
+            (ngModelChange)="aisDeviceModelId.set($event)"
+            [disabled]="uploading()"
+          >
+            <option value="">Select device model</option>
+            @for (m of deviceModels(); track m.id) {
+              <option [value]="m.id">{{ m.name }}</option>
+            }
+          </select>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="bulk-sim-provider">SIM Provider *</label>
+        @if (optionsLoading()) {
+          <span class="text-muted">Loading SIM providers…</span>
+        } @else {
+          <select
+            id="bulk-sim-provider"
+            class="form-control"
+            [ngModel]="simProviderId()"
+            (ngModelChange)="simProviderId.set($event)"
+            [disabled]="uploading()"
+          >
+            <option value="">Select SIM provider</option>
+            @for (p of simProviders(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Select File *</label>
+        <input
+          type="file"
+          class="form-control"
+          accept=".txt,text/plain"
+          (change)="onFileSelected($event)"
+          [disabled]="uploading()"
+        />
+        @if (uploadFile(); as f) {
+          <p class="text-muted" style="margin-top: var(--space-xs)">
+            <span class="material-icons" style="font-size: 14px; vertical-align: middle">description</span>
+            {{ f.name }} ({{ (f.size / 1024).toFixed(1) }} KB)
+          </p>
+        }
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-outline" (click)="close()" [disabled]="uploading()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="!canSubmit()">
+        @if (uploading()) { <span class="spinner"></span> }
+        Submit
+      </button>
+    </div>
+  </aside>
+}
+
+@if (toast(); as t) {
+  <div class="bulk-upload-dialog__toast" [class]="'bulk-upload-dialog__toast--' + t.kind" role="status" aria-live="polite">
+    <span class="material-icons">
+      @switch (t.kind) {
+        @case ('success') { check_circle }
+        @case ('error') { error }
+        @default { info }
+      }
+    </span>
+    <span>{{ t.message }}</span>
+    <button type="button" class="bulk-upload-dialog__toast-close" (click)="dismissToast()" aria-label="Dismiss">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+}

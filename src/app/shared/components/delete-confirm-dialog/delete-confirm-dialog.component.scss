@@ -1,0 +1,31 @@
+.delete-confirm-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  max-width: 440px;
+}
+
+.delete-confirm-dialog__target {
+  margin: var(--space-sm) 0;
+  font-size: var(--font-sm);
+}
+
+.delete-confirm-dialog__hint {
+  margin: var(--space-md) 0 var(--space-sm);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+
+  kbd {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-page);
+    font-family: var(--font-family);
+    font-size: var(--font-xs);
+    font-weight: 700;
+    color: var(--color-danger);
+  }
+}

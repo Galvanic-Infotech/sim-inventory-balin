@@ -1,0 +1,17 @@
+<div class="otp-boxes">
+  @for (i of indices(); track i) {
+    <input
+      #box
+      type="text"
+      class="otp-box"
+      inputmode="numeric"
+      maxlength="1"
+      autocomplete="one-time-code"
+      [value]="digits()[i]"
+      [disabled]="disabled()"
+      (input)="onInput(i, $event)"
+      (keydown)="onKeyDown(i, $event)"
+      (paste)="onPaste(i, $event)"
+    />
+  }
+</div>

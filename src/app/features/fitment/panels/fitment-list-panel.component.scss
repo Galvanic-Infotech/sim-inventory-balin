@@ -1,0 +1,134 @@
+:host {
+  display: block;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+
+  .stat-card {
+    cursor: pointer;
+    border: 1px solid transparent;
+    text-align: left;
+    font: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+
+    &:hover {
+      border-color: var(--color-border);
+    }
+
+    &.stat-active {
+      border-color: var(--color-primary);
+      box-shadow: var(--shadow-sm);
+    }
+  }
+
+  .stat-icon {
+    font-size: 32px;
+  }
+
+  .stat-total .stat-icon {
+    color: var(--color-primary);
+  }
+
+  .stat-pending .stat-icon {
+    color: var(--color-warning);
+  }
+
+  .stat-completed .stat-icon {
+    color: var(--color-success);
+  }
+
+  .stat-expired .stat-icon {
+    color: var(--color-danger);
+  }
+}
+
+@media (max-width: 720px) {
+  .stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dlp-card {
+  padding: var(--space-md) 0 0;
+  overflow: visible;
+
+  > .tab-toolbar {
+    padding: 0 var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  > .alert {
+    margin: 0 var(--space-md) var(--space-md);
+  }
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: var(--font-xs);
+
+  .material-icons {
+    font-size: 14px;
+  }
+}
+
+.drawer-head-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.detail-eyebrow {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.drawer-section {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .section-title {
+    margin-bottom: var(--space-md);
+  }
+}
+
+.cert-link {
+  margin-top: var(--space-md);
+  width: fit-content;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-xs);
+  font-weight: 600;
+  background: var(--color-bg-page);
+  color: var(--color-text-secondary);
+
+  &[data-status='Completed'] {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+  }
+
+  &[data-status='OtpPending'] {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+  }
+
+  &[data-status='Expired'] {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+  }
+}

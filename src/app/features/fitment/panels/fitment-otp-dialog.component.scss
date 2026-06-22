@@ -1,0 +1,26 @@
+.fitment-otp-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  max-width: 480px;
+  width: 92vw;
+}
+
+.otp-input-group {
+  margin-bottom: var(--space-sm);
+}
+
+.otp-input {
+  letter-spacing: 8px;
+  font-size: var(--font-lg);
+  font-weight: 600;
+  text-align: center;
+}
+
+.otp-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-md);
+}

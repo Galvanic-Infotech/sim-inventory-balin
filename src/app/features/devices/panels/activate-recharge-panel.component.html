@@ -1,0 +1,191 @@
+<div class="panel-toolbar">
+  <div>
+    <h3>{{ 'devices.activate.title' | translate }}</h3>
+    <p class="text-muted">{{ 'devices.activate.subtitle' | translate }}</p>
+  </div>
+</div>
+
+<div class="arp-op-picker">
+  <p class="arp-op-label">{{ 'devices.activate.whatToDo' | translate }}</p>
+  <div class="arp-op-grid">
+    <button
+      type="button"
+      class="arp-op-card"
+      [class.arp-op-card--active]="operation() === 'Activate'"
+      (click)="selectOperation('Activate')"
+    >
+      <span class="material-icons arp-op-icon">bolt</span>
+      <div>
+        <strong>{{ 'devices.activate.activate' | translate }}</strong>
+        <span class="text-muted">{{ 'devices.activate.activateHint' | translate }}</span>
+      </div>
+      <span class="material-icons arp-op-check">
+        {{ operation() === 'Activate' ? 'radio_button_checked' : 'radio_button_unchecked' }}
+      </span>
+    </button>
+    <button
+      type="button"
+      class="arp-op-card"
+      [class.arp-op-card--active]="operation() === 'Recharge'"
+      (click)="selectOperation('Recharge')"
+    >
+      <span class="material-icons arp-op-icon">autorenew</span>
+      <div>
+        <strong>{{ 'devices.activate.renewRecharge' | translate }}</strong>
+        <span class="text-muted">{{ 'devices.activate.renewHint' | translate }}</span>
+      </div>
+      <span class="material-icons arp-op-check">
+        {{ operation() === 'Recharge' ? 'radio_button_checked' : 'radio_button_unchecked' }}
+      </span>
+    </button>
+  </div>
+</div>
+
+@if (operation(); as op) {
+  <div class="card arp-card">
+    <div class="tab-toolbar">
+      <div class="tab-toolbar-left">
+        <h3>
+          @if (op === 'Activate') {
+            {{ 'devices.activate.availableDevices' | translate }}
+          } @else {
+            {{ 'devices.activate.rechargeEligible' | translate }}
+          }
+        </h3>
+        <span class="count-badge">{{ filteredRows().length }}</span>
+        @if (selectedCount()) {
+          <span class="count-badge" style="background: var(--color-primary-bg); color: var(--color-primary)">
+            {{ 'devices.activate.selected' | translate: { count: selectedCount() } }}
+          </span>
+        }
+      </div>
+      <div class="tab-toolbar-right">
+        @if (filteredRows().length) {
+          <button type="button" class="btn btn-outline btn-sm" (click)="toggleAllVisible()">
+            {{ allVisibleSelected() ? ('devices.activate.clearAll' | translate) : ('devices.activate.selectAll' | translate) }}
+          </button>
+        }
+        <app-search-bar
+          [placeholder]="'devices.activate.searchPlaceholder' | translate"
+          [initialValue]="searchTerm()"
+          (searchChange)="onSearchChange($event)"
+        />
+        <button class="btn btn-ghost" (click)="fetch()" [title]="'devices.list.refreshTable' | translate">
+          <span class="material-icons">refresh</span>
+        </button>
+      </div>
+    </div>
+
+    @if (submitSuccess()) {
+      <div class="alert alert-success arp-alert">
+        <span class="material-icons">check_circle</span> {{ submitSuccess() }}
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert alert-danger arp-alert">
+        <span class="material-icons">error</span> {{ error() }}
+        <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+      </div>
+    } @else {
+      <p-table
+        [value]="filteredRows()"
+        [paginator]="true"
+        [rows]="10"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [loading]="loading()"
+        dataKey="itemId"
+        styleClass="app-table"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem"></th>
+            <th style="width: 4rem">#</th>
+            <th>{{ 'devices.columns.deviceModel' | translate }}</th>
+            <th>{{ 'devices.columns.uid' | translate }}</th>
+            <th>{{ 'devices.columns.imei' | translate }}</th>
+            <th>{{ 'devices.columns.simProvider' | translate }}</th>
+            <th>{{ 'devices.columns.iccid' | translate }}</th>
+            <th>{{ 'devices.columns.status' | translate }}</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-d let-rowIndex="rowIndex">
+          <tr
+            class="arp-row"
+            [class.arp-row--selected]="selectedIds().has(d.itemId)"
+            (click)="toggleDevice(d.itemId)"
+          >
+            <td>
+              <span class="material-icons arp-check">
+                {{ selectedIds().has(d.itemId) ? 'check_box' : 'check_box_outline_blank' }}
+              </span>
+            </td>
+            <td>{{ rowIndex + 1 }}</td>
+            <td>{{ d.deviceModel?.name ?? '—' }}</td>
+            <td class="arp-mono">{{ d.uid.trim() }}</td>
+            <td class="arp-mono">{{ d.imei }}</td>
+            <td>{{ d.simProvider?.name ?? '—' }}</td>
+            <td class="arp-mono">{{ d.iccid }}</td>
+            <td>
+              <span
+                class="chip"
+                [style.background]="statusInfo(d.status).color + '22'"
+                [style.color]="statusInfo(d.status).color"
+              >
+                {{ statusInfo(d.status).label }}
+              </span>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8">
+              <div class="tab-empty" style="padding: var(--space-lg)">
+                <span class="material-icons">memory</span>
+                <p>{{ 'devices.list.noDevices' | translate }}</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </div>
+
+  <div class="card arp-action">
+    <div class="arp-action-fields">
+      @if (submitError()) {
+        <div class="alert alert-danger arp-action-error">
+          <span class="material-icons">error</span> {{ submitError() }}
+        </div>
+      }
+    </div>
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="!canSubmit()"
+      (click)="openConfirm()"
+    >
+      @if (submitting()) {
+        <span class="spinner spinner--xs"></span> {{ 'devices.activate.processing' | translate }}
+      } @else if (op === 'Activate') {
+        <span class="material-icons">bolt</span>
+        {{ activateButtonLabel() }}
+      } @else {
+        <span class="material-icons">autorenew</span>
+        {{ rechargeButtonLabel() }}
+      }
+    </button>
+  </div>
+
+  <app-action-summary-dialog
+    [open]="showConfirm()"
+    [title]="confirmTitle()"
+    [confirmLabel]="confirmLabel()"
+    [rows]="confirmRows()"
+    [devices]="selectedDevices()"
+    [loading]="submitting()"
+    [error]="submitError()"
+    (confirm)="confirmSubmit()"
+    (cancel)="closeConfirm()"
+  />
+}

@@ -1,0 +1,419 @@
+<div class="stats-row">
+  <button
+    type="button"
+    class="stat-card stat-total"
+    [class.stat-active]="!statusFilter()"
+    (click)="clearStatusFilter()"
+  >
+    <span class="material-icons stat-icon">summarize</span>
+    <div>
+      <div class="stat-value">{{ totalFitments() }}</div>
+      <div class="stat-label">{{ 'fitment.list.totalFitments' | translate }}</div>
+    </div>
+  </button>
+  <button
+    type="button"
+    class="stat-card stat-pending"
+    [class.stat-active]="statusFilter() === 'OtpPending'"
+    (click)="toggleStatusFilter('OtpPending')"
+  >
+    <span class="material-icons stat-icon">hourglass_top</span>
+    <div>
+      <div class="stat-value">{{ statusCount()?.OtpPending ?? 0 }}</div>
+      <div class="stat-label">{{ 'fitment.list.otpPending' | translate }}</div>
+    </div>
+  </button>
+  <button
+    type="button"
+    class="stat-card stat-completed"
+    [class.stat-active]="statusFilter() === 'Completed'"
+    (click)="toggleStatusFilter('Completed')"
+  >
+    <span class="material-icons stat-icon">check_circle</span>
+    <div>
+      <div class="stat-value">{{ statusCount()?.Completed ?? 0 }}</div>
+      <div class="stat-label">{{ 'fitment.list.completed' | translate }}</div>
+    </div>
+  </button>
+  <button
+    type="button"
+    class="stat-card stat-expired"
+    [class.stat-active]="statusFilter() === 'Expired'"
+    (click)="toggleStatusFilter('Expired')"
+  >
+    <span class="material-icons stat-icon">schedule</span>
+    <div>
+      <div class="stat-value">{{ statusCount()?.Expired ?? 0 }}</div>
+      <div class="stat-label">{{ 'fitment.list.expired' | translate }}</div>
+    </div>
+  </button>
+</div>
+
+<div class="card dlp-card">
+  <div class="tab-toolbar">
+    <div class="tab-toolbar-left">
+      <h3>{{ 'fitment.list.heading' | translate }}</h3>
+      @if (pagination(); as pg) {
+        <span class="count-badge">{{ pg.totalCount }}</span>
+      }
+    </div>
+    <div class="tab-toolbar-right">
+      <app-search-bar
+        [placeholder]="'fitment.list.searchPlaceholder' | translate"
+        [initialValue]="searchTerm()"
+        (searchChange)="onSearchChange($event)"
+      />
+      <button class="btn btn-ghost" (click)="refresh()" [title]="'common.refresh' | translate">
+        <span class="material-icons">refresh</span>
+      </button>
+      <button type="button" class="btn btn-primary" (click)="createClick.emit()">
+        <span class="material-icons">add</span> {{ 'fitment.list.createFitment' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-danger">
+      <span class="material-icons">error</span> {{ error() }}
+      <button class="btn btn-ghost" (click)="refresh()">{{ 'common.retry' | translate }}</button>
+    </div>
+  }
+
+  <p-table
+    [value]="rows()"
+    [lazy]="true"
+    (onLazyLoad)="onLazyLoad($event)"
+    [paginator]="true"
+    [rows]="tableQuery().pageSize ?? 10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    [first]="tableFirst()"
+    dataKey="id"
+    sortMode="single"
+    styleClass="app-table"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">#</th>
+        <th>{{ 'fitment.list.colVehicleFitment' | translate }}</th>
+        <th>{{ 'fitment.list.colOemRfc' | translate }}</th>
+        <th>{{ 'fitment.list.colChassisEngine' | translate }}</th>
+        <th>{{ 'fitment.list.colMakeModel' | translate }}</th>
+        <th>{{ 'fitment.list.colCustomer' | translate }}</th>
+        <th>{{ 'fitment.list.colStateRto' | translate }}</th>
+        <th>{{ 'fitment.list.colFitmentDate' | translate }}</th>
+        <th>{{ 'fitment.list.colValidTill' | translate }}</th>
+        <th>{{ 'fitment.list.colStatus' | translate }}</th>
+        <th>{{ 'fitment.list.colAction' | translate }}</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-f let-rowIndex="rowIndex">
+      <tr class="row-clickable" (click)="openDetail(f)">
+        <td>{{ rowIndex + 1 }}</td>
+        <td>
+          <div class="cell-stack">
+            <strong class="cell-primary">{{ f.vehicleRegistrationNo || '—' }}</strong>
+            <span class="cell-sub">{{ f.fitmentNo }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="cell-stack">
+            <span class="cell-primary">{{ f.entity?.name ?? '—' }}</span>
+            @if (f.entity?.entityType?.name) {
+              <span class="cell-sub">{{ f.entity?.entityType?.name }}</span>
+            }
+          </div>
+        </td>
+        <td>
+          <div class="cell-stack">
+            <span class="cell-primary">{{ f.chassisNo || '—' }}</span>
+            @if (f.engineNo) {
+              <span class="cell-sub">{{ f.engineNo }}</span>
+            }
+          </div>
+        </td>
+        <td>
+          <div class="cell-stack">
+            <strong class="cell-primary">{{ f.vehicleMake || '—' }}</strong>
+            @if (f.vehicleModel) {
+              <span class="cell-sub">{{ f.vehicleModel }}</span>
+            }
+          </div>
+        </td>
+        <td>
+          <div class="cell-stack">
+            <span class="cell-primary">{{ f.customerName }}</span>
+            <span class="cell-sub">{{ f.mobileNo }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="cell-stack">
+            <span class="cell-primary">{{ f.rto?.district?.state?.stateName ?? '—' }}</span>
+            <span class="cell-sub">{{ f.rto?.rtoCode }} — {{ f.rto?.rtoName }}</span>
+          </div>
+        </td>
+        <td>{{ f.fitmentDate | date: 'mediumDate' }}</td>
+        <td>{{ f.fitmentValidTill | date: 'mediumDate' }}</td>
+        <td>
+          @if (f.status) {
+            <span class="chip status-chip" [attr.data-status]="f.status">{{ ('fitment.status.' + f.status) | translate }}</span>
+          } @else {
+            —
+          }
+        </td>
+        <td (click)="$event.stopPropagation()">
+          <div class="action-cell">
+            @if (f.status === 'OtpPending') {
+              <button class="btn btn-primary btn-sm" (click)="openOtpDialog(f)">
+                <span class="material-icons">verified</span> {{ 'fitment.list.verifyOtp' | translate }}
+              </button>
+            } @else if (f.status === 'Expired') {
+              <button class="btn btn-outline btn-sm" (click)="openOtpDialog(f)">
+                <span class="material-icons">refresh</span> {{ 'fitment.list.reInitiate' | translate }}
+              </button>
+            }
+            @if (canDelete()) {
+              <button
+                class="btn btn-icon"
+                style="border: 1px solid var(--color-danger); color: var(--color-danger); background: #fff;"
+                [disabled]="deletingId() === f.id"
+                (click)="askDeleteFitment(f)"
+                [title]="'fitment.list.deleteFitmentTitle' | translate"
+              >
+                @if (deletingId() === f.id) {
+                  <div class="spinner spinner--dark"></div>
+                } @else {
+                  <span class="material-icons">delete</span>
+                }
+              </button>
+            }
+            @if (f.status !== 'OtpPending' && f.status !== 'Expired' && !canDelete()) {
+              —
+            }
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="11">
+          <div class="tab-empty" style="padding: var(--space-lg)">
+            <span class="material-icons">build</span>
+            <p>{{ 'fitment.list.emptyMessage' | translate }}</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<app-delete-confirm-dialog
+  [open]="deleteTarget() !== null"
+  [title]="'fitment.list.deleteTitle' | translate"
+  [message]="'fitment.list.deleteMessage' | translate"
+  [targetName]="deleteTarget()?.fitmentNo ?? null"
+  [loading]="deletingId() !== null"
+  (confirm)="confirmDeleteFitment()"
+  (cancel)="cancelDeleteFitment()"
+/>
+
+<app-fitment-otp-dialog
+  [open]="otpDialogOpen()"
+  [fitment]="otpFitment()"
+  (success)="onOtpSuccess()"
+  (cancel)="closeOtpDialog()"
+/>
+
+@if (selected(); as f) {
+  <div class="drawer-backdrop" (click)="closeDetail()" aria-hidden="true"></div>
+  <aside class="drawer-panel drawer-panel--wide" role="dialog" aria-modal="true" aria-labelledby="fitment-detail-title">
+    <div class="dialog-header">
+      <div>
+        <div class="detail-eyebrow">{{ 'fitment.list.detailEyebrow' | translate }}</div>
+        <h3 id="fitment-detail-title">{{ f.fitmentNo }}</h3>
+      </div>
+      <div class="drawer-head-right">
+        @if (f.status) {
+          <span class="chip status-chip" [attr.data-status]="f.status">{{ ('fitment.status.' + f.status) | translate }}</span>
+        }
+        <button type="button" class="btn btn-ghost" (click)="closeDetail()" [attr.aria-label]="'common.close' | translate">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="dialog-body">
+      <section class="drawer-section">
+        <h4 class="section-title">
+          <span class="material-icons">apartment</span>
+          {{ 'fitment.list.sectionEntity' | translate }}
+        </h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.entityName' | translate }}</span>
+            <span class="detail-value">{{ f.entity?.name ?? '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.entityType' | translate }}</span>
+            <span class="detail-value">{{ f.entity?.entityType?.name ?? '—' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="drawer-section">
+        <h4 class="section-title">
+          <span class="material-icons">directions_car</span>
+          {{ 'fitment.list.sectionVehicle' | translate }}
+        </h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.registration' | translate }}</span>
+            <span class="detail-value">{{ f.vehicleRegistrationNo || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.chassis' | translate }}</span>
+            <span class="detail-value">{{ f.chassisNo || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.engine' | translate }}</span>
+            <span class="detail-value">{{ f.engineNo || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.makeModel' | translate }}</span>
+            <span class="detail-value">{{ f.vehicleMake }} {{ f.vehicleModel }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.mfgYear' | translate }}</span>
+            <span class="detail-value">{{ f.mafYear || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.category' | translate }}</span>
+            <span class="detail-value">{{ f.vehicleCategory?.name ?? '—' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="drawer-section">
+        <h4 class="section-title">
+          <span class="material-icons">person</span>
+          {{ 'fitment.list.sectionCustomer' | translate }}
+        </h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.name' | translate }}</span>
+            <span class="detail-value">{{ f.customerName || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.mobile' | translate }}</span>
+            <span class="detail-value">{{ f.mobileNo || '—' }}</span>
+          </div>
+          <div class="detail-item detail-item--wide">
+            <span class="detail-label">{{ 'fitment.list.address' | translate }}</span>
+            <span class="detail-value">{{ f.address || '—' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="drawer-section">
+        <h4 class="section-title">
+          <span class="material-icons">location_on</span>
+          {{ 'fitment.list.sectionRto' | translate }}
+        </h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.state' | translate }}</span>
+            <span class="detail-value">{{ f.rto?.district?.state?.stateName ?? '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.district' | translate }}</span>
+            <span class="detail-value">{{ f.rto?.district?.districtName ?? '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.rtoCode' | translate }}</span>
+            <span class="detail-value">{{ f.rto?.rtoCode ?? '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.rtoName' | translate }}</span>
+            <span class="detail-value">{{ f.rto?.rtoName ?? '—' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="drawer-section">
+        <h4 class="section-title">
+          <span class="material-icons">event</span>
+          {{ 'fitment.list.sectionDates' | translate }}
+        </h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.colFitmentDate' | translate }}</span>
+            <span class="detail-value">{{ f.fitmentDate | date: 'mediumDate' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.colValidTill' | translate }}</span>
+            <span class="detail-value">{{ f.fitmentValidTill | date: 'mediumDate' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.created' | translate }}</span>
+            <span class="detail-value">{{ f.createdAt | date: 'medium' }}</span>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-ghost" (click)="closeDetail()">{{ 'common.close' | translate }}</button>
+      @if (canDelete()) {
+        <button
+          class="btn btn-outline"
+          style="border-color: var(--color-danger); color: var(--color-danger);"
+          [disabled]="deletingId() === f.id"
+          (click)="askDeleteFitment(f)"
+        >
+          @if (deletingId() === f.id) {
+            <div class="spinner spinner--dark"></div>
+            {{ 'common.deleting' | translate }}
+          } @else {
+            <span class="material-icons">delete</span> {{ 'common.delete' | translate }}
+          }
+        </button>
+      }
+      @if (f.fitmentCertificateUrl) {
+        <a
+          class="btn btn-outline"
+          [href]="f.fitmentCertificateUrl"
+          target="_blank"
+          rel="noopener"
+          [download]="'fitment-' + f.fitmentNo + '.pdf'"
+        >
+          <span class="material-icons">download</span> {{ 'common.download' | translate }}
+        </a>
+      }
+      @if (f.status === 'Completed') {
+        <button
+          class="btn btn-outline"
+          [disabled]="regeneratingId() === f.id"
+          (click)="regenerateCertificate(f)"
+        >
+          @if (regeneratingId() === f.id) {
+            <div class="spinner spinner--dark"></div>
+            {{ 'common.regenerating' | translate }}
+          } @else {
+            <span class="material-icons">autorenew</span> {{ 'common.regenerate' | translate }}
+          }
+        </button>
+      }
+      @if (f.status === 'OtpPending') {
+        <button class="btn btn-primary" (click)="closeDetail(); openOtpDialog(f)">
+          <span class="material-icons">verified</span> {{ 'fitment.list.verifyOtp' | translate }}
+        </button>
+      } @else if (f.status === 'Expired') {
+        <button class="btn btn-outline" (click)="closeDetail(); openOtpDialog(f)">
+          <span class="material-icons">refresh</span> {{ 'fitment.list.reInitiate' | translate }}
+        </button>
+      }
+    </div>
+  </aside>
+}

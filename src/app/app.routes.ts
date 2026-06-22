@@ -47,6 +47,20 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'devices',
+        loadComponent: () =>
+          import('./features/devices/devices.component').then(
+            (m) => m.DevicesComponent,
+          ),
+      },
+      {
+        path: 'fitment',
+        loadComponent: () =>
+          import('./features/fitment/fitment.component').then(
+            (m) => m.FitmentComponent,
+          ),
+      },
+      {
         path: 'master',
         loadComponent: () =>
           import('./features/master/master.component').then(

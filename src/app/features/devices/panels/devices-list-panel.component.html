@@ -1,0 +1,142 @@
+<div class="dlp-filters">
+  <button
+    type="button"
+    class="dlp-chip"
+    [class.dlp-chip--active]="statusFilter() === ''"
+    (click)="selectStatus('')"
+  >
+    <span class="material-icons">all_inclusive</span> {{ 'devices.list.all' | translate }}
+  </button>
+  @for (s of statuses; track s) {
+    <button
+      type="button"
+      class="dlp-chip"
+      [class.dlp-chip--active]="statusFilter() === s"
+      [style.--chip-color]="statusInfo(s).color"
+      (click)="selectStatus(s)"
+    >
+      <span class="material-icons">{{ statusInfo(s).icon }}</span>
+      {{ statusInfo(s).label }}
+    </button>
+  }
+</div>
+
+<div class="card dlp-card">
+  <div class="tab-toolbar">
+    <div class="tab-toolbar-left">
+      <h3>
+        @if (statusFilter(); as sf) {
+          {{ statusInfo(sf).label }} {{ 'devices.list.devicesSuffix' | translate }}
+        } @else {
+          {{ 'devices.list.allDevices' | translate }}
+        }
+      </h3>
+      @if (pagination(); as pg) {
+        <span class="count-badge">{{ pg.totalCount }}</span>
+      }
+    </div>
+    <div class="tab-toolbar-right">
+      <app-search-bar
+        [placeholder]="'devices.list.searchPlaceholder' | translate"
+        [initialValue]="searchTerm()"
+        (searchChange)="onSearchChange($event)"
+      />
+      <button class="btn btn-ghost" (click)="fetch()" [title]="'devices.list.refreshTable' | translate">
+        <span class="material-icons">refresh</span>
+      </button>
+      @if (canBulkUpload()) {
+        <button type="button" class="btn btn-primary" (click)="showBulkUpload.set(true)">
+          <span class="material-icons">upload_file</span> {{ 'devices.list.bulkUpload' | translate }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-danger">
+      <span class="material-icons">error</span> {{ error() }}
+      <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else {
+    <p-table
+      [value]="rows()"
+      [lazy]="true"
+      (onLazyLoad)="onLazyLoad($event)"
+      [paginator]="true"
+      [rows]="tableQuery().pageSize ?? 10"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [totalRecords]="totalRecords()"
+      [loading]="loading()"
+      [first]="tableFirst()"
+      dataKey="itemId"
+      sortMode="single"
+      styleClass="app-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem">#</th>
+          <th>{{ 'devices.columns.deviceModel' | translate }}</th>
+          <th pSortableColumn="serialNumber">{{ 'devices.columns.serialNumber' | translate }} <p-sortIcon field="serialNumber" /></th>
+          <th pSortableColumn="imei">{{ 'devices.columns.imei' | translate }} <p-sortIcon field="imei" /></th>
+          <th>{{ 'devices.columns.simProvider' | translate }}</th>
+          <th pSortableColumn="iccid">{{ 'devices.columns.iccid' | translate }} <p-sortIcon field="iccid" /></th>
+          <th>{{ 'devices.columns.primarySim' | translate }}</th>
+          <th>{{ 'devices.columns.secondarySim' | translate }}</th>
+          <th pSortableColumn="name">{{ 'devices.columns.oemRfc' | translate }} <p-sortIcon field="name" /></th>
+          <th pSortableColumn="status">{{ 'devices.columns.status' | translate }} <p-sortIcon field="status" /></th>
+          <th pSortableColumn="onboardedAt">{{ 'devices.columns.onboarded' | translate }} <p-sortIcon field="onboardedAt" /></th>
+          <th>{{ 'devices.columns.action' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-d let-rowIndex="rowIndex">
+        <tr>
+          <td>{{ rowIndex + 1 }}</td>
+          <td>{{ d.deviceModel?.name ?? '—' }}</td>
+          <td>{{ d.serialNumber }}</td>
+          <td>{{ d.imei }}</td>
+          <td>{{ d.simProvider?.name ?? '—' }}</td>
+          <td>{{ d.iccid }}</td>
+          <td>{{ d.primarySimPhone ?? '—' }}</td>
+          <td>{{ d.secondarySimPhone ?? '—' }}</td>
+          <td>{{ d.entityName }}</td>
+          <td>
+            <span
+              class="chip dlp-chip-status"
+              [style.background]="statusInfo(d.status).color + '22'"
+              [style.color]="statusInfo(d.status).color"
+            >
+              {{ statusInfo(d.status).label }}
+            </span>
+          </td>
+          <td>{{ d.onboardedAt | date: 'mediumDate' }}</td>
+          <td>
+            @if (canStartFitment(d)) {
+              <button
+                class="btn btn-outline btn-icon"
+                style="border-color: var(--color-text-primary); color: var(--color-text-primary); background: #fff;"
+                (click)="startFitment(d)"
+                [title]="'devices.list.startFitment' | translate"
+              >
+                <span class="material-icons">description</span>
+              </button>
+            } @else {
+              —
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="12">
+            <div class="tab-empty" style="padding: var(--space-lg)">
+              <span class="material-icons">memory</span>
+              <p>{{ 'devices.list.noDevices' | translate }}</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
+
+<app-bulk-upload-dialog [(open)]="showBulkUpload" />

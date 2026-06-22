@@ -1,0 +1,44 @@
+.master-page {
+  padding: var(--space-lg);
+}
+
+.master-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.master-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+
+  .material-icons {
+    font-size: 28px;
+    color: var(--color-primary);
+  }
+
+  h1 {
+    font-size: var(--font-xl);
+    font-weight: 700;
+    margin: 0;
+  }
+}
+
+.rbac-badge {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  font-size: var(--font-xs);
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+@media (max-width: 640px) {
+  .master-page {
+    padding: var(--space-md);
+  }
+}

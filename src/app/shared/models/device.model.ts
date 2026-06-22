@@ -1,0 +1,157 @@
+import {
+  ITEM_STATUS,
+  ITEM_STATUSES,
+  DEVICE_FILTER_STATUSES,
+  ITEM_STATUS_META,
+  ItemStatus,
+  RECHARGE_BY_STATUS_PARAM,
+} from './item-status.model';
+
+/** @deprecated Use {@link ItemStatus} — kept for existing device feature imports */
+export type AisDeviceStatus = ItemStatus;
+
+/** @deprecated Use {@link ITEM_STATUSES} */
+export const AIS_DEVICE_STATUSES: AisDeviceStatus[] = [...ITEM_STATUSES];
+
+/** Status chips shown on device list / inventory filters */
+export const AIS_DEVICE_FILTER_STATUSES: AisDeviceStatus[] = [...DEVICE_FILTER_STATUSES];
+
+export interface AisDeviceRef {
+  id: string;
+  name: string;
+}
+
+export interface AisDevice {
+  itemId: string;
+  serialNumber: string;
+  imei: string;
+  iccid: string;
+  primarySimPhone: string | null;
+  secondarySimPhone: string | null;
+  status: AisDeviceStatus;
+  entityId: string;
+  entityName: string;
+  onboardedAt: string;
+  deviceModel?: AisDeviceRef | null;
+  simProvider?: AisDeviceRef | null;
+}
+
+export interface AisDeviceStatusCount {
+  status: AisDeviceStatus;
+  count: number;
+}
+
+export interface AisEntityDeviceCount {
+  entityId: string;
+  entityName: string;
+  totalCount: number;
+  statusCounts: AisDeviceStatusCount[];
+}
+
+export interface AisDeviceListFilters {
+  status?: AisDeviceStatus;
+  entityId?: string;
+}
+
+export interface DailyInstallation {
+  date: string;
+  count: number;
+}
+
+export interface EntityInstallationGraph {
+  entityId: string;
+  entityName: string;
+  totalCount: number;
+  dailyInstallations: DailyInstallation[];
+}
+
+export type UploadJobState = 'Pending' | 'Processing' | 'Completed' | 'Failed' | string;
+
+export interface UploadJobError {
+  rowNumber?: number;
+  message?: string;
+  [k: string]: unknown;
+}
+
+export interface UploadJobResult {
+  totalRows: number;
+  successfulRows: number;
+  skippedRows: number;
+  failedRows: number;
+  errors: UploadJobError[];
+}
+
+export interface UploadJobStatus {
+  id: string;
+  jobType: string;
+  status: UploadJobState;
+  createdAt: string;
+  completedAt: string | null;
+  errorMessage: string | null;
+  result: UploadJobResult | null;
+}
+
+export interface UploadJobHandle {
+  id: string;
+  statusUrl: string;
+}
+
+export interface MoveDevicesRequest {
+  isReturn: boolean;
+  toEntityId?: string;
+  itemIds: string[];
+  remarks?: string;
+}
+
+export type DeviceSimOperation = 'Activate' | 'Recharge';
+
+export interface DeviceActivateRequest {
+  operation: DeviceSimOperation;
+  itemIds: string[];
+  simProviderId?: string;
+}
+
+export { RECHARGE_BY_STATUS_PARAM, ITEM_STATUS };
+
+export type MovementDirection = 'in' | 'out';
+
+export interface MovementLogItem {
+  logId: string;
+  itemId: string;
+  serialNumber: string;
+  direction: MovementDirection;
+  fromEntityId: string;
+  fromEntityName: string;
+  toEntityId: string;
+  toEntityName: string;
+  remarks: string | null;
+  createdAt: string;
+}
+
+export interface MovementDayGroup {
+  date: string;
+  movedIn: number;
+  movedOut: number;
+  items: MovementLogItem[];
+}
+
+export interface DeviceByStatus {
+  itemId: string;
+  uid: string;
+  imei: string;
+  iccid: string;
+  status: AisDeviceStatus;
+  deviceModel?: AisDeviceRef | null;
+  simProvider?: AisDeviceRef | null;
+}
+
+/** @deprecated Use {@link ITEM_STATUS_META} */
+export const DEVICE_STATUS_META: Record<
+  AisDeviceStatus,
+  { label: string; color: string; icon: string }
+> = Object.fromEntries(
+  ITEM_STATUSES.map((s) => {
+    const { label, color, icon } = ITEM_STATUS_META[s];
+    return [s, { label, color, icon }];
+  }),
+) as Record<AisDeviceStatus, { label: string; color: string; icon: string }>;

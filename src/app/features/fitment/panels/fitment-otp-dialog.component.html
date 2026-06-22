@@ -1,0 +1,92 @@
+@if (open() && fitment(); as f) {
+  <div class="dialog-backdrop" (click)="onCancel()" aria-hidden="true"></div>
+  <aside
+    class="dialog-card fitment-otp-dialog"
+    role="alertdialog"
+    aria-modal="true"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="dialog-header">
+      <h3>
+        @if (isExpired()) {
+          {{ 'fitment.otp.reInitiateTitle' | translate }}
+        } @else {
+          {{ 'fitment.otp.verifyTitle' | translate }}
+        }
+      </h3>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="onCancel()" [attr.aria-label]="'common.close' | translate">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <p class="text-muted">
+        {{ 'fitment.otp.fitmentFor' | translate }} <strong>{{ f.fitmentNo }}</strong> {{ 'fitment.otp.forVehicle' | translate }}
+        <strong>{{ f.vehicleRegistrationNo }}</strong>.
+        @if (isExpired()) {
+          {{ 'fitment.otp.expiredSent' | translate }}
+        } @else {
+          {{ 'fitment.otp.sentTo' | translate }}
+        }
+        <strong>+91 {{ f.mobileNo }}</strong>.
+      </p>
+
+      @if (initiating()) {
+        <div class="alert alert-info">
+          <span class="spinner spinner--dark"></span> {{ 'fitment.otp.sendingFresh' | translate }}
+        </div>
+      }
+
+      <div class="form-group otp-input-group">
+        <label>{{ 'fitment.otp.enterOtp' | translate }}</label>
+        <app-otp-boxes
+          [length]="6"
+          [disabled]="initiating()"
+          [(value)]="otp"
+          (complete)="verify()"
+        />
+      </div>
+
+      <div class="otp-actions-row">
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm"
+          [disabled]="!canResend() || initiating()"
+          (click)="resend()"
+        >
+          <span class="material-icons">refresh</span> {{ resendLabel() }}
+        </button>
+      </div>
+
+      @if (successMsg()) {
+        <div class="alert alert-success">
+          <span class="material-icons">check_circle</span> {{ successMsg() }}
+        </div>
+      }
+
+      @if (error()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ error() }}
+        </div>
+      }
+    </div>
+
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-ghost" [disabled]="verifying()" (click)="onCancel()">
+        {{ 'common.cancel' | translate }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="verifying() || initiating()"
+        (click)="verify()"
+      >
+        @if (verifying()) {
+          <span class="spinner"></span> {{ 'common.verifying' | translate }}
+        } @else {
+          <span class="material-icons">verified</span> {{ 'fitment.otp.verifyTitle' | translate }}
+        }
+      </button>
+    </div>
+  </aside>
+}

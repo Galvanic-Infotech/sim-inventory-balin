@@ -1,0 +1,33 @@
+<div class="master-page">
+  <div class="master-header">
+    <div class="master-title">
+      <span class="material-icons">build</span>
+      <h1>{{ 'fitment.title' | translate }}</h1>
+      <span class="rbac-badge">BALIN</span>
+    </div>
+    @if (view() === 'list') {
+      <button type="button" class="btn btn-primary" (click)="openCreate()">
+        <span class="material-icons">add</span>
+        <span>{{ 'fitment.list.createFitment' | translate }}</span>
+      </button>
+    } @else if (view() === 'create') {
+      <button class="btn btn-ghost" (click)="backToList()">
+        <span class="material-icons">arrow_back</span>
+        <span>{{ 'fitment.backToList' | translate }}</span>
+      </button>
+    }
+  </div>
+
+  @switch (view()) {
+    @case ('list') {
+      <app-fitment-list-panel (createClick)="openCreate()" />
+    }
+    @case ('create') {
+      <app-fitment-create-stepper
+        [initialSerial]="initialSerial()"
+        (done)="backToList()"
+        (cancel)="backToList()"
+      />
+    }
+  }
+</div>

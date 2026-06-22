@@ -13,7 +13,10 @@ const PAGE_META: Record<string, { icon: string; titleKey: string }> = {
   dashboard: { icon: 'dashboard', titleKey: 'layout.nav.dashboard' },
   'sim-inventory': { icon: 'sim_card', titleKey: 'layout.nav.simInventory' },
   billing: { icon: 'receipt_long', titleKey: 'layout.nav.billing' },
+  devices: { icon: 'memory', titleKey: 'layout.nav.devices' },
+  fitment: { icon: 'build', titleKey: 'layout.nav.fitment' },
   master: { icon: 'dataset', titleKey: 'layout.nav.master' },
+  onboarding: { icon: 'rocket_launch', titleKey: 'layout.nav.onboarding' },
   profile: { icon: 'manage_accounts', titleKey: 'layout.profilePassword' },
 };
 

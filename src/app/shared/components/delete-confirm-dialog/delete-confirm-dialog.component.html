@@ -1,0 +1,55 @@
+@if (open()) {
+  <div class="dialog-backdrop" (click)="onCancel()" aria-hidden="true"></div>
+  <aside
+    class="dialog-card delete-confirm-dialog"
+    role="alertdialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="dialogTitleId"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="dialog-header">
+      <h3 [id]="dialogTitleId">{{ title() }}</h3>
+      <button type="button" class="btn btn-ghost btn-sm" (click)="onCancel()" aria-label="Close">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="dialog-body">
+      <p>{{ message() }}</p>
+      @if (targetName(); as name) {
+        <p class="delete-confirm-dialog__target"><strong>{{ name }}</strong></p>
+      }
+      <p class="delete-confirm-dialog__hint">
+        Type <kbd>DELETE</kbd> below to confirm this action.
+      </p>
+      <div class="form-group" style="margin-bottom: 0">
+        <input
+          class="form-control"
+          [ngModel]="typed()"
+          (ngModelChange)="typed.set($event)"
+          placeholder="DELETE"
+          autocomplete="off"
+          spellcheck="false"
+          [disabled]="loading()"
+        />
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-ghost" [disabled]="loading()" (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-danger"
+        [disabled]="loading() || typed() !== 'DELETE'"
+        (click)="onConfirm()"
+      >
+        @if (loading()) {
+          <span class="spinner"></span>
+        } @else {
+          <span class="material-icons">delete</span>
+        }
+        {{ confirmLabel() }}
+      </button>
+    </div>
+  </aside>
+}
