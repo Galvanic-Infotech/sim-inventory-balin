@@ -1161,8 +1161,10 @@
     },
     "search": {
       "title": "सिम खोजें",
-      "placeholder": "सिम नंबर दर्ज करें (ICCID)",
+      "placeholder": "सिम नंबर या MSISDN दर्ज करें",
       "hint": "सिम/MSISDN नंबर",
+      "autocompleteLoading": "खोज रहे हैं…",
+      "autocompleteEmpty": "कोई मेल खाता सिम नहीं",
       "copied": "कॉपी हो गया!",
       "clearingIn": "{{seconds}} सेकंड में खोज साफ़ होगी",
       "checkStatus": "स्थिति जाँचें",

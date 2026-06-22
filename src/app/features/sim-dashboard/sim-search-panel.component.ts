@@ -1,8 +1,9 @@
-import { Component, inject, OnDestroy, output, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SimService } from '../../core/services/sim.service';
 import { PermissionService, PERMS } from '../../core/services/permission.service';
 import { TranslationService } from '../../core/services/translation.service';
+import { APP_CONFIG } from '../../core/constants/api.constants';
 import {
   SimDetail,
   resolveSimFilterType,
@@ -12,12 +13,16 @@ import {
   isSimTempDisconnected,
   itemStatusChipClass,
 } from '../../shared/models/sim.model';
+import { SimInventoryItem } from '../../shared/models/sim-inventory.model';
 import { itemStatusLabel, normalizeItemStatus } from '../../shared/models/item-status.model';
 import { extractApiError } from '../../core/utils/api-error.util';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SimSmsWhitelistDialogComponent } from './sim-sms-whitelist-dialog.component';
 
 export type ValidTillPreset = '3months' | '6months' | '1year' | 'custom';
+
+const MIN_SUGGEST_LEN = 3;
+const SUGGEST_PAGE_SIZE = 8;
 
 interface DetailField {
   icon: string;
@@ -37,6 +42,9 @@ export class SimSearchPanelComponent implements OnDestroy {
   private readonly i18n = inject(TranslationService);
   readonly perm = inject(PermissionService);
   private clearCountdownTimer: ReturnType<typeof setInterval> | null = null;
+  private suggestTimer?: ReturnType<typeof setTimeout>;
+  private suggestBlurTimer?: ReturnType<typeof setTimeout>;
+  private suggestGen = 0;
 
   readonly basketRefresh = output<void>();
 
@@ -56,7 +64,10 @@ export class SimSearchPanelComponent implements OnDestroy {
   readonly showSmsDialog = signal(false);
   readonly copiedToast = signal(false);
   readonly clearCountdown = signal<number | null>(null);
-  readonly statusChecking = signal(false);
+  readonly actionsLocked = computed(() => this.clearCountdown() !== null);
+  readonly suggestions = signal<SimInventoryItem[]>([]);
+  readonly suggestionsLoading = signal(false);
+  readonly showSuggestions = signal(false);
 
   // Activation form fields
   validTillPreset: ValidTillPreset = '1year';
@@ -71,6 +82,53 @@ export class SimSearchPanelComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.stopClearCountdown();
+    this.clearSuggestTimer();
+    clearTimeout(this.suggestBlurTimer);
+  }
+
+  onInputChange(value: string): void {
+    this.searchValue = value;
+    if (this.actionsLocked()) return;
+
+    this.clearSuggestTimer();
+    const term = value.trim();
+    if (term.length < MIN_SUGGEST_LEN) {
+      this.closeSuggestions();
+      return;
+    }
+
+    this.showSuggestions.set(true);
+    this.suggestTimer = setTimeout(() => this.fetchSuggestions(term), APP_CONFIG.DEBOUNCE_MS);
+  }
+
+  onInputFocus(): void {
+    if (this.actionsLocked()) return;
+    const term = this.searchValue.trim();
+    if (term.length >= MIN_SUGGEST_LEN && this.suggestions().length) {
+      this.showSuggestions.set(true);
+    }
+  }
+
+  onInputBlur(): void {
+    clearTimeout(this.suggestBlurTimer);
+    this.suggestBlurTimer = setTimeout(() => this.closeSuggestions(), 150);
+  }
+
+  selectSuggestion(item: SimInventoryItem): void {
+    clearTimeout(this.suggestBlurTimer);
+    this.closeSuggestions();
+    const value = this.suggestionSearchValue(item);
+    if (!value) return;
+    this.searchValue = value;
+    this.search();
+  }
+
+  suggestionSearchValue(item: SimInventoryItem): string {
+    const mobile = item.mobileNo?.trim();
+    const iccid = item.iccid?.trim();
+    if (mobile && resolveSimFilterType(mobile)) return mobile;
+    if (iccid && resolveSimFilterType(iccid)) return iccid;
+    return mobile || iccid || '';
   }
 
   detailFields(sim: SimDetail): DetailField[] {
@@ -93,6 +151,8 @@ export class SimSearchPanelComponent implements OnDestroy {
   }
 
   search(): void {
+    if (this.actionsLocked()) return;
+    this.closeSuggestions();
     this.stopClearCountdown();
 
     const value = this.searchValue.trim();
@@ -127,6 +187,7 @@ export class SimSearchPanelComponent implements OnDestroy {
   }
 
   openConfirm(type: 'activate' | 'temp' | 'resume'): void {
+    if (this.actionsLocked()) return;
     if (type === 'activate') {
       this.validTillPreset = '1year';
       this.validTillCustom = '';
@@ -174,13 +235,6 @@ export class SimSearchPanelComponent implements OnDestroy {
     this.actionError.set('');
     this.actionSuccess.set('');
 
-    const done = () => {
-      this.actionLoading.set(false);
-      this.showConfirm.set(null);
-      this.basketRefresh.emit();
-      this.search();
-    };
-
     if (type === 'activate') {
       const validTill = this.computedValidTill;
       if (!validTill) {
@@ -196,45 +250,23 @@ export class SimSearchPanelComponent implements OnDestroy {
         remarks: this.remarks.trim(),
       }).subscribe({
         next: () => {
-          this.actionLoading.set(false);
-          this.showConfirm.set(null);
-          this.basketRefresh.emit();
-          this.refreshSimDetail();
-          this.actionSuccess.set(this.i18n.translate('simDashboard.search.success.activateInitiated'));
-          this.startPostActivateCountdown();
+          this.onActionSuccess(this.i18n.translate('simDashboard.search.success.activateInitiated'));
         },
-        error: (err) => {
-          this.actionLoading.set(false);
-          this.actionError.set(
-            extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
-          );
-        },
+        error: (err) => this.onActionError(err),
       });
     } else if (type === 'temp') {
       this.sim.tempDisconnect(sim.iccid, sim.simPhone).subscribe({
         next: () => {
-          this.actionSuccess.set(this.i18n.translate('simDashboard.search.success.tempDeactivated'));
-          done();
+          this.onActionSuccess(this.i18n.translate('simDashboard.search.success.tempDeactivated'));
         },
-        error: (err) => {
-          this.actionLoading.set(false);
-          this.actionError.set(
-            extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
-          );
-        },
+        error: (err) => this.onActionError(err),
       });
     } else {
       this.sim.resumeTempDisconnect(sim.iccid, sim.simPhone).subscribe({
         next: () => {
-          this.actionSuccess.set(this.i18n.translate('simDashboard.search.success.resumed'));
-          done();
+          this.onActionSuccess(this.i18n.translate('simDashboard.search.success.resumed'));
         },
-        error: (err) => {
-          this.actionLoading.set(false);
-          this.actionError.set(
-            extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
-          );
-        },
+        error: (err) => this.onActionError(err),
       });
     }
   }
@@ -251,45 +283,22 @@ export class SimSearchPanelComponent implements OnDestroy {
     return itemStatusChipClass(status);
   }
 
-  checkStatus(): void {
-    this.fetchSimDetail(false);
+  private onActionSuccess(message: string): void {
+    this.actionLoading.set(false);
+    this.showConfirm.set(null);
+    this.basketRefresh.emit();
+    this.actionSuccess.set(message);
+    this.startPostActionCountdown();
   }
 
-  private refreshSimDetail(): void {
-    this.fetchSimDetail(true);
+  private onActionError(err: unknown): void {
+    this.actionLoading.set(false);
+    this.actionError.set(
+      extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
+    );
   }
 
-  private fetchSimDetail(silent: boolean): void {
-    if (!silent && this.statusChecking()) return;
-
-    const value = this.searchValue.trim();
-    if (!value) return;
-
-    const filterType = resolveSimFilterType(value);
-    if (!filterType) return;
-
-    if (!silent) {
-      this.statusChecking.set(true);
-      this.searchError.set('');
-    }
-
-    this.sim.searchSim(filterType, value).subscribe({
-      next: (sim) => {
-        if (!silent) this.statusChecking.set(false);
-        this.simDetail.set(sim);
-      },
-      error: (err) => {
-        if (!silent) {
-          this.statusChecking.set(false);
-          this.searchError.set(
-            extractApiError(err, this.i18n.translate('simDashboard.search.errors.requestFailed')),
-          );
-        }
-      },
-    });
-  }
-
-  private startPostActivateCountdown(): void {
+  private startPostActionCountdown(): void {
     this.stopClearCountdown();
     this.clearCountdown.set(10);
 
@@ -319,5 +328,46 @@ export class SimSearchPanelComponent implements OnDestroy {
     this.actionSuccess.set('');
     this.searchError.set('');
     this.actionError.set('');
+    this.closeSuggestions();
+  }
+
+  private fetchSuggestions(term: string): void {
+    const gen = ++this.suggestGen;
+    this.suggestionsLoading.set(true);
+
+    this.sim
+      .fetchSimInventory({
+        pageNumber: 1,
+        pageSize: SUGGEST_PAGE_SIZE,
+        searchTerm: term,
+        sortBy: 'activationAt',
+        sortOrder: 'desc',
+      })
+      .subscribe({
+        next: ({ items }) => {
+          if (gen !== this.suggestGen) return;
+          this.suggestionsLoading.set(false);
+          this.suggestions.set(items);
+          this.showSuggestions.set(true);
+        },
+        error: () => {
+          if (gen !== this.suggestGen) return;
+          this.suggestionsLoading.set(false);
+          this.suggestions.set([]);
+        },
+      });
+  }
+
+  private closeSuggestions(): void {
+    this.clearSuggestTimer();
+    this.showSuggestions.set(false);
+    this.suggestions.set([]);
+    this.suggestionsLoading.set(false);
+    this.suggestGen++;
+  }
+
+  private clearSuggestTimer(): void {
+    clearTimeout(this.suggestTimer);
+    this.suggestTimer = undefined;
   }
 }

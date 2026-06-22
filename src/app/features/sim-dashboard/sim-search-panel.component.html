@@ -2,18 +2,57 @@
   <div class="sim-search__header">
     <h2>{{ 'simDashboard.search.title' | translate }}</h2>
     <div class="sim-search__input-row">
-      <input
-        class="form-control"
-        type="text"
-        inputmode="numeric"
-        [placeholder]="'simDashboard.search.placeholder' | translate"
-        [(ngModel)]="searchValue"
-        (keyup.enter)="search()"
-      />
+      <div class="sim-search__input-wrap">
+        <input
+          class="form-control"
+          type="text"
+          inputmode="numeric"
+          autocomplete="off"
+          [placeholder]="'simDashboard.search.placeholder' | translate"
+          [ngModel]="searchValue"
+          [disabled]="actionsLocked()"
+          (ngModelChange)="onInputChange($event)"
+          (focus)="onInputFocus()"
+          (blur)="onInputBlur()"
+          (keyup.enter)="search()"
+        />
+        @if (showSuggestions() && !actionsLocked()) {
+          <ul class="sim-search__suggestions" role="listbox">
+            @if (suggestionsLoading()) {
+              <li class="sim-search__suggestion sim-search__suggestion--meta">
+                <span class="spinner spinner--xs"></span>
+                {{ 'simDashboard.search.autocompleteLoading' | translate }}
+              </li>
+            } @else if (!suggestions().length) {
+              <li class="sim-search__suggestion sim-search__suggestion--meta">
+                {{ 'simDashboard.search.autocompleteEmpty' | translate }}
+              </li>
+            } @else {
+              @for (item of suggestions(); track item.itemId) {
+                <li>
+                  <button
+                    type="button"
+                    class="sim-search__suggestion"
+                    role="option"
+                    (mousedown)="$event.preventDefault()"
+                    (click)="selectSuggestion(item)"
+                  >
+                    <span class="sim-search__suggestion-main">{{ item.mobileNo || item.iccid }}</span>
+                    @if (item.mobileNo && item.iccid) {
+                      <span class="sim-search__suggestion-sub">{{ item.iccid }}</span>
+                    }
+                    <span [class]="statusClass(item.status)">{{ translatedStatus(item.status) }}</span>
+                  </button>
+                </li>
+              }
+            }
+          </ul>
+        }
+      </div>
       <button
         type="button"
         class="btn btn-primary sim-search__btn"
-        [disabled]="searching()"
+        [disabled]="searching() || actionsLocked()"
         (click)="search()"
       >
         @if (searching()) {
@@ -42,19 +81,6 @@
           {{ actionSuccess() }}
           @if (clearCountdown(); as seconds) {
             <span class="sim-search__countdown">{{ 'simDashboard.search.clearingIn' | translate: { seconds } }}</span>
-            <button
-              type="button"
-              class="btn btn-outline sim-search__check-status"
-              [disabled]="statusChecking()"
-              (click)="checkStatus()"
-            >
-              @if (statusChecking()) {
-                <span class="spinner"></span>
-              } @else {
-                <span class="material-icons">refresh</span>
-              }
-              {{ 'simDashboard.search.checkStatus' | translate }}
-            </button>
           }
         </div>
       }
@@ -88,45 +114,47 @@
           <div class="alert alert-danger">{{ actionError() }}</div>
         }
 
-        @if (isInitial(sim) && canActivate()) {
-          <button
-            type="button"
-            class="btn btn-outline sim-detail__action sim-detail__action--success"
-            [disabled]="actionLoading()"
-            (click)="openConfirm('activate')"
-          >
-            {{ 'simDashboard.search.actions.activate' | translate }}
-          </button>
-        }
-        @if (isActive(sim) && canTempSuspend()) {
-          <button
-            type="button"
-            class="btn btn-outline sim-detail__action sim-detail__action--warning"
-            [disabled]="actionLoading()"
-            (click)="openConfirm('temp')"
-          >
-            {{ 'simDashboard.search.actions.tempDeactivate' | translate }}
-          </button>
-        }
-        @if (isTempDisconnected(sim) && canResume()) {
-          <button
-            type="button"
-            class="btn btn-outline sim-detail__action sim-detail__action--primary"
-            [disabled]="actionLoading()"
-            (click)="openConfirm('resume')"
-          >
-            {{ 'simDashboard.search.actions.resume' | translate }}
-          </button>
-        }
+        @if (!actionsLocked()) {
+          @if (isInitial(sim) && canActivate()) {
+            <button
+              type="button"
+              class="btn btn-outline sim-detail__action sim-detail__action--success"
+              [disabled]="actionLoading()"
+              (click)="openConfirm('activate')"
+            >
+              {{ 'simDashboard.search.actions.activate' | translate }}
+            </button>
+          }
+          @if (isActive(sim) && canTempSuspend()) {
+            <button
+              type="button"
+              class="btn btn-outline sim-detail__action sim-detail__action--warning"
+              [disabled]="actionLoading()"
+              (click)="openConfirm('temp')"
+            >
+              {{ 'simDashboard.search.actions.tempDeactivate' | translate }}
+            </button>
+          }
+          @if (isTempDisconnected(sim) && canResume()) {
+            <button
+              type="button"
+              class="btn btn-outline sim-detail__action sim-detail__action--primary"
+              [disabled]="actionLoading()"
+              (click)="openConfirm('resume')"
+            >
+              {{ 'simDashboard.search.actions.resume' | translate }}
+            </button>
+          }
 
-        <button
-          type="button"
-          class="btn btn-outline sim-detail__action"
-          (click)="showSmsDialog.set(true)"
-        >
-          <span class="material-icons">sms</span>
-          {{ 'simDashboard.search.actions.smsWhitelist' | translate }}
-        </button>
+          <button
+            type="button"
+            class="btn btn-outline sim-detail__action"
+            (click)="showSmsDialog.set(true)"
+          >
+            <span class="material-icons">sms</span>
+            {{ 'simDashboard.search.actions.smsWhitelist' | translate }}
+          </button>
+        }
       </div>
     } @else if (hasSearched()) {
       <p class="sim-search__empty text-muted">{{ 'simDashboard.search.noResult' | translate }}</p>

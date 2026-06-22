@@ -1161,8 +1161,10 @@
     },
     "search": {
       "title": "Search SIM",
-      "placeholder": "Enter SIM Number (ICCID)",
+      "placeholder": "Enter SIM number or MSISDN",
       "hint": "SIM/MSISDN NUMBER",
+      "autocompleteLoading": "Searching…",
+      "autocompleteEmpty": "No matching SIMs",
       "copied": "Copied!",
       "clearingIn": "Clearing search in {{seconds}}s",
       "checkStatus": "Check Status",
