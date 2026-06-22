@@ -1,276 +1,283 @@
 <div class="billing">
-  <div class="billing__heading">
-    <div class="billing__eyebrow">
-      <span class="material-icons">receipt_long</span>
-      <span>{{ 'billing.title' | translate }}</span>
+  <div class="billing__topbar">
+    <div class="billing__heading">
+      <div class="billing__eyebrow">
+        <span class="material-icons">receipt_long</span>
+        <span>{{ 'billing.title' | translate }}</span>
+      </div>
+      <p class="billing__subtitle">{{ 'billing.subtitle' | translate }}</p>
     </div>
-    <p class="billing__subtitle">{{ 'billing.subtitle' | translate }}</p>
-  </div>
 
-  <!-- Product type tabs -->
-  <div class="billing__tabs">
-    @for (type of productTypes; track type) {
-      <button
-        type="button"
-        class="billing__tab"
-        [class.active]="selectedProductType() === type"
-        (click)="selectProductType(type)"
-      >
-        <span class="material-icons">{{ productTypeIcon(type) }}</span>
-        {{ productTypeLabelKey(type) | translate }}
-      </button>
-    }
-  </div>
-
-  <!-- Account summary tiles -->
-  <section class="billing__summary">
-    <article class="billing-card billing-card--accent">
-      <div class="billing-card__head">
-        <span class="billing-card__label">{{ 'billing.summary.outstanding' | translate }}</span>
-        <span class="billing-card__pill">{{ utilisationPct() | number:'1.0-1' }}% used</span>
-      </div>
-      @if (configLoading() && !config()) {
-        <span class="billing-card__skel"></span>
-      } @else {
-        <span class="billing-card__value">{{ config()?.currentOutstanding ?? 0 | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
-      }
-      <div class="billing-card__bar">
-        <div class="billing-card__bar-fill" [style.width.%]="utilisationPct()"></div>
-      </div>
-      <span class="billing-card__hint">{{ 'billing.summary.outstandingHint' | translate }}</span>
-    </article>
-
-    <article class="billing-card">
-      <div class="billing-card__icon" style="background: var(--color-primary-soft); color: var(--color-primary)">
-        <span class="material-icons">credit_score</span>
-      </div>
-      <div>
-        <span class="billing-card__label">{{ 'billing.summary.creditLimit' | translate }}</span>
-        <span class="billing-card__value billing-card__value--md">{{ config()?.creditLimit ?? 0 | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
-      </div>
-    </article>
-
-    <article class="billing-card">
-      <div class="billing-card__icon" [style.background]="availableCredit() >= 0 ? 'var(--color-success-bg)' : 'var(--color-danger-bg)'" [style.color]="availableCredit() >= 0 ? 'var(--color-success)' : 'var(--color-danger)'">
-        <span class="material-icons">{{ availableCredit() >= 0 ? 'account_balance_wallet' : 'warning' }}</span>
-      </div>
-      <div>
-        <span class="billing-card__label">{{ 'billing.summary.available' | translate }}</span>
-        <span class="billing-card__value billing-card__value--md" [style.color]="availableCredit() >= 0 ? 'var(--color-text-primary)' : 'var(--color-danger)'">
-          {{ availableCredit() | currency:'INR':'symbol-narrow':'1.2-2' }}
-        </span>
-        @if (availableCredit() < 0) {
-          <span class="billing-card__hint" style="color: var(--color-danger)">{{ 'billing.summary.overLimit' | translate }}</span>
+    <div class="billing__topbar-actions">
+      <div class="billing__tabs" role="tablist">
+        @for (type of productTypes; track type) {
+          <button
+            type="button"
+            class="billing__tab"
+            role="tab"
+            [class.active]="selectedProductType() === type"
+            [attr.aria-selected]="selectedProductType() === type"
+            (click)="selectProductType(type)"
+          >
+            <span class="material-icons">{{ productTypeIcon(type) }}</span>
+            {{ productTypeLabelKey(type) | translate }}
+          </button>
         }
       </div>
-    </article>
 
-    <article class="billing-card">
-      <div class="billing-card__icon" style="background: var(--color-warning-bg); color: var(--color-warning)">
-        <span class="material-icons">payments</span>
-      </div>
-      <div>
-        <span class="billing-card__label">{{ rateLabelKey() | translate }}</span>
-        <span class="billing-card__value billing-card__value--md">{{ config()?.dailyRate ?? 0 | currency:'INR':'symbol-narrow':'1.4-4' }}</span>
-        <span class="billing-card__hint">
-          {{ 'billing.summary.yearly' | translate }}: {{ config()?.yearlyAmount ?? 0 | currency:'INR':'symbol-narrow':'1.2-2' }}
-          · {{ 'billing.summary.tax' | translate }} {{ config()?.taxRate ?? 0 | number:'1.0-2' }}%
-        </span>
-      </div>
-    </article>
-  </section>
-
-  <!-- 7-day transaction chart -->
-  <section class="billing__panel billing__chart">
-    <div class="billing__panel-head">
-      <h3>{{ 'billing.chart.title' | translate }}</h3>
-      @if (chartHasData()) {
-        <span class="billing__chart-total">
-          {{ 'billing.chart.total' | translate }}:
-          <strong>{{ chartTotal() | currency:'INR':'symbol-narrow':'1.2-2' }}</strong>
-        </span>
-      }
-    </div>
-
-    @if (loading() && !items().length) {
-      <div class="billing__chart-skeleton" aria-hidden="true">
-        <div class="billing__chart-skel-line"></div>
-      </div>
-    } @else if (!chartHasData()) {
-      <div class="billing__chart-empty">
-        <span class="material-icons">show_chart</span>
-        <p>{{ 'billing.chart.empty' | translate }}</p>
-      </div>
-    } @else {
-      <div class="billing__chart-wrap">
-        <div class="billing__chart-yaxis">
-          <span>{{ chartMaxValue() | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
-          <span>{{ (chartMaxValue() / 2) | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
-          <span>{{ 0 | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
-        </div>
-
-        <div class="billing__chart-plot" (mouseleave)="setHoveredChartDate(null)">
-          <svg class="billing__chart-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <defs>
-              <linearGradient id="billing-line-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.32" />
-                <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0" />
-              </linearGradient>
-            </defs>
-
-            @for (tick of [0, 50, 100]; track tick) {
-              <line
-                class="billing__chart-grid"
-                x1="0" [attr.y1]="10 + tick * 0.86"
-                x2="100" [attr.y2]="10 + tick * 0.86"
-              />
-            }
-
-            <path class="billing__chart-area" [attr.d]="chartGeometry().areaPath" fill="url(#billing-line-fill)" />
-            <path class="billing__chart-line" [attr.d]="chartGeometry().linePath" />
-          </svg>
-
-          @if (hoveredChartPoint(); as hp) {
-            <span
-              class="billing__chart-hover-line"
-              [style.left.%]="hp.x"
-              aria-hidden="true"
-            ></span>
-          }
-
-          @for (pt of chartGeometry().points; track pt.date) {
-            <button
-              type="button"
-              class="billing__chart-point"
-              [class.billing__chart-point--credit]="pt.net > 0"
-              [class.billing__chart-point--empty]="pt.amount === 0"
-              [class.billing__chart-point--today]="pt.date === todayChartDate()"
-              [class.billing__chart-point--active]="pt.date === hoveredChartDate()"
-              [style.left.%]="pt.x"
-              [style.top.%]="pt.y"
-              (mouseenter)="setHoveredChartDate(pt.date)"
-              (focus)="setHoveredChartDate(pt.date)"
-              (blur)="setHoveredChartDate(null)"
-              [attr.aria-label]="chartDayLabel(pt.date) + ': ' + (pt.amount | currency:'INR':'symbol-narrow':'1.0-0')"
-            ></button>
-          }
-
-          @if (hoveredChartPoint(); as hp) {
-            <div
-              class="billing__chart-tooltip"
-              [class.billing__chart-tooltip--right]="hp.x < 30"
-              [class.billing__chart-tooltip--left]="hp.x > 70"
-              [style.left.%]="hp.x"
-              [style.top.%]="hp.y"
-            >
-              <span class="billing__chart-tooltip-date">{{ chartFullDate(hp.date) }}</span>
-              <span
-                class="billing__chart-tooltip-amount"
-                [class.billing__chart-tooltip-amount--credit]="hp.net > 0"
-                [class.billing__chart-tooltip-amount--debit]="hp.net < 0"
-              >
-                {{ hp.net > 0 ? '+' : (hp.net < 0 ? '−' : '') }}{{ hp.amount | currency:'INR':'symbol-narrow':'1.2-2' }}
-              </span>
-            </div>
-          }
-        </div>
-
-        <div class="billing__chart-labels">
-          @for (pt of chartGeometry().points; track pt.date) {
-            <span
-              class="billing__chart-label"
-              [class.billing__chart-label--today]="pt.date === todayChartDate()"
-              [class.billing__chart-label--active]="pt.date === hoveredChartDate()"
-            >{{ chartDayLabel(pt.date) }}</span>
-          }
-        </div>
-      </div>
-    }
-  </section>
-
-  <!-- Table -->
-  <section class="billing__panel">
-    <div class="billing__panel-head">
-      <h3>{{ 'billing.tableTitle' | translate }}</h3>
-      @if (pagination(); as pg) {
-        <span class="count-badge">{{ pg.totalCount }}</span>
-      }
-      <span class="spacer"></span>
-      <button class="btn btn-ghost" (click)="refreshAll()" [title]="'common.refresh' | translate">
+      <button class="btn btn-ghost billing__refresh" (click)="refreshAll()" [title]="'common.refresh' | translate">
         <span class="material-icons">refresh</span>
       </button>
     </div>
+  </div>
 
-    @if (error()) {
-      <div class="alert alert-danger">
-        <span class="material-icons">error</span> {{ error() }}
-        <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+  <div class="billing__split">
+    <aside class="billing__aside">
+      <!-- Account summary tiles -->
+      <section class="billing__summary">
+        <article class="billing-card billing-card--accent">
+          <div class="billing-card__head">
+            <span class="billing-card__label">{{ 'billing.summary.outstanding' | translate }}</span>
+            <span class="billing-card__pill">{{ utilisationPct() | number:'1.0-1' }}% used</span>
+          </div>
+          @if (configLoading() && !config()) {
+            <span class="billing-card__skel"></span>
+          } @else {
+            <span class="billing-card__value">{{ config()?.currentOutstanding ?? 0 | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+          }
+          <div class="billing-card__bar">
+            <div class="billing-card__bar-fill" [style.width.%]="utilisationPct()"></div>
+          </div>
+          <span class="billing-card__hint">{{ 'billing.summary.outstandingHint' | translate }}</span>
+        </article>
+
+        <article class="billing-card billing-card--row">
+          <div class="billing-card__icon" style="background: var(--color-primary-soft); color: var(--color-primary)">
+            <span class="material-icons">credit_score</span>
+          </div>
+          <div>
+            <span class="billing-card__label">{{ 'billing.summary.creditLimit' | translate }}</span>
+            <span class="billing-card__value billing-card__value--md">{{ config()?.creditLimit ?? 0 | currency:'INR':'symbol-narrow':'1.2-2' }}</span>
+          </div>
+        </article>
+
+        <article class="billing-card billing-card--row">
+          <div class="billing-card__icon" [style.background]="availableCredit() >= 0 ? 'var(--color-success-bg)' : 'var(--color-danger-bg)'" [style.color]="availableCredit() >= 0 ? 'var(--color-success)' : 'var(--color-danger)'">
+            <span class="material-icons">{{ availableCredit() >= 0 ? 'account_balance_wallet' : 'warning' }}</span>
+          </div>
+          <div>
+            <span class="billing-card__label">{{ 'billing.summary.available' | translate }}</span>
+            <span class="billing-card__value billing-card__value--md" [style.color]="availableCredit() >= 0 ? 'var(--color-text-primary)' : 'var(--color-danger)'">
+              {{ availableCredit() | currency:'INR':'symbol-narrow':'1.2-2' }}
+            </span>
+            @if (availableCredit() < 0) {
+              <span class="billing-card__hint" style="color: var(--color-danger)">{{ 'billing.summary.overLimit' | translate }}</span>
+            }
+          </div>
+        </article>
+
+        <article class="billing-card billing-card--row">
+          <div class="billing-card__icon" style="background: var(--color-warning-bg); color: var(--color-warning)">
+            <span class="material-icons">payments</span>
+          </div>
+          <div>
+            <span class="billing-card__label">{{ rateLabelKey() | translate }}</span>
+            <span class="billing-card__value billing-card__value--md">{{ config()?.dailyRate ?? 0 | currency:'INR':'symbol-narrow':'1.4-4' }}</span>
+            <span class="billing-card__hint">
+              {{ 'billing.summary.tax' | translate }} {{ config()?.taxRate ?? 0 | number:'1.0-2' }}%
+            </span>
+          </div>
+        </article>
+      </section>
+
+      <!-- 7-day transaction chart -->
+      <section class="billing__panel billing__chart">
+        <div class="billing__panel-head">
+          <h3>{{ 'billing.chart.title' | translate }}</h3>
+          @if (chartHasData()) {
+            <span class="billing__chart-total">
+              <strong>{{ chartTotal() | currency:'INR':'symbol-narrow':'1.2-2' }}</strong>
+            </span>
+          }
+        </div>
+
+        @if (loading() && !items().length) {
+          <div class="billing__chart-skeleton" aria-hidden="true">
+            <div class="billing__chart-skel-line"></div>
+          </div>
+        } @else if (!chartHasData()) {
+          <div class="billing__chart-empty">
+            <span class="material-icons">show_chart</span>
+            <p>{{ 'billing.chart.empty' | translate }}</p>
+          </div>
+        } @else {
+          <div class="billing__chart-wrap">
+            <div class="billing__chart-yaxis">
+              <span>{{ chartMaxValue() | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+              <span>{{ (chartMaxValue() / 2) | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+              <span>{{ 0 | currency:'INR':'symbol-narrow':'1.0-0' }}</span>
+            </div>
+
+            <div class="billing__chart-plot" (mouseleave)="setHoveredChartDate(null)">
+              <svg class="billing__chart-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="billing-line-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.32" />
+                    <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+
+                @for (tick of [0, 50, 100]; track tick) {
+                  <line
+                    class="billing__chart-grid"
+                    x1="0" [attr.y1]="10 + tick * 0.86"
+                    x2="100" [attr.y2]="10 + tick * 0.86"
+                  />
+                }
+
+                <path class="billing__chart-area" [attr.d]="chartGeometry().areaPath" fill="url(#billing-line-fill)" />
+                <path class="billing__chart-line" [attr.d]="chartGeometry().linePath" />
+              </svg>
+
+              @if (hoveredChartPoint(); as hp) {
+                <span
+                  class="billing__chart-hover-line"
+                  [style.left.%]="hp.x"
+                  aria-hidden="true"
+                ></span>
+              }
+
+              @for (pt of chartGeometry().points; track pt.date) {
+                <button
+                  type="button"
+                  class="billing__chart-point"
+                  [class.billing__chart-point--credit]="pt.net > 0"
+                  [class.billing__chart-point--empty]="pt.amount === 0"
+                  [class.billing__chart-point--today]="pt.date === todayChartDate()"
+                  [class.billing__chart-point--active]="pt.date === hoveredChartDate()"
+                  [style.left.%]="pt.x"
+                  [style.top.%]="pt.y"
+                  (mouseenter)="setHoveredChartDate(pt.date)"
+                  (focus)="setHoveredChartDate(pt.date)"
+                  (blur)="setHoveredChartDate(null)"
+                  [attr.aria-label]="chartDayLabel(pt.date) + ': ' + (pt.amount | currency:'INR':'symbol-narrow':'1.0-0')"
+                ></button>
+              }
+
+              @if (hoveredChartPoint(); as hp) {
+                <div
+                  class="billing__chart-tooltip"
+                  [class.billing__chart-tooltip--right]="hp.x < 30"
+                  [class.billing__chart-tooltip--left]="hp.x > 70"
+                  [style.left.%]="hp.x"
+                  [style.top.%]="hp.y"
+                >
+                  <span class="billing__chart-tooltip-date">{{ chartFullDate(hp.date) }}</span>
+                  <span
+                    class="billing__chart-tooltip-amount"
+                    [class.billing__chart-tooltip-amount--credit]="hp.net > 0"
+                    [class.billing__chart-tooltip-amount--debit]="hp.net < 0"
+                  >
+                    {{ hp.net > 0 ? '+' : (hp.net < 0 ? '−' : '') }}{{ hp.amount | currency:'INR':'symbol-narrow':'1.2-2' }}
+                  </span>
+                </div>
+              }
+            </div>
+
+            <div class="billing__chart-labels">
+              @for (pt of chartGeometry().points; track pt.date) {
+                <span
+                  class="billing__chart-label"
+                  [class.billing__chart-label--today]="pt.date === todayChartDate()"
+                  [class.billing__chart-label--active]="pt.date === hoveredChartDate()"
+                >{{ chartDayLabel(pt.date) }}</span>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    </aside>
+
+    <!-- Table -->
+    <section class="billing__panel billing__table-panel">
+      <div class="billing__panel-head">
+        <h3>{{ 'billing.tableTitle' | translate }}</h3>
+        @if (pagination(); as pg) {
+          <span class="count-badge">{{ pg.totalCount }}</span>
+        }
       </div>
-    } @else {
-      <p-table
-        [value]="items()"
-        [lazy]="true"
-        (onLazyLoad)="onLazyLoad($event)"
-        [paginator]="true"
-        [rows]="tableQuery().pageSize ?? 10"
-        [rowsPerPageOptions]="[10, 25, 50, 100]"
-        [totalRecords]="totalRecords()"
-        [loading]="loading()"
-        [first]="tableFirst()"
-        styleClass="app-table"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>{{ 'billing.columns.date' | translate }}</th>
-            <th>{{ 'billing.columns.type' | translate }}</th>
-            <th class="num">{{ 'billing.columns.activeSims' | translate }}</th>
-            <th class="num">{{ 'billing.columns.rate' | translate }}</th>
-            <th class="num">{{ 'billing.columns.debited' | translate }}</th>
-            <th class="num">{{ 'billing.columns.tax' | translate }}</th>
-            <th class="num">{{ 'billing.columns.credited' | translate }}</th>
-            <th class="num">{{ 'billing.columns.net' | translate }}</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-t>
-          <tr>
-            <td>
-              <div class="cell-stack">
-                <span class="cell-primary">{{ t.date | date:'mediumDate' }}</span>
-                <span class="cell-sub">{{ t.createdAt | date:'HH:mm' }}</span>
-              </div>
-            </td>
-            <td>
-              <span class="txn-chip" [class.txn-chip--credit]="isCredit(t)">
-                <span class="material-icons">{{ isCredit(t) ? 'arrow_downward' : 'arrow_upward' }}</span>
-                {{ t.transactionType }}
-              </span>
-            </td>
-            <td class="num">{{ t.totalActivatedSims | number }}</td>
-            <td class="num">{{ t.dailyRate | currency:'INR':'symbol-narrow':'1.4-4' }}</td>
-            <td class="num">{{ t.debitedAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</td>
-            <td class="num">
-              <span class="cell-sub">{{ t.taxRate | number:'1.0-2' }}%</span>
-              <div>{{ t.taxAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</div>
-            </td>
-            <td class="num">{{ t.creditedAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</td>
-            <td class="num">
-              <strong [style.color]="isCredit(t) ? 'var(--color-success)' : 'var(--color-text-primary)'">
-                {{ isCredit(t) ? '+' : '−' }}{{ net(t) | currency:'INR':'symbol-narrow':'1.2-2' }}
-              </strong>
-            </td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="8">
-              <div class="tab-empty">
-                <span class="material-icons">receipt_long</span>
-                <p>{{ 'billing.empty' | translate }}</p>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    }
-  </section>
+
+      @if (error()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ error() }}
+          <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+        </div>
+      } @else {
+        <p-table
+          [value]="items()"
+          [lazy]="true"
+          (onLazyLoad)="onLazyLoad($event)"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50, 100]"
+          [totalRecords]="totalRecords()"
+          [loading]="loading()"
+          [first]="tableFirst()"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'billing.columns.date' | translate }}</th>
+              <th>{{ 'billing.columns.type' | translate }}</th>
+              <th class="num">{{ 'billing.columns.activeSims' | translate }}</th>
+              <th class="num">{{ 'billing.columns.rate' | translate }}</th>
+              <th class="num">{{ 'billing.columns.debited' | translate }}</th>
+              <th class="num">{{ 'billing.columns.tax' | translate }}</th>
+              <th class="num">{{ 'billing.columns.credited' | translate }}</th>
+              <th class="num">{{ 'billing.columns.net' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-t>
+            <tr>
+              <td>
+                <div class="cell-stack">
+                  <span class="cell-primary">{{ t.date | date:'mediumDate' }}</span>
+                  <span class="cell-sub">{{ t.createdAt | date:'HH:mm' }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="txn-chip" [class.txn-chip--credit]="isCredit(t)">
+                  <span class="material-icons">{{ isCredit(t) ? 'arrow_downward' : 'arrow_upward' }}</span>
+                  {{ t.transactionType }}
+                </span>
+              </td>
+              <td class="num">{{ t.totalActivatedSims | number }}</td>
+              <td class="num">{{ t.dailyRate | currency:'INR':'symbol-narrow':'1.4-4' }}</td>
+              <td class="num">{{ t.debitedAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</td>
+              <td class="num">
+                <span class="cell-sub">{{ t.taxRate | number:'1.0-2' }}%</span>
+                <div>{{ t.taxAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</div>
+              </td>
+              <td class="num">{{ t.creditedAmount | currency:'INR':'symbol-narrow':'1.2-2' }}</td>
+              <td class="num">
+                <strong [style.color]="isCredit(t) ? 'var(--color-success)' : 'var(--color-text-primary)'">
+                  {{ isCredit(t) ? '+' : '−' }}{{ net(t) | currency:'INR':'symbol-narrow':'1.2-2' }}
+                </strong>
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="8">
+                <div class="tab-empty">
+                  <span class="material-icons">receipt_long</span>
+                  <p>{{ 'billing.empty' | translate }}</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+    </section>
+  </div>
 </div>
