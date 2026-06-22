@@ -1,44 +1,52 @@
 .master-page {
-  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
 .master-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-lg);
   flex-wrap: wrap;
   gap: var(--space-sm);
 }
 
-.master-title {
+.master-heading {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.master-eyebrow {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 10px;
+  font-size: var(--font-xs);
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
 
   .material-icons {
-    font-size: 28px;
+    font-size: 18px;
     color: var(--color-primary);
-  }
-
-  h1 {
-    font-size: var(--font-xl);
-    font-weight: 700;
-    margin: 0;
   }
 }
 
 .rbac-badge {
-  background: var(--color-primary-bg);
+  background: var(--color-primary-soft);
   color: var(--color-primary);
-  font-size: var(--font-xs);
+  font-size: 10px;
   font-weight: 700;
-  padding: 2px 8px;
+  letter-spacing: 1px;
+  padding: 3px 10px;
   border-radius: var(--radius-full);
+  text-transform: uppercase;
 }
 
-@media (max-width: 640px) {
-  .master-page {
-    padding: var(--space-md);
-  }
+.master-subtitle {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
 }

@@ -130,6 +130,7 @@
   },
   "fitment": {
     "title": "Fitment",
+    "subtitle": "Create fitments, verify OTP and review installation history",
     "backToList": "Back to list",
     "list": {
       "totalFitments": "Total Fitments",
@@ -249,6 +250,7 @@
   },
   "devices": {
     "title": "Device Console",
+    "subtitle": "Track devices, transfer between entities and manage activations",
     "tabs": {
       "dashboard": "Dashboard",
       "inventory": "Inventory",

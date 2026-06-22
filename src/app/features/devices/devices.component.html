@@ -1,30 +1,35 @@
 <div class="master-page">
   <div class="master-header">
-    <div class="master-title">
-      <span class="material-icons">memory</span>
-      <h1>{{ 'devices.title' | translate }}</h1>
-      <span class="rbac-badge">BALIN</span>
+    <div class="master-heading">
+      <div class="master-eyebrow">
+        <span class="material-icons">memory</span>
+        <span>{{ 'devices.title' | translate }}</span>
+        <span class="rbac-badge">BALIN</span>
+      </div>
+      <p class="master-subtitle">{{ 'devices.subtitle' | translate }}</p>
     </div>
   </div>
 
-  <div class="tab-bar">
-    @for (tab of tabs(); track tab.key) {
-      <button
-        class="tab-item"
-        [class.active]="activeTab() === tab.key"
-        (click)="selectTab(tab.key)"
-      >
-        <span class="material-icons">{{ tab.icon }}</span>
-        <span class="tab-label">{{ tab.label }}</span>
-      </button>
-    }
-  </div>
+  <section class="master-panel">
+    <div class="tab-bar">
+      @for (tab of tabs(); track tab.key) {
+        <button
+          class="tab-item"
+          [class.active]="activeTab() === tab.key"
+          (click)="selectTab(tab.key)"
+        >
+          <span class="material-icons">{{ tab.icon }}</span>
+          <span class="tab-label">{{ tab.label }}</span>
+        </button>
+      }
+    </div>
 
-  <div class="tab-content">
-    @switch (activeTab()) {
-      @case ('devices') { <app-devices-list-panel /> }
-      @case ('transfer') { <app-devices-transfer-panel /> }
-      @case ('activate-recharge') { <app-devices-activate-recharge-panel /> }
-    }
-  </div>
+    <div class="tab-content">
+      @switch (activeTab()) {
+        @case ('devices') { <app-devices-list-panel /> }
+        @case ('transfer') { <app-devices-transfer-panel /> }
+        @case ('activate-recharge') { <app-devices-activate-recharge-panel /> }
+      }
+    </div>
+  </section>
 </div>

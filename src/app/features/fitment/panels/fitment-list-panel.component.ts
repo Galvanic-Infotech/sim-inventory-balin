@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
@@ -28,10 +28,7 @@ export class FitmentListPanelComponent {
   private readonly fitment = inject(FitmentService);
   private readonly i18n = inject(TranslationService);
   readonly perm = inject(PermissionService);
-  readonly canCreate = this.perm.can(PERMS.FITMENT_CREATE);
   readonly canDelete = this.perm.can(PERMS.FITMENT_DELETE);
-
-  @Output() createClick = new EventEmitter<void>();
 
   readonly selected = signal<Fitment | null>(null);
 
