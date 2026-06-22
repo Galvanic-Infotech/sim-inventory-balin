@@ -46,6 +46,7 @@ export class DevicesListPanelComponent {
   readonly perm = inject(PermissionService);
   readonly canBulkUpload = this.perm.can(PERMS.DEVICE_BULK_UPLOAD);
   readonly canCreateFitment = this.perm.can(PERMS.FITMENT_CREATE);
+  readonly canDeviceMapping = this.perm.can(PERMS.FITMENT_DEVICE_MAPPING);
 
   canStartFitment(d: AisDevice): boolean {
     return this.canCreateFitment() && isItemActive(d.status) && !!d.serialNumber;

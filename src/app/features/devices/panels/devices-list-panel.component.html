@@ -121,7 +121,7 @@
                   <span class="material-icons">description</span>
                 </button>
               }
-              @if (d.serialNumber) {
+              @if (canDeviceMapping() && d.serialNumber) {
                 <button
                   class="btn btn-outline btn-icon"
                   style="border-color: var(--color-primary); color: var(--color-primary); background: #fff;"
@@ -131,7 +131,7 @@
                   <span class="material-icons">assignment</span>
                 </button>
               }
-              @if (!canStartFitment(d) && !d.serialNumber) {
+              @if (!canStartFitment(d) && !(canDeviceMapping() && d.serialNumber)) {
                 —
               }
             </div>

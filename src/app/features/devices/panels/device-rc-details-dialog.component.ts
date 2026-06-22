@@ -8,6 +8,25 @@ import { RcDetailsRequest } from '../../../shared/models/fitment.model';
 
 const FUEL_TYPES = ['PETROL', 'DIESEL', 'CNG', 'ELECTRIC', 'HYBRID', 'LPG'] as const;
 
+function toDateInput(v: string | null | undefined): string {
+  if (!v) return '';
+  const idx = v.indexOf('T');
+  return idx > 0 ? v.slice(0, idx) : v;
+}
+
+function toMonthFirstDay(v: string | null | undefined): string {
+  if (!v) return '';
+  const idx = v.indexOf('T');
+  const datePart = idx > 0 ? v.slice(0, idx) : v;
+  const m = /^(\d{4}-\d{2})/.exec(datePart);
+  return m ? `${m[1]}-01` : datePart;
+}
+
+function toMonthInput(v: string | null | undefined): string {
+  if (!v) return '';
+  return v.slice(0, 7);
+}
+
 const EMPTY_FORM: RcDetailsRequest = {
   rcNumber: '',
   registrationDate: '',
@@ -42,6 +61,8 @@ export class DeviceRcDetailsDialogComponent {
   readonly form = signal<RcDetailsRequest>({ ...EMPTY_FORM });
   readonly saving = signal(false);
   readonly deleting = signal(false);
+  readonly loading = signal(false);
+  readonly hasExisting = signal(false);
   readonly error = signal('');
   readonly showDeleteConfirm = signal(false);
 
@@ -66,16 +87,61 @@ export class DeviceRcDetailsDialogComponent {
 
   constructor() {
     effect(() => {
-      if (this.open()) {
+      const open = this.open();
+      const serial = this.serialNumber();
+      if (open) {
         this.form.set({ ...EMPTY_FORM });
         this.error.set('');
         this.showDeleteConfirm.set(false);
+        this.hasExisting.set(false);
+        if (serial) this.fetchExisting(serial);
       }
+    });
+  }
+
+  private fetchExisting(serial: string): void {
+    this.loading.set(true);
+    this.fitment.getVehicleDetails(serial).subscribe({
+      next: (res) => {
+        this.loading.set(false);
+        const vd = res.data?.vehicleDetails;
+        if (!vd || !vd.rcNumber) return;
+        this.hasExisting.set(true);
+        this.form.set({
+          rcNumber: vd.rcNumber ?? '',
+          registrationDate: toDateInput(vd.registrationDate),
+          vehiclesChasiNumber: vd.vehiclesChasiNumber ?? '',
+          vehicleEngineNumber: vd.vehicleEngineNumber ?? '',
+          makerDescription: vd.makerDescription ?? '',
+          makerModel: vd.makerModel ?? '',
+          manufacturingDateFormatted: toMonthFirstDay(vd.manufacturingDateFormatted),
+          fuelType: vd.fuelType ?? 'PETROL',
+          ownerName: vd.ownerName ?? '',
+          presentAddress: vd.presentAddress ?? '',
+          permanentAddress: vd.permanentAddress ?? '',
+        });
+      },
+      error: () => {
+        this.loading.set(false);
+      },
     });
   }
 
   setField<K extends keyof RcDetailsRequest>(key: K, value: RcDetailsRequest[K]): void {
     this.form.update((f) => ({ ...f, [key]: value }));
+  }
+
+  setMonth(key: 'manufacturingDateFormatted', value: string): void {
+    const next = value ? `${value}-01` : '';
+    this.form.update((f) => ({ ...f, [key]: next }));
+  }
+
+  monthValue(key: 'manufacturingDateFormatted'): string {
+    return toMonthInput(this.form()[key]);
+  }
+
+  dateValue(key: 'registrationDate'): string {
+    return toDateInput(this.form()[key]);
   }
 
   onClose(): void {

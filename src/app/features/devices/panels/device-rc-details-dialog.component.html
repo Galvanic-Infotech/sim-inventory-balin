@@ -33,6 +33,12 @@
         </div>
       }
 
+      @if (loading()) {
+        <div class="tab-empty" style="padding: var(--space-md)">
+          <span class="spinner spinner--dark"></span>
+        </div>
+      }
+
       <div class="grid grid-2">
         <div class="form-group">
           <label>{{ 'devices.rcDetails.fields.rcNumber' | translate }} *</label>
@@ -49,7 +55,7 @@
           <input
             type="date"
             class="form-control"
-            [ngModel]="form().registrationDate"
+            [ngModel]="dateValue('registrationDate')"
             (ngModelChange)="setField('registrationDate', $event)"
           />
         </div>
@@ -97,10 +103,10 @@
         <div class="form-group">
           <label>{{ 'devices.rcDetails.fields.manufacturingDate' | translate }} *</label>
           <input
-            type="date"
+            type="month"
             class="form-control"
-            [ngModel]="form().manufacturingDateFormatted"
-            (ngModelChange)="setField('manufacturingDateFormatted', $event)"
+            [ngModel]="monthValue('manufacturingDateFormatted')"
+            (ngModelChange)="setMonth('manufacturingDateFormatted', $event)"
           />
         </div>
 
@@ -152,15 +158,19 @@
     </div>
 
     <div class="dialog-footer" style="justify-content: space-between">
-      <button
-        type="button"
-        class="btn btn-danger"
-        (click)="openDelete()"
-        [disabled]="saving() || deleting()"
-      >
-        <span class="material-icons">delete</span>
-        {{ 'devices.rcDetails.delete' | translate }}
-      </button>
+      @if (hasExisting()) {
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="openDelete()"
+          [disabled]="saving() || deleting() || loading()"
+        >
+          <span class="material-icons">delete</span>
+          {{ 'devices.rcDetails.delete' | translate }}
+        </button>
+      } @else {
+        <span></span>
+      }
       <div style="display: flex; gap: var(--space-sm)">
         <button type="button" class="btn btn-outline" (click)="onClose()" [disabled]="saving() || deleting()">
           {{ 'common.cancel' | translate }}
