@@ -439,6 +439,40 @@
       "loadPool": "डिवाइस लोड करने में विफल",
       "transferFailed": "डिवाइस ट्रांसफर करने में विफल",
       "requestFailed": "अनुरोध विफल"
+    },
+    "rcDetails": {
+      "title": "RC विवरण",
+      "save": "सहेजें",
+      "delete": "RC हटाएं",
+      "confirmDeleteTitle": "RC विवरण हटाएं?",
+      "confirmDeleteMessage": "इस डिवाइस के लिए सहेजे गए RC विवरण हट जाएंगे। यह कार्रवाई वापस नहीं की जा सकती।",
+      "fields": {
+        "rcNumber": "RC नंबर",
+        "registrationDate": "पंजीकरण तिथि",
+        "chassisNumber": "चेसिस नंबर",
+        "engineNumber": "इंजन नंबर",
+        "makerDescription": "निर्माता",
+        "makerModel": "मॉडल",
+        "manufacturingDate": "निर्माण तिथि",
+        "fuelType": "ईंधन प्रकार",
+        "ownerName": "मालिक का नाम",
+        "presentAddress": "वर्तमान पता",
+        "permanentAddress": "स्थायी पता"
+      },
+      "placeholders": {
+        "rcNumber": "जैसे MP09AB1234",
+        "chassisNumber": "वाहन चेसिस नंबर",
+        "engineNumber": "वाहन इंजन नंबर",
+        "makerDescription": "जैसे टाटा",
+        "makerModel": "जैसे टाटा 407",
+        "ownerName": "पंजीकृत मालिक",
+        "presentAddress": "वर्तमान पता",
+        "permanentAddress": "स्थायी पता"
+      },
+      "errors": {
+        "saveFailed": "RC विवरण सहेजने में विफल",
+        "deleteFailed": "RC विवरण हटाने में विफल"
+      }
     }
   },
   "oem": {

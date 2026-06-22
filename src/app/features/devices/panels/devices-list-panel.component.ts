@@ -21,11 +21,20 @@ import { TableQueryParams } from '../../../shared/models/table-query.model';
 import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util';
 import { BulkUploadDialogComponent } from '../../../shared/components/bulk-upload-dialog/bulk-upload-dialog.component';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
+import { DeviceRcDetailsDialogComponent } from './device-rc-details-dialog.component';
 
 @Component({
   selector: 'app-devices-list-panel',
   standalone: true,
-  imports: [TableModule, DatePipe, FormsModule, SearchBarComponent, BulkUploadDialogComponent, TranslatePipe],
+  imports: [
+    TableModule,
+    DatePipe,
+    FormsModule,
+    SearchBarComponent,
+    BulkUploadDialogComponent,
+    DeviceRcDetailsDialogComponent,
+    TranslatePipe,
+  ],
   templateUrl: './devices-list-panel.component.html',
   styleUrl: './devices-list-panel.component.scss',
 })
@@ -64,6 +73,23 @@ export class DevicesListPanelComponent {
   readonly statusFilter = signal<AisDeviceStatus | ''>('');
   readonly totalRecords = computed(() => this.pagination()?.totalCount ?? 0);
   readonly showBulkUpload = signal(false);
+  readonly showRcDetails = signal(false);
+  readonly rcDetailsSerial = signal<string | null>(null);
+
+  openRcDetails(d: AisDevice): void {
+    if (!d.serialNumber) return;
+    this.rcDetailsSerial.set(d.serialNumber);
+    this.showRcDetails.set(true);
+  }
+
+  closeRcDetails(): void {
+    this.showRcDetails.set(false);
+    this.rcDetailsSerial.set(null);
+  }
+
+  onRcDetailsSaved(): void {
+    this.load();
+  }
 
   constructor() {
     effect(() => {

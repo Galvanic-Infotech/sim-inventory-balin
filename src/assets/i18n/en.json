@@ -439,6 +439,40 @@
       "loadPool": "Failed to load devices",
       "transferFailed": "Failed to transfer devices",
       "requestFailed": "Request failed"
+    },
+    "rcDetails": {
+      "title": "RC Details",
+      "save": "Save",
+      "delete": "Delete RC",
+      "confirmDeleteTitle": "Delete RC Details?",
+      "confirmDeleteMessage": "This will remove saved RC details for this device. This action cannot be undone.",
+      "fields": {
+        "rcNumber": "RC Number",
+        "registrationDate": "Registration Date",
+        "chassisNumber": "Chassis Number",
+        "engineNumber": "Engine Number",
+        "makerDescription": "Maker",
+        "makerModel": "Model",
+        "manufacturingDate": "Manufacturing Date",
+        "fuelType": "Fuel Type",
+        "ownerName": "Owner Name",
+        "presentAddress": "Present Address",
+        "permanentAddress": "Permanent Address"
+      },
+      "placeholders": {
+        "rcNumber": "e.g. MP09AB1234",
+        "chassisNumber": "Vehicle chassis number",
+        "engineNumber": "Vehicle engine number",
+        "makerDescription": "e.g. Tata",
+        "makerModel": "e.g. Tata 407",
+        "ownerName": "Registered owner",
+        "presentAddress": "Present address",
+        "permanentAddress": "Permanent address"
+      },
+      "errors": {
+        "saveFailed": "Failed to save RC details",
+        "deleteFailed": "Failed to delete RC details"
+      }
     }
   },
   "oem": {

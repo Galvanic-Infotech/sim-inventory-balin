@@ -1,0 +1,200 @@
+@if (open()) {
+  <div class="drawer-backdrop" (click)="onClose()" aria-hidden="true"></div>
+  <aside
+    class="drawer-panel drawer-panel--wide"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="rc-details-title"
+  >
+    <div class="dialog-header">
+      <div>
+        <h3 id="rc-details-title">{{ 'devices.rcDetails.title' | translate }}</h3>
+        @if (serialNumber()) {
+          <small style="color: var(--color-text-muted)">
+            {{ 'devices.columns.serialNumber' | translate }}: <strong>{{ serialNumber() }}</strong>
+          </small>
+        }
+      </div>
+      <button
+        type="button"
+        class="btn btn-ghost"
+        (click)="onClose()"
+        [attr.aria-label]="'common.close' | translate"
+      >
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      @if (error()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label>{{ 'devices.rcDetails.fields.rcNumber' | translate }} *</label>
+          <input
+            class="form-control"
+            [ngModel]="form().rcNumber"
+            (ngModelChange)="setField('rcNumber', $event)"
+            [placeholder]="'devices.rcDetails.placeholders.rcNumber' | translate"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'devices.rcDetails.fields.registrationDate' | translate }} *</label>
+          <input
+            type="date"
+            class="form-control"
+            [ngModel]="form().registrationDate"
+            (ngModelChange)="setField('registrationDate', $event)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'devices.rcDetails.fields.chassisNumber' | translate }} *</label>
+          <input
+            class="form-control"
+            [ngModel]="form().vehiclesChasiNumber"
+            (ngModelChange)="setField('vehiclesChasiNumber', $event)"
+            [placeholder]="'devices.rcDetails.placeholders.chassisNumber' | translate"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'devices.rcDetails.fields.engineNumber' | translate }} *</label>
+          <input
+            class="form-control"
+            [ngModel]="form().vehicleEngineNumber"
+            (ngModelChange)="setField('vehicleEngineNumber', $event)"
+            [placeholder]="'devices.rcDetails.placeholders.engineNumber' | translate"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'devices.rcDetails.fields.makerDescription' | translate }} *</label>
+          <input
+            class="form-control"
+            [ngModel]="form().makerDescription"
+            (ngModelChange)="setField('makerDescription', $event)"
+            [placeholder]="'devices.rcDetails.placeholders.makerDescription' | translate"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'devices.rcDetails.fields.makerModel' | translate }} *</label>
+          <input
+            class="form-control"
+            [ngModel]="form().makerModel"
+            (ngModelChange)="setField('makerModel', $event)"
+            [placeholder]="'devices.rcDetails.placeholders.makerModel' | translate"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'devices.rcDetails.fields.manufacturingDate' | translate }} *</label>
+          <input
+            type="date"
+            class="form-control"
+            [ngModel]="form().manufacturingDateFormatted"
+            (ngModelChange)="setField('manufacturingDateFormatted', $event)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>{{ 'devices.rcDetails.fields.fuelType' | translate }} *</label>
+          <select
+            class="form-control"
+            [ngModel]="form().fuelType"
+            (ngModelChange)="setField('fuelType', $event)"
+          >
+            @for (ft of fuelTypes; track ft) {
+              <option [value]="ft">{{ ft }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1">
+          <label>{{ 'devices.rcDetails.fields.ownerName' | translate }} *</label>
+          <input
+            class="form-control"
+            [ngModel]="form().ownerName"
+            (ngModelChange)="setField('ownerName', $event)"
+            [placeholder]="'devices.rcDetails.placeholders.ownerName' | translate"
+          />
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1">
+          <label>{{ 'devices.rcDetails.fields.presentAddress' | translate }} *</label>
+          <textarea
+            class="form-control"
+            rows="2"
+            [ngModel]="form().presentAddress"
+            (ngModelChange)="setField('presentAddress', $event)"
+            [placeholder]="'devices.rcDetails.placeholders.presentAddress' | translate"
+          ></textarea>
+        </div>
+
+        <div class="form-group" style="grid-column: 1 / -1">
+          <label>{{ 'devices.rcDetails.fields.permanentAddress' | translate }} *</label>
+          <textarea
+            class="form-control"
+            rows="2"
+            [ngModel]="form().permanentAddress"
+            (ngModelChange)="setField('permanentAddress', $event)"
+            [placeholder]="'devices.rcDetails.placeholders.permanentAddress' | translate"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-footer" style="justify-content: space-between">
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="openDelete()"
+        [disabled]="saving() || deleting()"
+      >
+        <span class="material-icons">delete</span>
+        {{ 'devices.rcDetails.delete' | translate }}
+      </button>
+      <div style="display: flex; gap: var(--space-sm)">
+        <button type="button" class="btn btn-outline" (click)="onClose()" [disabled]="saving() || deleting()">
+          {{ 'common.cancel' | translate }}
+        </button>
+        <button type="button" class="btn btn-primary" (click)="submit()" [disabled]="!canSubmit()">
+          @if (saving()) { <span class="spinner"></span> }
+          {{ 'devices.rcDetails.save' | translate }}
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  @if (showDeleteConfirm()) {
+    <div class="dialog-backdrop" style="z-index: 1100" (click)="closeDelete()" aria-hidden="true">
+      <div class="dialog-card" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+        <div class="dialog-header">
+          <h3>{{ 'devices.rcDetails.confirmDeleteTitle' | translate }}</h3>
+          <button type="button" class="btn btn-ghost" (click)="closeDelete()" [attr.aria-label]="'common.close' | translate">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <div class="dialog-body">
+          <p>{{ 'devices.rcDetails.confirmDeleteMessage' | translate }}</p>
+        </div>
+        <div class="dialog-footer">
+          <button type="button" class="btn btn-outline" (click)="closeDelete()" [disabled]="deleting()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting()">
+            @if (deleting()) { <span class="spinner"></span> }
+            {{ 'common.delete' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+}

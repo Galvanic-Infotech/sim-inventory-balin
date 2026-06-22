@@ -7,6 +7,7 @@ import {
   Fitment,
   FitmentStatusCount,
   FitmentVehicleDetailsResponse,
+  RcDetailsRequest,
   ResendFitmentOtpRequest,
   ValidateFitmentOtpRequest,
 } from '../../shared/models/fitment.model';
@@ -62,5 +63,21 @@ export class FitmentService {
     let params = new HttpParams();
     Object.entries(record).forEach(([k, v]) => (params = params.set(k, v)));
     return this.http.get<RbacResponse<Fitment[]>>(this.EP.FITMENT_LIST, { params });
+  }
+
+  fillRcDetails(
+    serialNo: string,
+    body: RcDetailsRequest,
+  ): Observable<RbacResponse<{ message: string }>> {
+    return this.http.post<RbacResponse<{ message: string }>>(
+      `${this.EP.FITMENT_FILL_RC_DETAILS}/${encodeURIComponent(serialNo)}/fill-device-rc-details`,
+      body,
+    );
+  }
+
+  deleteRcDetails(serialNo: string): Observable<RbacResponse<{ message: string }>> {
+    return this.http.delete<RbacResponse<{ message: string }>>(
+      `${this.EP.FITMENT_DELETE_RC_DETAILS}/${encodeURIComponent(serialNo)}/delete-device-rc-details`,
+    );
   }
 }

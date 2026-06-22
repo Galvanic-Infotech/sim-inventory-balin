@@ -110,18 +110,31 @@
           </td>
           <td>{{ d.onboardedAt | date: 'mediumDate' }}</td>
           <td>
-            @if (canStartFitment(d)) {
-              <button
-                class="btn btn-outline btn-icon"
-                style="border-color: var(--color-text-primary); color: var(--color-text-primary); background: #fff;"
-                (click)="startFitment(d)"
-                [title]="'devices.list.startFitment' | translate"
-              >
-                <span class="material-icons">description</span>
-              </button>
-            } @else {
-              —
-            }
+            <div class="action-cell">
+              @if (canStartFitment(d)) {
+                <button
+                  class="btn btn-outline btn-icon"
+                  style="border-color: var(--color-text-primary); color: var(--color-text-primary); background: #fff;"
+                  (click)="startFitment(d)"
+                  [title]="'devices.list.startFitment' | translate"
+                >
+                  <span class="material-icons">description</span>
+                </button>
+              }
+              @if (d.serialNumber) {
+                <button
+                  class="btn btn-outline btn-icon"
+                  style="border-color: var(--color-primary); color: var(--color-primary); background: #fff;"
+                  (click)="openRcDetails(d)"
+                  [title]="'devices.rcDetails.title' | translate"
+                >
+                  <span class="material-icons">assignment</span>
+                </button>
+              }
+              @if (!canStartFitment(d) && !d.serialNumber) {
+                —
+              }
+            </div>
           </td>
         </tr>
       </ng-template>
@@ -140,3 +153,10 @@
 </div>
 
 <app-bulk-upload-dialog [(open)]="showBulkUpload" />
+
+<app-device-rc-details-dialog
+  [open]="showRcDetails()"
+  [serialNumber]="rcDetailsSerial()"
+  (close)="closeRcDetails()"
+  (saved)="onRcDetailsSaved()"
+/>

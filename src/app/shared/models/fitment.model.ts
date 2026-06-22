@@ -19,6 +19,8 @@ export interface FitmentVehicleDetailsResponse {
   item: { itemId: string; imei?: string; simProvider?: string };
 }
 
+export type RcDetailsRequest = FitmentVehicleDetails;
+
 export interface CreateFitmentRequest {
   itemId: string;
   rtoId: string;
