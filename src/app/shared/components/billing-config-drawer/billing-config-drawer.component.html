@@ -28,23 +28,19 @@
         </div>
       }
 
-      @if (configs().length > 1) {
-        <div class="cfg-tabs">
-          @for (type of productTypes; track type) {
-            @if (findBillingConfig(configs(), type)) {
-              <button
-                type="button"
-                class="cfg-tab"
-                [class.active]="selectedProductType() === type"
-                (click)="selectProductType(type)"
-              >
-                <span class="material-icons">{{ type === BillingProductType.Sim ? 'sim_card' : 'verified_user' }}</span>
-                {{ ('billing.productType.' + (type === BillingProductType.Sim ? 'sim' : 'license')) | translate }}
-              </button>
-            }
-          }
-        </div>
-      }
+      <div class="cfg-tabs">
+        @for (type of productTypes; track type) {
+          <button
+            type="button"
+            class="cfg-tab"
+            [class.active]="selectedProductType() === type"
+            (click)="selectProductType(type)"
+          >
+            <span class="material-icons">{{ productTypeIcon(type) }}</span>
+            {{ productTypeLabelKey(type) | translate }}
+          </button>
+        }
+      </div>
 
       @if (config(); as cfg) {
         <div class="cfg-stats">

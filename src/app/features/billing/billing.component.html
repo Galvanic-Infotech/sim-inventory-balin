@@ -16,8 +16,8 @@
         [class.active]="selectedProductType() === type"
         (click)="selectProductType(type)"
       >
-        <span class="material-icons">{{ type === BillingProductType.Sim ? 'sim_card' : 'verified_user' }}</span>
-        {{ ('billing.productType.' + (type === BillingProductType.Sim ? 'sim' : 'license')) | translate }}
+        <span class="material-icons">{{ productTypeIcon(type) }}</span>
+        {{ productTypeLabelKey(type) | translate }}
       </button>
     }
   </div>

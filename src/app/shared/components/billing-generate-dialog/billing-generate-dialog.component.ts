@@ -4,7 +4,7 @@ import { BillingService } from '../../../core/services/billing.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import { extractApiError } from '../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { BillingProductType, BILLING_PRODUCT_TYPES } from '../../models/billing.model';
+import { BillingProductType, BILLING_PRODUCT_TYPES, billingProductTypeLabelKey } from '../../models/billing.model';
 
 @Component({
   selector: 'app-billing-generate-dialog',
@@ -24,6 +24,7 @@ export class BillingGenerateDialogComponent {
 
   readonly productTypes = BILLING_PRODUCT_TYPES;
   readonly BillingProductType = BillingProductType;
+  readonly productTypeLabelKey = billingProductTypeLabelKey;
   productType: BillingProductType = BillingProductType.Sim;
 
   date = this.defaultDate();

@@ -15,6 +15,8 @@ import {
   BillingTransaction,
   BILLING_PRODUCT_TYPES,
   availableCredit,
+  billingProductTypeIcon,
+  billingProductTypeLabelKey,
   creditUtilisationPct,
   findBillingConfig,
   isCredit,
@@ -78,6 +80,8 @@ export class BillingComponent {
   readonly isCredit = isCredit;
   readonly net = transactionNet;
   readonly findBillingConfig = findBillingConfig;
+  readonly productTypeLabelKey = billingProductTypeLabelKey;
+  readonly productTypeIcon = billingProductTypeIcon;
 
   constructor() {
     effect(() => {

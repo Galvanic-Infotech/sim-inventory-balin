@@ -47,17 +47,30 @@ export function transactionNet(t: BillingTransaction): number {
     : t.debitedAmount + t.taxAmount;
 }
 
-export const BillingProductType = {
-  Sim: 1,
-  License: 2,
-} as const;
-
-export type BillingProductType = (typeof BillingProductType)[keyof typeof BillingProductType];
+export enum BillingProductType {
+  Sim = 1,
+  License = 2,
+}
 
 export const BILLING_PRODUCT_TYPES: BillingProductType[] = [
   BillingProductType.Sim,
   BillingProductType.License,
 ];
+
+export function parseBillingProductType(value: unknown): BillingProductType {
+  const n = Number(value);
+  return n === BillingProductType.License ? BillingProductType.License : BillingProductType.Sim;
+}
+
+export function billingProductTypeLabelKey(type: BillingProductType): string {
+  return type === BillingProductType.License
+    ? 'billing.productType.license'
+    : 'billing.productType.sim';
+}
+
+export function billingProductTypeIcon(type: BillingProductType): string {
+  return type === BillingProductType.License ? 'verified_user' : 'sim_card';
+}
 
 export interface BillingConfig {
   id: string;
@@ -79,9 +92,7 @@ export function parseBillingConfig(json: Record<string, unknown>): BillingConfig
     const n = typeof v === 'number' ? v : Number(v);
     return Number.isFinite(n) ? n : 0;
   };
-  const rawType = num(json['productType']);
-  const productType =
-    rawType === BillingProductType.License ? BillingProductType.License : BillingProductType.Sim;
+  const productType = parseBillingProductType(json['productType']);
   return {
     id: String(json['id'] ?? ''),
     entityId: String(json['entityId'] ?? ''),

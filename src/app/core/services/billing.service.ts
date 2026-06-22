@@ -15,6 +15,7 @@ import {
 } from '../../shared/models/billing.model';
 
 export interface AddCreditPayload {
+  productType: BillingProductType;
   amount: number;
   notes: string;
 }
@@ -53,28 +54,19 @@ export class BillingService {
       creditLimit: number;
     },
   ): Observable<BillingConfig> {
-    const params = this.productTypeParam(new HttpParams(), payload.productType);
     return this.http
       .put<RbacResponse<Record<string, unknown>>>(
         `${API_ENDPOINTS.SIM.BILLING_CONFIG}/${entityId}/config`,
         payload,
-        { params },
       )
       .pipe(map((res) => parseBillingConfig(res.data ?? {})));
   }
 
-  addCredit(
-    entityId: string,
-    payload: AddCreditPayload,
-    productType: BillingProductType = BillingProductType.Sim,
-  ): Observable<BillingTransaction> {
-    const params = this.productTypeParam(new HttpParams(), productType);
-    const headers = new HttpHeaders({ 'X-Entity-ID': entityId });
+  addCredit(entityId: string, payload: AddCreditPayload): Observable<BillingTransaction> {
     return this.http
       .post<RbacResponse<Record<string, unknown>>>(
         `${API_ENDPOINTS.SIM.BILLING_CREDIT}/${entityId}/credit`,
         payload,
-        { params, headers },
       )
       .pipe(map((res) => parseBillingTransaction(res.data ?? {})));
   }

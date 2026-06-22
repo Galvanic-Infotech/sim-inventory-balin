@@ -35,7 +35,7 @@
               [class.btn-outline]="productType !== type"
               (click)="productType = type"
             >
-              {{ ('billing.productType.' + (type === BillingProductType.Sim ? 'sim' : 'license')) | translate }}
+              {{ productTypeLabelKey(type) | translate }}
             </button>
           }
         </div>

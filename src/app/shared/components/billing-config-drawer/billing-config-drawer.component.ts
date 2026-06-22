@@ -9,6 +9,8 @@ import {
   BillingConfig,
   BillingProductType,
   BILLING_PRODUCT_TYPES,
+  billingProductTypeIcon,
+  billingProductTypeLabelKey,
   availableCredit,
   creditUtilisationPct,
   findBillingConfig,
@@ -40,6 +42,8 @@ export class BillingConfigDrawerComponent {
   readonly productTypes = BILLING_PRODUCT_TYPES;
   readonly BillingProductType = BillingProductType;
   readonly findBillingConfig = findBillingConfig;
+  readonly productTypeLabelKey = billingProductTypeLabelKey;
+  readonly productTypeIcon = billingProductTypeIcon;
 
   yearlyAmount = 0;
   yearInDays = 365;
@@ -96,7 +100,15 @@ export class BillingConfigDrawerComponent {
 
   selectProductType(type: BillingProductType): void {
     this.selectedProductType.set(type);
-    this.loadFormFromConfig(findBillingConfig(this.configs(), type));
+    const cfg = findBillingConfig(this.configs(), type);
+    if (cfg) {
+      this.loadFormFromConfig(cfg);
+    } else {
+      this.yearlyAmount = 0;
+      this.yearInDays = 365;
+      this.taxRate = 18;
+      this.creditLimit = 0;
+    }
     this.saveError.set('');
   }
 
@@ -136,9 +148,13 @@ export class BillingConfigDrawerComponent {
       .subscribe({
         next: (cfg) => {
           this.saving.set(false);
-          this.configs.update((items) =>
-            items.map((item) => (item.productType === cfg.productType ? cfg : item)),
-          );
+          this.configs.update((items) => {
+            const idx = items.findIndex((item) => item.productType === cfg.productType);
+            return idx >= 0
+              ? items.map((item, i) => (i === idx ? cfg : item))
+              : [...items, cfg];
+          });
+          this.loadFormFromConfig(cfg);
           this.closed.emit(true);
         },
         error: (err) => {

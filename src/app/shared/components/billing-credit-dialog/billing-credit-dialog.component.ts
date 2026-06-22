@@ -4,7 +4,7 @@ import { BillingService } from '../../../core/services/billing.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import { extractApiError } from '../../../core/utils/api-error.util';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { BillingProductType, BILLING_PRODUCT_TYPES } from '../../models/billing.model';
+import { BillingProductType, BILLING_PRODUCT_TYPES, billingProductTypeLabelKey } from '../../models/billing.model';
 
 @Component({
   selector: 'app-billing-credit-dialog',
@@ -23,6 +23,7 @@ export class BillingCreditDialogComponent {
 
   readonly productTypes = BILLING_PRODUCT_TYPES;
   readonly BillingProductType = BillingProductType;
+  readonly productTypeLabelKey = billingProductTypeLabelKey;
   productType: BillingProductType = BillingProductType.Sim;
 
   amount: number | null = null;
@@ -45,7 +46,11 @@ export class BillingCreditDialogComponent {
     this.saving.set(true);
     this.error.set('');
     this.billing
-      .addCredit(this.entityId(), { amount, notes: this.notes.trim() }, this.productType)
+      .addCredit(this.entityId(), {
+        productType: this.productType,
+        amount,
+        notes: this.notes.trim(),
+      })
       .subscribe({
         next: () => {
           this.saving.set(false);
