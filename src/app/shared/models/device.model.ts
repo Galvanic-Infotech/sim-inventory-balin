@@ -135,6 +135,87 @@ export interface MovementDayGroup {
   items: MovementLogItem[];
 }
 
+export interface MovementChartDay {
+  date: string;
+  movedIn: number;
+  movedOut: number;
+  total: number;
+}
+
+function normalizeMovementDate(date: string): string {
+  return date.slice(0, 10);
+}
+
+/** Map API day groups to chart points (dates as returned, oldest → newest). */
+export function movementGroupsToChartDays(groups: MovementDayGroup[]): MovementChartDay[] {
+  return [...groups]
+    .map((g) => ({
+      date: normalizeMovementDate(g.date),
+      movedIn: g.movedIn,
+      movedOut: g.movedOut,
+      total: g.movedIn + g.movedOut,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+export interface MovementChartPoint extends MovementChartDay {
+  x: number;
+  y: number;
+  amount: number;
+}
+
+export interface MovementChartGeometry {
+  points: MovementChartPoint[];
+  linePath: string;
+  areaPath: string;
+  max: number;
+  baselineY: number;
+}
+
+function smoothMovementLinePath(points: Pick<MovementChartPoint, 'x' | 'y'>[]): string {
+  if (!points.length) return '';
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i];
+    const p1 = points[i + 1];
+    const cpx = (p0.x + p1.x) / 2;
+    d += ` C ${cpx} ${p0.y}, ${cpx} ${p1.y}, ${p1.x} ${p1.y}`;
+  }
+  return d;
+}
+
+/** Map chart days to SVG coordinates (oldest → newest, left → right). */
+export function buildMovementChartGeometry(
+  days: MovementChartDay[],
+  width = 100,
+  height = 100,
+  padding = { top: 10, right: 6, bottom: 4, left: 6 },
+): MovementChartGeometry {
+  const amounts = days.map((d) => d.total);
+  const max = Math.max(...amounts, 1);
+  const innerW = width - padding.left - padding.right;
+  const innerH = height - padding.top - padding.bottom;
+  const baselineY = padding.top + innerH;
+  const count = days.length;
+
+  const points: MovementChartPoint[] = days.map((day, i) => {
+    const amount = day.total;
+    const x =
+      count <= 1 ? padding.left + innerW / 2 : padding.left + (i / (count - 1)) * innerW;
+    const y = baselineY - (amount / max) * innerH;
+    return { ...day, x, y, amount };
+  });
+
+  const linePath = smoothMovementLinePath(points);
+  const areaPath = points.length
+    ? `${linePath} L ${points[points.length - 1].x} ${baselineY} L ${points[0].x} ${baselineY} Z`
+    : '';
+
+  return { points, linePath, areaPath, max, baselineY };
+}
+
 export interface DeviceByStatus {
   itemId: string;
   uid: string;

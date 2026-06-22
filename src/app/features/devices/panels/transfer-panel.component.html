@@ -1,136 +1,245 @@
-<div class="panel-toolbar">
-  <div>
-    <h3>{{ 'devices.transfer.title' | translate }}</h3>
-    <p class="text-muted">{{ 'devices.transfer.subtitle' | translate }}</p>
-  </div>
-  <div class="tp-toolbar-actions">
-    <button class="btn btn-ghost" (click)="loadSummary()" [disabled]="summaryLoading()" [title]="'common.refresh' | translate">
-      <span class="material-icons">refresh</span>
-    </button>
-    <button class="btn btn-primary" (click)="openDialog()">
-      <span class="material-icons">swap_horiz</span> {{ 'devices.transfer.title' | translate }}
-    </button>
-  </div>
-</div>
-
-<div class="tp-stats">
-  <div class="tp-stat tp-stat--in">
-    <span class="material-icons">south_west</span>
+<div class="tp">
+  <div class="panel-toolbar">
     <div>
-      <span class="tp-stat-label">{{ 'devices.transfer.movedIn' | translate }}</span>
-      <strong>{{ totalIn() }}</strong>
+      <h3>{{ 'devices.transfer.title' | translate }}</h3>
+      <p class="text-muted">{{ 'devices.transfer.subtitle' | translate }}</p>
     </div>
-  </div>
-  <div class="tp-stat tp-stat--out">
-    <span class="material-icons">north_east</span>
-    <div>
-      <span class="tp-stat-label">{{ 'devices.transfer.movedOut' | translate }}</span>
-      <strong>{{ totalOut() }}</strong>
-    </div>
-  </div>
-  <div class="tp-stat tp-stat--days">
-    <span class="material-icons">calendar_month</span>
-    <div>
-      <span class="tp-stat-label">{{ 'devices.transfer.activeDays' | translate }}</span>
-      <strong>{{ summary().length }}</strong>
-    </div>
-  </div>
-</div>
-
-<div class="card tp-card">
-  <div class="tab-toolbar">
-    <div class="tab-toolbar-left">
-      <h3>{{ 'devices.transfer.movementSummary' | translate }}</h3>
-      <span class="count-badge">{{ filteredSummary().length }}</span>
-    </div>
-    <div class="tab-toolbar-right">
-      <app-search-bar
-        [placeholder]="'devices.transfer.searchPlaceholder' | translate"
-        [initialValue]="summarySearch()"
-        (searchChange)="onSummarySearch($event)"
-      />
+    <div class="tp-toolbar-actions">
+      <button class="btn btn-ghost" (click)="refreshAll()" [disabled]="tableLoading()" [title]="'common.refresh' | translate">
+        <span class="material-icons">refresh</span>
+      </button>
+      <button class="btn btn-primary" (click)="openDialog()">
+        <span class="material-icons">swap_horiz</span> {{ 'devices.transfer.title' | translate }}
+      </button>
     </div>
   </div>
 
-  @if (summaryError()) {
-    <div class="alert alert-danger">
-      <span class="material-icons">error</span> {{ summaryError() }}
-      <button class="btn btn-ghost" (click)="loadSummary()">{{ 'common.retry' | translate }}</button>
-    </div>
-  } @else if (summaryLoading()) {
-    <div class="tab-empty" style="padding: var(--space-xl)">
-      <span class="spinner"></span>
-      <p>{{ 'devices.transfer.loadingMovements' | translate }}</p>
-    </div>
-  } @else if (!filteredSummary().length) {
-    <div class="tab-empty" style="padding: var(--space-xl)">
-      <span class="material-icons">swap_horiz</span>
-      <p>{{ 'devices.transfer.noMovements' | translate }}</p>
-    </div>
-  } @else {
-    <ul class="tp-days">
-      @for (group of filteredSummary(); track trackDay($index, group)) {
-        <li class="tp-day" [class.tp-day--open]="isExpanded(group.date)">
-          <button type="button" class="tp-day-head" (click)="toggleDate(group.date)">
-            <span class="tp-day-chevron material-icons">
-              {{ isExpanded(group.date) ? 'expand_more' : 'chevron_right' }}
-            </span>
-            <span class="tp-day-date">
-              {{ group.date | date: 'EEE, dd MMM yyyy' }}
-            </span>
-            <span class="tp-day-pills">
-              <span class="tp-pill tp-pill--in">
-                <span class="material-icons">south_west</span> {{ group.movedIn }} {{ 'devices.transfer.in' | translate }}
-              </span>
-              <span class="tp-pill tp-pill--out">
-                <span class="material-icons">north_east</span> {{ group.movedOut }} {{ 'devices.transfer.out' | translate }}
-              </span>
-            </span>
-          </button>
+  <div class="tp__split">
+    <aside class="tp__aside">
+      <section class="tp__summary">
+        <article class="tp-card tp-card--row">
+          <div class="tp-card__icon" style="background: var(--color-success-bg); color: var(--color-success)">
+            <span class="material-icons">south_west</span>
+          </div>
+          <div>
+            <span class="tp-card__label">{{ 'devices.transfer.movedIn' | translate }}</span>
+            <span class="tp-card__value tp-card__value--md">{{ totalIn() }}</span>
+          </div>
+        </article>
 
-          @if (isExpanded(group.date)) {
-            <div class="tp-day-body">
-              <table class="tp-table">
-                <thead>
-                  <tr>
-                    <th>{{ 'devices.columns.direction' | translate }}</th>
-                    <th>{{ 'devices.columns.serial' | translate }}</th>
-                    <th>{{ 'devices.columns.from' | translate }}</th>
-                    <th>{{ 'devices.columns.to' | translate }}</th>
-                    <th>{{ 'devices.columns.time' | translate }}</th>
-                    <th>{{ 'devices.columns.remarks' | translate }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (item of group.items; track trackItem($index, item)) {
-                    <tr>
-                      <td>
-                        <span
-                          class="tp-dir"
-                          [class.tp-dir--in]="item.direction === 'in'"
-                          [class.tp-dir--out]="item.direction === 'out'"
-                        >
-                          <span class="material-icons">
-                            {{ item.direction === 'in' ? 'south_west' : 'north_east' }}
-                          </span>
-                          {{ item.direction === 'in' ? ('devices.transfer.directionIn' | translate) : ('devices.transfer.directionOut' | translate) }}
-                        </span>
-                      </td>
-                      <td class="tp-mono">{{ item.serialNumber }}</td>
-                      <td>{{ item.fromEntityName }}</td>
-                      <td>{{ item.toEntityName }}</td>
-                      <td class="tp-time tp-mono">{{ item.createdAt | date: 'HH:mm' }}</td>
-                      <td class="tp-remarks">{{ item.remarks || '—' }}</td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
+        <article class="tp-card tp-card--row">
+          <div class="tp-card__icon" style="background: var(--color-warning-bg); color: var(--color-warning)">
+            <span class="material-icons">north_east</span>
+          </div>
+          <div>
+            <span class="tp-card__label">{{ 'devices.transfer.movedOut' | translate }}</span>
+            <span class="tp-card__value tp-card__value--md">{{ totalOut() }}</span>
+          </div>
+        </article>
+
+        <article class="tp-card tp-card--row">
+          <div class="tp-card__icon" style="background: var(--color-primary-soft); color: var(--color-primary)">
+            <span class="material-icons">calendar_month</span>
+          </div>
+          <div>
+            <span class="tp-card__label">{{ 'devices.transfer.activeDays' | translate }}</span>
+            <span class="tp-card__value tp-card__value--md">{{ activeDays() }}</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="tp__panel tp__chart">
+        <div class="tp__panel-head">
+          <h3>{{ 'devices.transfer.chart.title' | translate }}</h3>
+          @if (chartHasData()) {
+            <span class="tp__chart-total">
+              <strong>{{ chartTotal() }}</strong> {{ 'devices.transfer.chart.total' | translate }}
+            </span>
           }
-        </li>
+        </div>
+
+        @if (tableLoading() && !chartSource().length) {
+          <div class="tp__chart-skeleton" aria-hidden="true">
+            <div class="tp__chart-skel-line"></div>
+          </div>
+        } @else if (!chartHasData()) {
+          <div class="tp__chart-empty">
+            <span class="material-icons">show_chart</span>
+            <p>{{ 'devices.transfer.chart.empty' | translate }}</p>
+          </div>
+        } @else {
+          <div class="tp__chart-wrap">
+            <div class="tp__chart-yaxis">
+              <span>{{ chartMaxValue() }}</span>
+              <span>{{ chartMaxValue() / 2 | number:'1.0-0' }}</span>
+              <span>0</span>
+            </div>
+
+            <div class="tp__chart-plot" (mouseleave)="setHoveredChartDate(null)">
+              <svg class="tp__chart-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="transfer-line-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.32" />
+                    <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+
+                @for (tick of [0, 50, 100]; track tick) {
+                  <line
+                    class="tp__chart-grid"
+                    x1="0" [attr.y1]="10 + tick * 0.86"
+                    x2="100" [attr.y2]="10 + tick * 0.86"
+                  />
+                }
+
+                <path class="tp__chart-area" [attr.d]="chartGeometry().areaPath" fill="url(#transfer-line-fill)" />
+                <path class="tp__chart-line" [attr.d]="chartGeometry().linePath" />
+              </svg>
+
+              @if (hoveredChartPoint(); as hp) {
+                <span
+                  class="tp__chart-hover-line"
+                  [style.left.%]="hp.x"
+                  aria-hidden="true"
+                ></span>
+              }
+
+              @for (pt of chartGeometry().points; track pt.date) {
+                <button
+                  type="button"
+                  class="tp__chart-point"
+                  [class.tp__chart-point--in]="pt.movedIn > pt.movedOut"
+                  [class.tp__chart-point--out]="pt.movedOut > pt.movedIn"
+                  [class.tp__chart-point--empty]="pt.amount === 0"
+                  [class.tp__chart-point--today]="pt.date === todayChartDate()"
+                  [class.tp__chart-point--active]="pt.date === hoveredChartDate()"
+                  [style.left.%]="pt.x"
+                  [style.top.%]="pt.y"
+                  (mouseenter)="setHoveredChartDate(pt.date)"
+                  (focus)="setHoveredChartDate(pt.date)"
+                  (blur)="setHoveredChartDate(null)"
+                  [attr.aria-label]="chartDayLabel(pt.date) + ': ' + pt.total"
+                ></button>
+              }
+
+              @if (hoveredChartPoint(); as hp) {
+                <div
+                  class="tp__chart-tooltip"
+                  [class.tp__chart-tooltip--right]="hp.x < 30"
+                  [class.tp__chart-tooltip--left]="hp.x > 70"
+                  [style.left.%]="hp.x"
+                  [style.top.%]="hp.y"
+                >
+                  <span class="tp__chart-tooltip-date">{{ chartFullDate(hp.date) }}</span>
+                  <span class="tp__chart-tooltip-total">{{ hp.total }} {{ 'devices.transfer.chart.devices' | translate }}</span>
+                  <span class="tp__chart-tooltip-breakdown">
+                    <span class="tp__chart-tooltip-in">{{ hp.movedIn }} {{ 'devices.transfer.in' | translate }}</span>
+                    <span class="tp__chart-tooltip-sep">·</span>
+                    <span class="tp__chart-tooltip-out">{{ hp.movedOut }} {{ 'devices.transfer.out' | translate }}</span>
+                  </span>
+                </div>
+              }
+            </div>
+
+            <div
+              class="tp__chart-labels"
+              [style.grid-template-columns]="'repeat(' + chartGeometry().points.length + ', minmax(0, 1fr))'"
+            >
+              @for (pt of chartGeometry().points; track pt.date) {
+                <span
+                  class="tp__chart-label"
+                  [class.tp__chart-label--today]="pt.date === todayChartDate()"
+                  [class.tp__chart-label--active]="pt.date === hoveredChartDate()"
+                >{{ chartDayLabel(pt.date) }}</span>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    </aside>
+
+    <section class="tp__panel tp__table-panel">
+      <div class="tp__panel-head">
+        <h3>{{ 'devices.transfer.movementSummary' | translate }}</h3>
+        @if (pagination(); as pg) {
+          <span class="count-badge">{{ pg.totalCount }}</span>
+        }
+        <span class="spacer"></span>
+        <app-search-bar
+          [placeholder]="'devices.transfer.searchPlaceholder' | translate"
+          [initialValue]="summarySearch()"
+          (searchChange)="onSummarySearch($event)"
+        />
+      </div>
+
+      @if (tableError()) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ tableError() }}
+          <button class="btn btn-ghost" (click)="fetchTable()">{{ 'common.retry' | translate }}</button>
+        </div>
+      } @else {
+        <p-table
+          [value]="movementRows()"
+          [lazy]="true"
+          (onLazyLoad)="onLazyLoad($event)"
+          [paginator]="true"
+          [rows]="tableQuery().pageSize ?? 10"
+          [rowsPerPageOptions]="[10, 25, 50]"
+          [totalRecords]="totalRecords()"
+          [loading]="tableLoading()"
+          [first]="tableFirst()"
+          styleClass="app-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'devices.columns.direction' | translate }}</th>
+              <th>{{ 'devices.columns.serial' | translate }}</th>
+              <th>{{ 'devices.columns.from' | translate }}</th>
+              <th>{{ 'devices.columns.to' | translate }}</th>
+              <th>{{ 'devices.columns.time' | translate }}</th>
+              <th>{{ 'devices.columns.remarks' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>
+                <span
+                  class="tp-dir"
+                  [class.tp-dir--in]="item.direction === 'in'"
+                  [class.tp-dir--out]="item.direction === 'out'"
+                >
+                  <span class="material-icons">
+                    {{ item.direction === 'in' ? 'south_west' : 'north_east' }}
+                  </span>
+                  {{ item.direction === 'in' ? ('devices.transfer.directionIn' | translate) : ('devices.transfer.directionOut' | translate) }}
+                </span>
+              </td>
+              <td>
+                <div class="cell-stack">
+                  <span class="cell-primary tp-mono">{{ item.serialNumber }}</span>
+                  <span class="cell-sub">{{ item.createdAt | date: 'mediumDate' }}</span>
+                </div>
+              </td>
+              <td>{{ item.fromEntityName }}</td>
+              <td>{{ item.toEntityName }}</td>
+              <td class="tp-time tp-mono">{{ item.createdAt | date: 'HH:mm' }}</td>
+              <td class="tp-remarks">{{ item.remarks || '—' }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="6">
+                <div class="tab-empty">
+                  <span class="material-icons">swap_horiz</span>
+                  <p>{{ 'devices.transfer.noMovements' | translate }}</p>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       }
-    </ul>
-  }
+    </section>
+  </div>
 </div>
 
 @if (showDialog()) {

@@ -352,7 +352,13 @@
       "confirmRemarks": "Remarks",
       "typeReturn": "Return to parent",
       "typeTransfer": "Transfer",
-      "targetParent": "Parent entity"
+      "targetParent": "Parent entity",
+      "chart": {
+        "title": "Movement Activity",
+        "total": "movements",
+        "devices": "devices",
+        "empty": "No movement data yet"
+      }
     },
     "activate": {
       "title": "Activate / Recharge",

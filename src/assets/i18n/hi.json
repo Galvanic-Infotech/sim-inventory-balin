@@ -352,7 +352,13 @@
       "confirmRemarks": "टिप्पणी",
       "typeReturn": "मूल को वापस",
       "typeTransfer": "ट्रांसफर",
-      "targetParent": "मूल इकाई"
+      "targetParent": "मूल इकाई",
+      "chart": {
+        "title": "मूवमेंट गतिविधि",
+        "total": "मूवमेंट",
+        "devices": "डिवाइस",
+        "empty": "अभी कोई मूवमेंट डेटा नहीं"
+      }
     },
     "activate": {
       "title": "सक्रिय करें / रिचार्ज",
