@@ -22,6 +22,7 @@ import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util'
 import { BulkUploadDialogComponent } from '../../../shared/components/bulk-upload-dialog/bulk-upload-dialog.component';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { DeviceRcDetailsDialogComponent } from './device-rc-details-dialog.component';
+import { DeviceDetailsDrawerComponent } from './device-details-drawer.component';
 
 @Component({
   selector: 'app-devices-list-panel',
@@ -33,6 +34,7 @@ import { DeviceRcDetailsDialogComponent } from './device-rc-details-dialog.compo
     SearchBarComponent,
     BulkUploadDialogComponent,
     DeviceRcDetailsDialogComponent,
+    DeviceDetailsDrawerComponent,
     TranslatePipe,
   ],
   templateUrl: './devices-list-panel.component.html',
@@ -76,9 +78,22 @@ export class DevicesListPanelComponent {
   readonly showBulkUpload = signal(false);
   readonly showRcDetails = signal(false);
   readonly rcDetailsSerial = signal<string | null>(null);
+  readonly showDetails = signal(false);
+  readonly detailsDevice = signal<AisDevice | null>(null);
+
+  openDetails(d: AisDevice): void {
+    this.detailsDevice.set(d);
+    this.showDetails.set(true);
+  }
+
+  closeDetails(): void {
+    this.showDetails.set(false);
+    this.detailsDevice.set(null);
+  }
 
   openRcDetails(d: AisDevice): void {
     if (!d.serialNumber) return;
+    this.showDetails.set(false);
     this.rcDetailsSerial.set(d.serialNumber);
     this.showRcDetails.set(true);
   }

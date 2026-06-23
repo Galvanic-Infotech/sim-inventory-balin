@@ -76,15 +76,13 @@
         <tr>
           <th style="width: 4rem">#</th>
           <th>{{ 'devices.columns.deviceModel' | translate }}</th>
-          <th pSortableColumn="serialNumber">{{ 'devices.columns.serialNumber' | translate }} <p-sortIcon field="serialNumber" /></th>
-          <th pSortableColumn="imei">{{ 'devices.columns.imei' | translate }} <p-sortIcon field="imei" /></th>
-          <th>{{ 'devices.columns.simProvider' | translate }}</th>
-          <th pSortableColumn="iccid">{{ 'devices.columns.iccid' | translate }} <p-sortIcon field="iccid" /></th>
-          <th>{{ 'devices.columns.primarySim' | translate }}</th>
-          <th>{{ 'devices.columns.secondarySim' | translate }}</th>
+          <th pSortableColumn="imei">{{ 'devices.columns.imeiSerial' | translate }} <p-sortIcon field="imei" /></th>
+          <th pSortableColumn="iccid">{{ 'devices.columns.simProviderIccid' | translate }} <p-sortIcon field="iccid" /></th>
+          <th>{{ 'devices.columns.primarySimValidity' | translate }}</th>
+          <th>{{ 'devices.columns.secondarySimValidity' | translate }}</th>
           <th pSortableColumn="name">{{ 'devices.columns.oemRfc' | translate }} <p-sortIcon field="name" /></th>
           <th pSortableColumn="status">{{ 'devices.columns.status' | translate }} <p-sortIcon field="status" /></th>
-          <th pSortableColumn="onboardedAt">{{ 'devices.columns.onboarded' | translate }} <p-sortIcon field="onboardedAt" /></th>
+          <th pSortableColumn="onboardedAt">{{ 'devices.columns.activationDate' | translate }} <p-sortIcon field="onboardedAt" /></th>
           <th>{{ 'devices.columns.action' | translate }}</th>
         </tr>
       </ng-template>
@@ -92,12 +90,30 @@
         <tr>
           <td>{{ rowIndex + 1 }}</td>
           <td>{{ d.deviceModel?.name ?? '—' }}</td>
-          <td>{{ d.serialNumber }}</td>
-          <td>{{ d.imei }}</td>
-          <td>{{ d.simProvider?.name ?? '—' }}</td>
-          <td>{{ d.iccid }}</td>
-          <td>{{ d.primarySimPhone ?? '—' }}</td>
-          <td>{{ d.secondarySimPhone ?? '—' }}</td>
+          <td>
+            <div class="dlp-stack">
+              <span class="dlp-stack-primary">{{ d.imei || '—' }}</span>
+              <span class="dlp-stack-secondary">{{ d.serialNumber || '—' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="dlp-stack">
+              <span class="dlp-stack-primary">{{ d.simProvider?.name ?? '—' }}</span>
+              <span class="dlp-stack-secondary">{{ d.iccid || '—' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="dlp-stack">
+              <span class="dlp-stack-primary">{{ d.primarySimPhone ?? '—' }}</span>
+              <span class="dlp-stack-secondary">{{ (d.primarySimValidity | date: 'mediumDate') ?? '—' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="dlp-stack">
+              <span class="dlp-stack-primary">{{ d.secondarySimPhone ?? '—' }}</span>
+              <span class="dlp-stack-secondary">{{ (d.secondarySimValidity | date: 'mediumDate') ?? '—' }}</span>
+            </div>
+          </td>
           <td>{{ d.entityName }}</td>
           <td>
             <span
@@ -121,26 +137,21 @@
                   <span class="material-icons">description</span>
                 </button>
               }
-              @if (canDeviceMapping() && d.serialNumber) {
-                <button
-                  class="btn btn-outline btn-icon"
-                  style="border-color: var(--color-primary); color: var(--color-primary); background: #fff;"
-                  (click)="openRcDetails(d)"
-                  [title]="'devices.rcDetails.title' | translate"
-                >
-                  <span class="material-icons">assignment</span>
-                </button>
-              }
-              @if (!canStartFitment(d) && !(canDeviceMapping() && d.serialNumber)) {
-                —
-              }
+              <button
+                class="btn btn-outline btn-icon"
+                style="border-color: var(--color-primary); color: var(--color-primary); background: #fff;"
+                (click)="openDetails(d)"
+                [title]="'devices.list.viewDetails' | translate"
+              >
+                <span class="material-icons">visibility</span>
+              </button>
             </div>
           </td>
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="12">
+          <td colspan="10">
             <div class="tab-empty" style="padding: var(--space-lg)">
               <span class="material-icons">memory</span>
               <p>{{ 'devices.list.noDevices' | translate }}</p>
@@ -153,6 +164,13 @@
 </div>
 
 <app-bulk-upload-dialog [(open)]="showBulkUpload" />
+
+<app-device-details-drawer
+  [open]="showDetails()"
+  [device]="detailsDevice()"
+  (close)="closeDetails()"
+  (openRc)="openRcDetails($event)"
+/>
 
 <app-device-rc-details-dialog
   [open]="showRcDetails()"

@@ -274,13 +274,18 @@
       "deviceModel": "Device Model",
       "serialNumber": "Serial Number",
       "imei": "IMEI",
+      "imeiSerial": "IMEI / Serial",
       "simProvider": "SIM Provider",
       "iccid": "ICCID",
+      "simProviderIccid": "SIM Provider / ICCID",
       "primarySim": "Primary SIM",
       "secondarySim": "Secondary SIM",
-      "oemRfc": "OEM/RFC",
+      "primarySimValidity": "Primary SIM / Validity",
+      "secondarySimValidity": "Secondary SIM / Validity",
+      "oemRfc": "OEM / RFC",
       "status": "Status",
       "onboarded": "Onboarded",
+      "activationDate": "Activation Date",
       "action": "Action",
       "uid": "UID",
       "direction": "Direction",
@@ -298,7 +303,37 @@
       "refreshTable": "Refresh table",
       "bulkUpload": "Bulk Upload",
       "noDevices": "No devices found",
-      "startFitment": "Start fitment"
+      "startFitment": "Start fitment",
+      "viewDetails": "View details"
+    },
+    "details": {
+      "title": "Device Details",
+      "subtitle": "Full device information",
+      "sections": {
+        "device": "Device",
+        "sim": "SIM",
+        "ownership": "Ownership"
+      },
+      "fields": {
+        "deviceModel": "Device Model",
+        "serialNumber": "Serial Number",
+        "imei": "IMEI",
+        "status": "Status",
+        "activationDate": "Activation Date",
+        "simProvider": "SIM Provider",
+        "iccid": "ICCID",
+        "primarySim": "Primary SIM",
+        "primarySimValidity": "Primary SIM Validity",
+        "secondarySim": "Secondary SIM",
+        "secondarySimValidity": "Secondary SIM Validity",
+        "oem": "OEM",
+        "rfc": "RFC",
+        "entity": "Entity"
+      },
+      "openRcDetails": "RC Details",
+      "close": "Close",
+      "loading": "Loading details…",
+      "notAvailable": "—"
     },
     "inventory": {
       "title": "Inventory",

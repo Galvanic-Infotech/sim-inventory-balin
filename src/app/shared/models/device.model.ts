@@ -27,7 +27,9 @@ export interface AisDevice {
   imei: string;
   iccid: string;
   primarySimPhone: string | null;
+  primarySimValidity: string | null;
   secondarySimPhone: string | null;
+  secondarySimValidity: string | null;
   status: AisDeviceStatus;
   entityId: string;
   entityName: string;

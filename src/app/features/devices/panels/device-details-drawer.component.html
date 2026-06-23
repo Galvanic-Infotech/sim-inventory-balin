@@ -1,0 +1,126 @@
+@if (open() && device(); as d) {
+  <div class="drawer-backdrop" (click)="onClose()" aria-hidden="true"></div>
+  <aside
+    class="drawer-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="device-details-title"
+  >
+    <div class="dialog-header">
+      <div>
+        <h3 id="device-details-title">{{ 'devices.details.title' | translate }}</h3>
+        <small style="color: var(--color-text-muted)">
+          {{ 'devices.details.fields.serialNumber' | translate }}:
+          <strong>{{ d.serialNumber || ('devices.details.notAvailable' | translate) }}</strong>
+        </small>
+      </div>
+      <button
+        type="button"
+        class="btn btn-ghost"
+        (click)="onClose()"
+        [attr.aria-label]="'common.close' | translate"
+      >
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="dialog-body ddd-body">
+      <section class="ddd-section">
+        <h4 class="ddd-section-title">
+          <span class="material-icons">memory</span>
+          {{ 'devices.details.sections.device' | translate }}
+        </h4>
+        <dl class="ddd-grid">
+          <div>
+            <dt>{{ 'devices.details.fields.deviceModel' | translate }}</dt>
+            <dd>{{ d.deviceModel?.name || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'devices.details.fields.status' | translate }}</dt>
+            <dd>
+              @if (statusMeta(); as sm) {
+                <span
+                  class="chip"
+                  [style.background]="sm.color + '22'"
+                  [style.color]="sm.color"
+                >{{ sm.label }}</span>
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'devices.details.fields.serialNumber' | translate }}</dt>
+            <dd>{{ d.serialNumber || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'devices.details.fields.imei' | translate }}</dt>
+            <dd>{{ d.imei || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'devices.details.fields.activationDate' | translate }}</dt>
+            <dd>{{ (d.onboardedAt | date: 'mediumDate') || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="ddd-section">
+        <h4 class="ddd-section-title">
+          <span class="material-icons">sim_card</span>
+          {{ 'devices.details.sections.sim' | translate }}
+        </h4>
+        <dl class="ddd-grid">
+          <div>
+            <dt>{{ 'devices.details.fields.simProvider' | translate }}</dt>
+            <dd>{{ d.simProvider?.name || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'devices.details.fields.iccid' | translate }}</dt>
+            <dd>{{ d.iccid || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'devices.details.fields.primarySim' | translate }}</dt>
+            <dd>{{ d.primarySimPhone || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'devices.details.fields.primarySimValidity' | translate }}</dt>
+            <dd>{{ (d.primarySimValidity | date: 'mediumDate') || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'devices.details.fields.secondarySim' | translate }}</dt>
+            <dd>{{ d.secondarySimPhone || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'devices.details.fields.secondarySimValidity' | translate }}</dt>
+            <dd>{{ (d.secondarySimValidity | date: 'mediumDate') || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="ddd-section">
+        <h4 class="ddd-section-title">
+          <span class="material-icons">business</span>
+          {{ 'devices.details.sections.ownership' | translate }}
+        </h4>
+        <dl class="ddd-grid">
+          <div>
+            <dt>{{ 'devices.details.fields.entity' | translate }}</dt>
+            <dd>{{ d.entityName || ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
+        </dl>
+      </section>
+    </div>
+
+    <div class="dialog-footer" style="justify-content: space-between">
+      @if (canShowRcButton()) {
+        <button type="button" class="btn btn-primary" (click)="onOpenRc()">
+          <span class="material-icons">assignment</span>
+          {{ 'devices.details.openRcDetails' | translate }}
+        </button>
+      } @else {
+        <span></span>
+      }
+      <button type="button" class="btn btn-outline" (click)="onClose()">
+        {{ 'devices.details.close' | translate }}
+      </button>
+    </div>
+  </aside>
+}

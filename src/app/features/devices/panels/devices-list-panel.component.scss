@@ -63,6 +63,25 @@
   font-weight: 600;
 }
 
+.dlp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dlp-stack-primary {
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+.dlp-stack-secondary {
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
 .dlp-bulk-bar {
   display: flex;
   align-items: center;

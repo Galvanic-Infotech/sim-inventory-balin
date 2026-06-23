@@ -274,13 +274,18 @@
       "deviceModel": "डिवाइस मॉडल",
       "serialNumber": "सीरियल नंबर",
       "imei": "IMEI",
+      "imeiSerial": "IMEI / सीरियल",
       "simProvider": "SIM प्रदाता",
       "iccid": "ICCID",
+      "simProviderIccid": "SIM प्रदाता / ICCID",
       "primarySim": "प्राथमिक SIM",
       "secondarySim": "द्वितीयक SIM",
-      "oemRfc": "OEM/RFC",
+      "primarySimValidity": "प्राथमिक SIM / वैधता",
+      "secondarySimValidity": "द्वितीयक SIM / वैधता",
+      "oemRfc": "OEM / RFC",
       "status": "स्थिति",
       "onboarded": "ऑनबोर्ड",
+      "activationDate": "सक्रियण तिथि",
       "action": "कार्रवाई",
       "uid": "UID",
       "direction": "दिशा",
@@ -298,7 +303,37 @@
       "refreshTable": "टेबल रीफ्रेश करें",
       "bulkUpload": "बल्क अपलोड",
       "noDevices": "कोई डिवाइस नहीं मिली",
-      "startFitment": "फिटमेंट शुरू करें"
+      "startFitment": "फिटमेंट शुरू करें",
+      "viewDetails": "विवरण देखें"
+    },
+    "details": {
+      "title": "डिवाइस विवरण",
+      "subtitle": "पूर्ण डिवाइस जानकारी",
+      "sections": {
+        "device": "डिवाइस",
+        "sim": "SIM",
+        "ownership": "स्वामित्व"
+      },
+      "fields": {
+        "deviceModel": "डिवाइस मॉडल",
+        "serialNumber": "सीरियल नंबर",
+        "imei": "IMEI",
+        "status": "स्थिति",
+        "activationDate": "सक्रियण तिथि",
+        "simProvider": "SIM प्रदाता",
+        "iccid": "ICCID",
+        "primarySim": "प्राथमिक SIM",
+        "primarySimValidity": "प्राथमिक SIM वैधता",
+        "secondarySim": "द्वितीयक SIM",
+        "secondarySimValidity": "द्वितीयक SIM वैधता",
+        "oem": "OEM",
+        "rfc": "RFC",
+        "entity": "इकाई"
+      },
+      "openRcDetails": "RC विवरण",
+      "close": "बंद करें",
+      "loading": "विवरण लोड हो रहा है…",
+      "notAvailable": "—"
     },
     "inventory": {
       "title": "इन्वेंटरी",
