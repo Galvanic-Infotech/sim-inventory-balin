@@ -488,6 +488,7 @@
         "engineNumber": "इंजन नंबर",
         "makerDescription": "निर्माता",
         "makerModel": "मॉडल",
+        "mobileNumber": "मोबाइल नंबर",
         "manufacturingDate": "निर्माण तिथि",
         "fuelType": "ईंधन प्रकार",
         "ownerName": "मालिक का नाम",
@@ -500,6 +501,7 @@
         "engineNumber": "वाहन इंजन नंबर",
         "makerDescription": "जैसे टाटा",
         "makerModel": "जैसे टाटा 407",
+        "mobileNumber": "10-अंकीय मोबाइल नंबर",
         "ownerName": "पंजीकृत मालिक",
         "presentAddress": "वर्तमान पता",
         "permanentAddress": "स्थायी पता"

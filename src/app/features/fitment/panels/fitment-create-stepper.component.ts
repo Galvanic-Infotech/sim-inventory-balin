@@ -166,6 +166,9 @@ export class FitmentCreateStepperComponent implements OnInit {
     this.form.mafYear = mfgYear;
     this.form.customerName = v.ownerName ?? '';
     this.form.address = v.presentAddress ?? '';
+    if (v.mobileNumber && !this.form.mobileNo) {
+      this.form.mobileNo = v.mobileNumber;
+    }
   }
 
   // ── Step 2 ──

@@ -488,6 +488,7 @@
         "engineNumber": "Engine Number",
         "makerDescription": "Maker",
         "makerModel": "Model",
+        "mobileNumber": "Mobile Number",
         "manufacturingDate": "Manufacturing Date",
         "fuelType": "Fuel Type",
         "ownerName": "Owner Name",
@@ -500,6 +501,7 @@
         "engineNumber": "Vehicle engine number",
         "makerDescription": "e.g. Tata",
         "makerModel": "e.g. Tata 407",
+        "mobileNumber": "10-digit mobile number",
         "ownerName": "Registered owner",
         "presentAddress": "Present address",
         "permanentAddress": "Permanent address"

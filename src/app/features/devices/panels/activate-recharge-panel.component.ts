@@ -150,7 +150,6 @@ export class DevicesActivateRechargePanelComponent {
 
   onSearchChange(value: string): void {
     this.searchTerm.set(value);
-    this.selectedIds.set(new Set());
   }
 
   fetch(): void {

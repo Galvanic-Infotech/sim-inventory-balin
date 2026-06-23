@@ -34,6 +34,7 @@ const EMPTY_FORM: RcDetailsRequest = {
   vehicleEngineNumber: '',
   makerDescription: '',
   makerModel: '',
+  mobileNumber: '',
   manufacturingDateFormatted: '',
   fuelType: 'PETROL',
   ownerName: '',
@@ -75,6 +76,7 @@ export class DeviceRcDetailsDialogComponent {
       !!f.vehicleEngineNumber.trim() &&
       !!f.makerDescription.trim() &&
       !!f.makerModel.trim() &&
+      /^\d{10}$/.test(f.mobileNumber.trim()) &&
       !!f.manufacturingDateFormatted &&
       !!f.fuelType &&
       !!f.ownerName.trim() &&
@@ -114,6 +116,7 @@ export class DeviceRcDetailsDialogComponent {
           vehicleEngineNumber: vd.vehicleEngineNumber ?? '',
           makerDescription: vd.makerDescription ?? '',
           makerModel: vd.makerModel ?? '',
+          mobileNumber: vd.mobileNumber ?? '',
           manufacturingDateFormatted: toMonthFirstDay(vd.manufacturingDateFormatted),
           fuelType: vd.fuelType ?? 'PETROL',
           ownerName: vd.ownerName ?? '',

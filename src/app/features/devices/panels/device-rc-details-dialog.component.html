@@ -123,6 +123,19 @@
           </select>
         </div>
 
+        <div class="form-group">
+          <label>{{ 'devices.rcDetails.fields.mobileNumber' | translate }} *</label>
+          <input
+            type="tel"
+            inputmode="numeric"
+            maxlength="10"
+            class="form-control"
+            [ngModel]="form().mobileNumber"
+            (ngModelChange)="setField('mobileNumber', $event)"
+            [placeholder]="'devices.rcDetails.placeholders.mobileNumber' | translate"
+          />
+        </div>
+
         <div class="form-group" style="grid-column: 1 / -1">
           <label>{{ 'devices.rcDetails.fields.ownerName' | translate }} *</label>
           <input

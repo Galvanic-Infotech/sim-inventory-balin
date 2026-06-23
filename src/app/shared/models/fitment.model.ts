@@ -7,6 +7,7 @@ export interface FitmentVehicleDetails {
   vehicleEngineNumber: string;
   makerDescription: string;
   makerModel: string;
+  mobileNumber: string;
   manufacturingDateFormatted: string;
   fuelType: string;
   ownerName: string;
