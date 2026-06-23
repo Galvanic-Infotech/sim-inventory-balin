@@ -120,7 +120,7 @@ export class BulkUploadDialogComponent {
 
     this.rbac.getAisDeviceModels({ pageNumber: 1, pageSize: 200 }).subscribe({
       next: (res) => {
-        this.deviceModels.set((res.data ?? []).filter((m) => m.isActive !== false && m.isApproved !== false));
+        this.deviceModels.set(res.data ?? []);
         modelsDone = true;
         finish();
       },
