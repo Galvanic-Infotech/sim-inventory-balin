@@ -1,0 +1,144 @@
+<div class="panel-toolbar">
+  <div>
+    <h3>{{ 'devices.simStatus.title' | translate }}</h3>
+    <p class="text-muted">{{ 'devices.simStatus.subtitle' | translate }}</p>
+  </div>
+</div>
+
+<div class="card ssp-card">
+  @if (providersError()) {
+    <div class="alert alert-danger">
+      <span class="material-icons">error</span> {{ providersError() }}
+    </div>
+  }
+
+  <div class="ssp-search">
+    <div class="ssp-search__fields">
+      <div class="form-group ssp-search__provider">
+        <label for="ssp-sim-provider">{{ 'devices.columns.simProvider' | translate }}</label>
+        @if (providersLoading()) {
+          <span class="text-muted">{{ 'devices.simStatus.loadingProviders' | translate }}</span>
+        } @else {
+          <select
+            id="ssp-sim-provider"
+            class="form-control"
+            [ngModel]="simProviderId()"
+            (ngModelChange)="simProviderId.set($event)"
+            [disabled]="fetching()"
+          >
+            <option value="">{{ 'devices.simStatus.selectProvider' | translate }}</option>
+            @for (p of simProviders(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+        }
+      </div>
+
+      <div class="form-group ssp-search__iccid">
+        <label for="ssp-iccid">{{ 'devices.columns.iccid' | translate }}</label>
+        <input
+          id="ssp-iccid"
+          class="form-control"
+          type="text"
+          inputmode="numeric"
+          autocomplete="off"
+          [placeholder]="'devices.simStatus.iccidPlaceholder' | translate"
+          [ngModel]="iccid()"
+          (ngModelChange)="iccid.set($event)"
+          [disabled]="fetching()"
+          (keyup.enter)="canFetch() && fetch()"
+        />
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-primary ssp-search__btn"
+      [disabled]="!canFetch()"
+      (click)="fetch()"
+    >
+      @if (fetching()) {
+        <span class="spinner"></span>
+        <span class="ssp-search__btn-label">{{ 'devices.simStatus.fetching' | translate }}</span>
+      } @else {
+        <span class="material-icons">search</span>
+        <span class="ssp-search__btn-label">{{ 'devices.simStatus.fetch' | translate }}</span>
+      }
+    </button>
+  </div>
+
+  @if (fetchError()) {
+    <div class="alert alert-danger ssp-alert">
+      <span class="material-icons">error</span> {{ fetchError() }}
+    </div>
+  }
+
+  @if (fetching()) {
+    <div class="ssp-loading">
+      <span class="spinner spinner--dark spinner--lg"></span>
+      <span class="text-muted">{{ 'devices.simStatus.fetching' | translate }}</span>
+    </div>
+  } @else if (result(); as data) {
+    <div class="ssp-result">
+      <div class="ssp-result__banner">
+        <div class="ssp-result__identity">
+          <span class="ssp-result__label">{{ 'devices.columns.iccid' | translate }}</span>
+          <span class="ssp-result__iccid">{{ data.iccid }}</span>
+        </div>
+        @if (statusMeta(); as sm) {
+          <span
+            class="chip"
+            [style.background]="sm.color + '22'"
+            [style.color]="sm.color"
+          >{{ sm.label }}</span>
+        } @else {
+          <span class="chip">{{ data.status }}</span>
+        }
+      </div>
+
+      <div class="ssp-sim-columns">
+        <section class="ssp-sim-block">
+          <h4 class="ssp-sim-block__title">
+            <span class="material-icons">sim_card</span>
+            {{ 'devices.simStatus.sections.primary' | translate }}
+          </h4>
+          <dl class="ssp-sim-block__grid">
+            <div>
+              <dt>{{ 'devices.simStatus.fields.msisdn' | translate }}</dt>
+              <dd>{{ data.primarySimPhone || '—' }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'devices.simStatus.fields.operator' | translate }}</dt>
+              <dd>{{ data.primaryOperatorName || '—' }}</dd>
+            </div>
+            <div class="ssp-sim-block__full">
+              <dt>{{ 'devices.details.fields.primarySimValidity' | translate }}</dt>
+              <dd>{{ (data.primarySimValidity | date: 'mediumDate') || '—' }}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="ssp-sim-block">
+          <h4 class="ssp-sim-block__title">
+            <span class="material-icons">sim_card</span>
+            {{ 'devices.simStatus.sections.secondary' | translate }}
+          </h4>
+          <dl class="ssp-sim-block__grid">
+            <div>
+              <dt>{{ 'devices.simStatus.fields.msisdn' | translate }}</dt>
+              <dd>{{ data.secondarySimPhone || '—' }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'devices.simStatus.fields.operator' | translate }}</dt>
+              <dd>{{ data.secondaryOperatorName || '—' }}</dd>
+            </div>
+            <div class="ssp-sim-block__full">
+              <dt>{{ 'devices.details.fields.secondarySimValidity' | translate }}</dt>
+              <dd>{{ (data.secondarySimValidity | date: 'mediumDate') || '—' }}</dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+    </div>
+  }
+</div>

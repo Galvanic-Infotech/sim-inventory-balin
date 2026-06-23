@@ -22,6 +22,7 @@ import {
   SimCardProvider,
   CreateSimCardProviderRequest,
   UpdateSimCardProviderRequest,
+  FetchSimStatusData,
   VehicleCategory,
   CreateVehicleCategoryRequest,
   UpdateVehicleCategoryRequest,
@@ -284,6 +285,10 @@ export class RbacService {
     req: UpdateSimCardProviderRequest,
   ): Observable<RbacResponse<SimCardProvider>> {
     return this.patch(`${this.EP.SIM_CARD_PROVIDER}/${id}`, req);
+  }
+
+  fetchSimStatus(simCardProvider: string, iccid: string): Observable<RbacResponse<FetchSimStatusData>> {
+    return this.get(this.EP.FETCH_SIM_STATUS, { simCardProvider, iccid });
   }
 
   getVehicleCategories(query: TableQueryParams = {}): Observable<RbacResponse<VehicleCategory[]>> {

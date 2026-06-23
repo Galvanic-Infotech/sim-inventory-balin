@@ -257,7 +257,8 @@
       "installation": "इंस्टॉलेशन",
       "devices": "डिवाइस",
       "transfer": "ट्रांसफर",
-      "activateRecharge": "सक्रिय करें/रिचार्ज"
+      "activateRecharge": "सक्रिय करें/रिचार्ज",
+      "simStatus": "SIM स्थिति"
     },
     "status": {
       "Initial": "प्रारंभिक",
@@ -422,6 +423,28 @@
       "activateSim": "SIM सक्रिय करें",
       "queuedActivate": "{{count}} डिवाइस सक्रियण के लिए कतार में।",
       "queuedRecharge": "{{count}} डिवाइस रिचार्ज के लिए कतार में।"
+    },
+    "simStatus": {
+      "title": "SIM स्थिति प्राप्त करें",
+      "subtitle": "ICCID से प्रदाता से लाइव SIM विवरण देखें",
+      "selectProvider": "SIM प्रदाता चुनें",
+      "loadingProviders": "SIM प्रदाता लोड हो रहे हैं…",
+      "loadProvidersFailed": "SIM प्रदाता लोड करने में विफल",
+      "iccidPlaceholder": "ICCID दर्ज करें (जैसे 89916431124820468799)",
+      "fetch": "स्थिति प्राप्त करें",
+      "fetching": "प्राप्त हो रहा है…",
+      "resultTitle": "SIM स्थिति",
+      "sections": {
+        "primary": "प्राथमिक SIM",
+        "secondary": "द्वितीयक SIM"
+      },
+      "fields": {
+        "status": "स्थिति",
+        "msisdn": "MSISDN",
+        "operator": "ऑपरेटर",
+        "primaryOperator": "प्राथमिक ऑपरेटर",
+        "secondaryOperator": "द्वितीयक ऑपरेटर"
+      }
     },
     "dashboard": {
       "reset": "रीसेट",

@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
     ITEM_TYPES: '/Master/get-item-types',
     CREATE_ITEM_TYPE: '/Master/create-item-type',
     SIM_CARD_PROVIDER: '/SimCardProvider',
+    FETCH_SIM_STATUS: '/SimCardProvider/fetch-sim-status',
     VEHICLE_CATEGORY: '/VehicleCategory',
     STATES: '/master/get-states',
     CREATE_STATE: '/master/create-state',

@@ -176,6 +176,20 @@ export interface UpdateSimCardProviderRequest {
   description: string;
 }
 
+export interface FetchSimStatusData {
+  iccid: string;
+  primarySimPhone: string;
+  secondarySimPhone: string;
+  primaryOperatorName: string;
+  secondaryOperatorName: string;
+  primarySimValidity: string;
+  secondarySimValidity: string;
+  status: string;
+  itemStatus: number;
+  primarySimOperator: number;
+  secondarySimOperator: number;
+}
+
 export interface VehicleCategory {
   id: string;
   name: string;

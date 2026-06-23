@@ -257,7 +257,8 @@
       "installation": "Installation",
       "devices": "Devices",
       "transfer": "Transfer",
-      "activateRecharge": "Activate/Recharge"
+      "activateRecharge": "Activate/Recharge",
+      "simStatus": "SIM Status"
     },
     "status": {
       "Initial": "Initial",
@@ -422,6 +423,28 @@
       "activateSim": "Activate SIM",
       "queuedActivate": "{{count}} device(s) queued for activation.",
       "queuedRecharge": "{{count}} device(s) queued for recharge."
+    },
+    "simStatus": {
+      "title": "Fetch SIM Status",
+      "subtitle": "Look up live SIM details from the provider by ICCID",
+      "selectProvider": "Select SIM provider",
+      "loadingProviders": "Loading SIM providers…",
+      "loadProvidersFailed": "Failed to load SIM providers",
+      "iccidPlaceholder": "Enter ICCID (e.g. 89916431124820468799)",
+      "fetch": "Fetch Status",
+      "fetching": "Fetching…",
+      "resultTitle": "SIM Status",
+      "sections": {
+        "primary": "Primary SIM",
+        "secondary": "Secondary SIM"
+      },
+      "fields": {
+        "status": "Status",
+        "msisdn": "MSISDN",
+        "operator": "Operator",
+        "primaryOperator": "Primary Operator",
+        "secondaryOperator": "Secondary Operator"
+      }
     },
     "dashboard": {
       "reset": "Reset",
