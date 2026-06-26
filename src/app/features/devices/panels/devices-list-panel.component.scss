@@ -29,6 +29,20 @@
     color: var(--chip-color);
   }
 
+  .dlp-chip-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--radius-pill, 999px);
+    background: color-mix(in srgb, var(--chip-color) 12%, transparent);
+    color: var(--chip-color);
+    font-size: var(--font-xs);
+    font-weight: 700;
+  }
+
   &:hover {
     border-color: var(--chip-color);
     color: var(--chip-color);
@@ -42,7 +56,16 @@
     .material-icons {
       color: #fff;
     }
+
+    .dlp-chip-count {
+      background: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
   }
+}
+
+.dlp-chip-status {
+  font-weight: 600;
 }
 
 .dlp-card {
@@ -57,10 +80,6 @@
   > .alert {
     margin: 0 var(--space-md) var(--space-md);
   }
-}
-
-.dlp-chip-status {
-  font-weight: 600;
 }
 
 .dlp-stack {

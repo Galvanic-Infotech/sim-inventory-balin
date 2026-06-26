@@ -55,6 +55,25 @@ export interface AisDeviceListFilters {
   entityId?: string;
 }
 
+export interface AisDeviceSummaryTrendPoint {
+  date: string;
+  count: number;
+}
+
+export interface AisDeviceSummary {
+  entityId: string;
+  calculatedAt: string;
+  total: number;
+  activated: number;
+  fitted: number;
+  expired: number;
+  aboutToExpire: number;
+  available: number;
+  inProgress: number;
+  statusBreakdown: Partial<Record<AisDeviceStatus, number>>;
+  fittedTrend: AisDeviceSummaryTrendPoint[];
+}
+
 export interface DailyInstallation {
   date: string;
   count: number;

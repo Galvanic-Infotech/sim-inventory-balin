@@ -5,7 +5,9 @@
     [class.dlp-chip--active]="statusFilter() === ''"
     (click)="selectStatus('')"
   >
-    <span class="material-icons">all_inclusive</span> {{ 'devices.list.all' | translate }}
+    <span class="material-icons">all_inclusive</span>
+    {{ 'devices.list.all' | translate }}
+    <span class="dlp-chip-count">{{ summary()?.total ?? 0 }}</span>
   </button>
   @for (s of statuses; track s) {
     <button
@@ -17,6 +19,7 @@
     >
       <span class="material-icons">{{ statusInfo(s).icon }}</span>
       {{ statusInfo(s).label }}
+      <span class="dlp-chip-count">{{ summaryCount(s) }}</span>
     </button>
   }
 </div>

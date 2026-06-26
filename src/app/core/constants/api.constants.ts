@@ -64,6 +64,7 @@ export const API_ENDPOINTS = {
     AIS_DEVICE_MOVEMENT_SUMMARY: '/AisDevice/movement-summary',
     AIS_DEVICE_BY_STATUS: '/AisDeviceInventory/devices-by-status',
     AIS_DEVICE_ACTIVATE: '/AisDevice/activate',
+    AIS_DEVICE_SUMMARY: '/AisDevice/summary',
     FITMENT: '/Fitment',
     FITMENT_LIST: '/Fitment/list',
     FITMENT_VEHICLE_DETAILS: '/Fitment/get-vehicle-details', // /{serialNo}

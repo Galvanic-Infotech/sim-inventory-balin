@@ -11,6 +11,7 @@ import {
   AIS_DEVICE_FILTER_STATUSES,
   AisDevice,
   AisDeviceStatus,
+  AisDeviceSummary,
 } from '../../../shared/models/device.model';
 import { TranslationService } from '../../../core/services/translation.service';
 import { translatedItemStatusMeta } from '../../../core/utils/item-status-i18n.util';
@@ -75,6 +76,8 @@ export class DevicesListPanelComponent {
   readonly searchTerm = signal('');
   readonly statusFilter = signal<AisDeviceStatus | ''>('');
   readonly totalRecords = computed(() => this.pagination()?.totalCount ?? 0);
+  readonly summary = signal<AisDeviceSummary | null>(null);
+  readonly summaryLoading = signal(false);
   readonly showBulkUpload = signal(false);
   readonly showRcDetails = signal(false);
   readonly rcDetailsSerial = signal<string | null>(null);
@@ -105,17 +108,61 @@ export class DevicesListPanelComponent {
 
   onRcDetailsSaved(): void {
     this.load();
+    this.fetchSummary();
+  }
+
+  summaryCount(status: AisDeviceStatus): number {
+    const s = this.summary();
+    if (!s) return 0;
+    const breakdown = s.statusBreakdown?.[status];
+    if (typeof breakdown === 'number') return breakdown;
+    switch (status) {
+      case 'Activated':
+        return s.activated ?? 0;
+      case 'Fitted':
+        return s.fitted ?? 0;
+      case 'Expired':
+        return s.expired ?? 0;
+      case 'AboutExpired':
+        return s.aboutToExpire ?? 0;
+      case 'Available':
+        return s.available ?? 0;
+      case 'InProgress':
+        return s.inProgress ?? 0;
+      default:
+        return 0;
+    }
   }
 
   constructor() {
     effect(() => {
       this.auth.entityId();
       this.resetListState();
+      this.fetchSummary();
       if (this.tableReady) {
         this.load({ pageNumber: 1, pageSize: this.tableQuery().pageSize ?? 10 });
       }
     });
   }
+
+  private fetchSummary(): void {
+    const gen = ++this.summaryGen;
+    this.summaryLoading.set(true);
+    this.devices.getSummary().subscribe({
+      next: (res) => {
+        if (gen !== this.summaryGen) return;
+        this.summaryLoading.set(false);
+        this.summary.set(res.data ?? null);
+      },
+      error: () => {
+        if (gen !== this.summaryGen) return;
+        this.summaryLoading.set(false);
+        this.summary.set(null);
+      },
+    });
+  }
+
+  private summaryGen = 0;
 
   onLazyLoad(event: TableLazyLoadEvent): void {
     this.tableReady = true;
@@ -153,6 +200,7 @@ export class DevicesListPanelComponent {
 
   fetch(query?: TableQueryParams): void {
     this.load(query);
+    this.fetchSummary();
   }
 
   private resetListState(): void {

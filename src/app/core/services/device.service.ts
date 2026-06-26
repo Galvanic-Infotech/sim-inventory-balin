@@ -8,6 +8,7 @@ import { toQueryRecord } from '../../shared/utils/table-query.util';
 import {
   AisDevice,
   AisDeviceListFilters,
+  AisDeviceSummary,
   AisEntityDeviceCount,
   DeviceActivateRequest,
   DeviceByStatus,
@@ -71,6 +72,10 @@ export class DeviceService {
 
   getDevicesByStatus(status: string): Observable<RbacResponse<DeviceByStatus[]>> {
     return this.get<DeviceByStatus[]>(this.EP.AIS_DEVICE_BY_STATUS, { status });
+  }
+
+  getSummary(): Observable<RbacResponse<AisDeviceSummary>> {
+    return this.get<AisDeviceSummary>(this.EP.AIS_DEVICE_SUMMARY);
   }
 
   activateDevices(req: DeviceActivateRequest): Observable<RbacResponse<unknown>> {
