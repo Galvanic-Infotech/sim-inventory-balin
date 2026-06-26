@@ -182,6 +182,7 @@ export interface FetchSimStatusData {
   secondarySimPhone: string;
   primaryOperatorName: string;
   secondaryOperatorName: string;
+  activatedOn?: string | null;
   primarySimValidity: string;
   secondarySimValidity: string;
   status: string;

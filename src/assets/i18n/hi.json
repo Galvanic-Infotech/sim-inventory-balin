@@ -440,8 +440,11 @@
       },
       "fields": {
         "status": "स्थिति",
+        "activatedOn": "सक्रियण तिथि",
+        "itemStatus": "आइटम स्थिति",
         "msisdn": "MSISDN",
         "operator": "ऑपरेटर",
+        "operatorCode": "ऑपरेटर कोड",
         "primaryOperator": "प्राथमिक ऑपरेटर",
         "secondaryOperator": "द्वितीयक ऑपरेटर"
       }

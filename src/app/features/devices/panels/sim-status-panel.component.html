@@ -81,9 +81,15 @@
   } @else if (result(); as data) {
     <div class="ssp-result">
       <div class="ssp-result__banner">
-        <div class="ssp-result__identity">
-          <span class="ssp-result__label">{{ 'devices.columns.iccid' | translate }}</span>
-          <span class="ssp-result__iccid">{{ data.iccid }}</span>
+        <div class="ssp-result__fields">
+          <div class="ssp-result__field">
+            <span class="ssp-result__label">{{ 'devices.columns.iccid' | translate }}</span>
+            <span class="ssp-result__value ssp-result__value--mono">{{ data.iccid }}</span>
+          </div>
+          <div class="ssp-result__field">
+            <span class="ssp-result__label">{{ 'devices.simStatus.fields.activatedOn' | translate }}</span>
+            <span class="ssp-result__value">{{ (data.activatedOn | date: 'mediumDate') || '—' }}</span>
+          </div>
         </div>
         @if (statusMeta(); as sm) {
           <span

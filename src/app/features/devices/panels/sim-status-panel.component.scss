@@ -106,13 +106,27 @@
   justify-content: space-between;
   gap: var(--space-md);
   flex-wrap: wrap;
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--space-md);
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
 }
 
-.ssp-result__identity {
+.ssp-result__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md) var(--space-xl);
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .ssp-result__fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ssp-result__field {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -127,12 +141,16 @@
   color: var(--color-text-muted);
 }
 
-.ssp-result__iccid {
-  font-size: var(--font-md);
+.ssp-result__value {
+  font-size: var(--font-sm);
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
+
+  &--mono {
+    font-size: var(--font-md);
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 .ssp-sim-columns {

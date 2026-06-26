@@ -430,7 +430,7 @@
       "selectProvider": "Select SIM provider",
       "loadingProviders": "Loading SIM providers…",
       "loadProvidersFailed": "Failed to load SIM providers",
-      "iccidPlaceholder": "Enter ICCID (e.g. 89916431124820468799)",
+      "iccidPlaceholder": "Enter ICCID",
       "fetch": "Fetch Status",
       "fetching": "Fetching…",
       "resultTitle": "SIM Status",
@@ -440,8 +440,11 @@
       },
       "fields": {
         "status": "Status",
+        "activatedOn": "Activated On",
+        "itemStatus": "Item Status",
         "msisdn": "MSISDN",
         "operator": "Operator",
+        "operatorCode": "Operator Code",
         "primaryOperator": "Primary Operator",
         "secondaryOperator": "Secondary Operator"
       }
