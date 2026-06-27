@@ -305,7 +305,9 @@
       "bulkUpload": "Bulk Upload",
       "noDevices": "No devices found",
       "startFitment": "Start fitment",
-      "viewDetails": "View details"
+      "viewDetails": "View details",
+      "fittedTrend": "Fitted Trend",
+      "fittedTrendSub": "Last 7 days"
     },
     "details": {
       "title": "Device Details",

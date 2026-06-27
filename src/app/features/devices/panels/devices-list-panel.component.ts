@@ -111,6 +111,60 @@ export class DevicesListPanelComponent {
     this.fetchSummary();
   }
 
+  readonly fittedTrendTotal = computed(() =>
+    (this.summary()?.fittedTrend ?? []).reduce((sum, p) => sum + (p.count ?? 0), 0),
+  );
+
+  readonly fittedTrendMax = computed(() => {
+    const points = this.summary()?.fittedTrend ?? [];
+    return points.reduce((m, p) => Math.max(m, p.count ?? 0), 0);
+  });
+
+  readonly fittedTrendGeometry = computed(() => {
+    const points = this.summary()?.fittedTrend ?? [];
+    if (points.length === 0) return null;
+    const width = 160;
+    const height = 40;
+    const max = this.fittedTrendMax();
+    const stepX = points.length > 1 ? width / (points.length - 1) : 0;
+    const coords = points.map((p, i) => {
+      const x = points.length === 1 ? width / 2 : i * stepX;
+      const y = max === 0 ? height : height - ((p.count ?? 0) / max) * height;
+      return { x, y, count: p.count ?? 0, date: p.date };
+    });
+    const linePath = coords.map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(2)},${c.y.toFixed(2)}`).join(' ');
+    const areaPath = `${linePath} L${width},${height} L0,${height} Z`;
+    return { width, height, coords, linePath, areaPath };
+  });
+
+  readonly trendHover = signal<{ x: number; y: number; date: string; count: number } | null>(null);
+
+  onTrendMove(event: MouseEvent): void {
+    const geo = this.fittedTrendGeometry();
+    if (!geo) return;
+    const svg = event.currentTarget as SVGSVGElement;
+    const rect = svg.getBoundingClientRect();
+    if (rect.width === 0) return;
+    const ratio = (event.clientX - rect.left) / rect.width;
+    const xViewBox = ratio * geo.width;
+    let nearest = geo.coords[0];
+    let bestDist = Math.abs(nearest.x - xViewBox);
+    for (const c of geo.coords) {
+      const d = Math.abs(c.x - xViewBox);
+      if (d < bestDist) {
+        bestDist = d;
+        nearest = c;
+      }
+    }
+    const pxX = (nearest.x / geo.width) * rect.width;
+    const pxY = (nearest.y / geo.height) * rect.height;
+    this.trendHover.set({ x: pxX, y: pxY, date: nearest.date, count: nearest.count });
+  }
+
+  onTrendLeave(): void {
+    this.trendHover.set(null);
+  }
+
   summaryCount(status: AisDeviceStatus): number {
     const s = this.summary();
     if (!s) return 0;

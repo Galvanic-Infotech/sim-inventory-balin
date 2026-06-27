@@ -24,6 +24,54 @@
   }
 </div>
 
+@if (fittedTrendGeometry(); as geo) {
+  <div class="dlp-trend">
+    <div class="dlp-trend-info">
+      <div class="dlp-trend-label">
+        <span class="material-icons">trending_up</span>
+        {{ 'devices.list.fittedTrend' | translate }}
+      </div>
+      <div class="dlp-trend-value">{{ fittedTrendTotal() }}</div>
+      <div class="dlp-trend-sub">{{ 'devices.list.fittedTrendSub' | translate }}</div>
+    </div>
+    <div class="dlp-trend-chart">
+      <svg
+        class="dlp-trend-svg"
+        [attr.viewBox]="'0 0 ' + geo.width + ' ' + geo.height"
+        preserveAspectRatio="none"
+        role="img"
+        [attr.aria-label]="'devices.list.fittedTrend' | translate"
+        (mousemove)="onTrendMove($event)"
+        (mouseleave)="onTrendLeave()"
+      >
+        <path [attr.d]="geo.areaPath" class="dlp-trend-area" />
+        <path [attr.d]="geo.linePath" class="dlp-trend-line" />
+        @for (c of geo.coords; track c.date) {
+          <circle [attr.cx]="c.x" [attr.cy]="c.y" r="2" class="dlp-trend-dot" />
+        }
+      </svg>
+      @if (trendHover(); as h) {
+        <div
+          class="dlp-trend-tooltip"
+          [style.left.px]="h.x"
+          [style.top.px]="h.y"
+        >
+          <div class="dlp-trend-tooltip-date">{{ h.date | date: 'mediumDate' }}</div>
+          <div class="dlp-trend-tooltip-count">
+            <span class="dlp-trend-tooltip-dot"></span>
+            {{ h.count }} {{ 'devices.status.Fitted' | translate }}
+          </div>
+        </div>
+        <div
+          class="dlp-trend-marker"
+          [style.left.px]="h.x"
+          [style.top.px]="h.y"
+        ></div>
+      }
+    </div>
+  </div>
+}
+
 <div class="card dlp-card">
   <div class="tab-toolbar">
     <div class="tab-toolbar-left">

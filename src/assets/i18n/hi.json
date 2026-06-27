@@ -305,7 +305,9 @@
       "bulkUpload": "बल्क अपलोड",
       "noDevices": "कोई डिवाइस नहीं मिली",
       "startFitment": "फिटमेंट शुरू करें",
-      "viewDetails": "विवरण देखें"
+      "viewDetails": "विवरण देखें",
+      "fittedTrend": "फिटमेंट प्रवृत्ति",
+      "fittedTrendSub": "पिछले 7 दिन"
     },
     "details": {
       "title": "डिवाइस विवरण",
