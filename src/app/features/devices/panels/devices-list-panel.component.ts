@@ -107,7 +107,7 @@ export class DevicesListPanelComponent {
   }
 
   onRcDetailsSaved(): void {
-    this.load();
+    this.scheduleLoad();
     this.fetchSummary();
   }
 
@@ -194,7 +194,7 @@ export class DevicesListPanelComponent {
       this.resetListState();
       this.fetchSummary();
       if (this.tableReady) {
-        this.load({ pageNumber: 1, pageSize: this.tableQuery().pageSize ?? 10 });
+        this.scheduleLoad();
       }
     });
   }
@@ -228,14 +228,14 @@ export class DevicesListPanelComponent {
     });
     this.tableQuery.set(query);
     this.tableFirst.set(event.first ?? 0);
-    this.load(query);
+    this.scheduleLoad();
   }
 
   onSearchChange(value: string): void {
     this.searchTerm.set(value);
     this.tableFirst.set(0);
     this.tableQuery.update((q) => ({ ...q, pageNumber: 1, searchTerm: value }));
-    this.load({ pageNumber: 1, searchTerm: value });
+    this.scheduleLoad();
   }
 
   selectStatus(status: AisDeviceStatus | ''): void {
@@ -243,7 +243,7 @@ export class DevicesListPanelComponent {
     this.statusFilter.set(status);
     this.tableFirst.set(0);
     this.tableQuery.update((q) => ({ ...q, pageNumber: 1 }));
-    this.load({ pageNumber: 1 });
+    this.scheduleLoad();
   }
 
   statusInfo(status: AisDeviceStatus | string) {
@@ -252,8 +252,8 @@ export class DevicesListPanelComponent {
     return translatedItemStatusMeta(String(status), (k) => this.i18n.instant(k));
   }
 
-  fetch(query?: TableQueryParams): void {
-    this.load(query);
+  fetch(): void {
+    this.scheduleLoad();
     this.fetchSummary();
   }
 
@@ -264,8 +264,18 @@ export class DevicesListPanelComponent {
     this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
   }
 
-  private load(query?: TableQueryParams): void {
-    const q = { ...this.tableQuery(), searchTerm: this.searchTerm(), ...query };
+  private loadHandle: ReturnType<typeof setTimeout> | null = null;
+
+  private scheduleLoad(): void {
+    if (this.loadHandle != null) clearTimeout(this.loadHandle);
+    this.loadHandle = setTimeout(() => {
+      this.loadHandle = null;
+      this.runLoad();
+    }, 0);
+  }
+
+  private runLoad(): void {
+    const q = { ...this.tableQuery(), searchTerm: this.searchTerm() };
     const status = this.statusFilter();
     const gen = ++this.fetchGen;
     this.loading.set(true);
