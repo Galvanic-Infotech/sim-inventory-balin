@@ -57,7 +57,7 @@
           </div>
           <div>
             <dt>{{ 'devices.details.fields.activationDate' | translate }}</dt>
-            <dd>{{ (d.onboardedAt | date: 'mediumDate') || ('devices.details.notAvailable' | translate) }}</dd>
+            <dd>{{ d.activationAt ? (d.activationAt | date: 'mediumDate') : ('devices.details.notAvailable' | translate) }}</dd>
           </div>
         </dl>
       </section>

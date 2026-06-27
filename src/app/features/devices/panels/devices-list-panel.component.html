@@ -175,7 +175,7 @@
               {{ statusInfo(d.status).label }}
             </span>
           </td>
-          <td>{{ d.onboardedAt | date: 'mediumDate' }}</td>
+          <td>{{ d.activationAt ? (d.activationAt | date: 'mediumDate') : '—' }}</td>
           <td>
             <div class="action-cell">
               @if (canStartFitment(d)) {

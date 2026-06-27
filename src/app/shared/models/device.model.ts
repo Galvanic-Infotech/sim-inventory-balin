@@ -34,6 +34,7 @@ export interface AisDevice {
   entityId: string;
   entityName: string;
   onboardedAt: string;
+  activationAt: string | null;
   deviceModel?: AisDeviceRef | null;
   simProvider?: AisDeviceRef | null;
 }
