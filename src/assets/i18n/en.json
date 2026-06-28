@@ -12,7 +12,9 @@
     "refresh": "Refresh",
     "back": "Back",
     "language": "Language",
-    "sending": "Sending..."
+    "sending": "Sending...",
+    "save": "Save",
+    "saving": "Saving…"
   },
   "auth": {
     "footerCopy": "© 2026 Balin Inventory Portal. All rights reserved.",
@@ -846,7 +848,30 @@
       "entities": "Entities",
       "roles": "Roles",
       "permissions": "Permissions",
-      "masterData": "Master Data"
+      "masterData": "Master Data",
+      "rtoMapping": "RTO Mapping"
+    },
+    "rto": {
+      "title": "RTO Mappings",
+      "searchPlaceholder": "Search by code, name, district...",
+      "addRto": "Map RTO",
+      "addFirst": "Map your first RTO",
+      "empty": "No RTOs mapped yet",
+      "editTitle": "Map RTOs",
+      "currentMappings": "Current Mappings",
+      "noMappedYet": "No RTOs mapped yet.",
+      "assignRemove": "Assign RTOs",
+      "noPool": "No RTOs available from parent entity.",
+      "mapped": "mapped",
+      "toAdd": "{{count}} to add",
+      "removeTitle": "Remove RTO mapping",
+      "removeMessage": "This will unmap the RTO from this entity.",
+      "errors": {
+        "load": "Failed to load RTO mappings",
+        "loadPool": "Failed to load RTO pool",
+        "save": "Failed to save RTO mappings",
+        "remove": "Failed to remove RTO mapping"
+      }
     },
     "common": {
       "create": "Create",

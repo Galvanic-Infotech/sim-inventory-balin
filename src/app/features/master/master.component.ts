@@ -8,6 +8,7 @@ import { EntitiesTabComponent } from './tabs/entities-tab.component';
 import { RolesTabComponent } from './tabs/roles-tab.component';
 import { PermissionsTabComponent } from './tabs/permissions-tab.component';
 import { MasterDataTabComponent } from './tabs/master-data-tab.component';
+import { RtoMappingTabComponent } from './tabs/rto-mapping-tab.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface Tab {
@@ -27,6 +28,7 @@ interface Tab {
     RolesTabComponent,
     PermissionsTabComponent,
     MasterDataTabComponent,
+    RtoMappingTabComponent,
     TranslatePipe,
   ],
   templateUrl: './master.component.html',
@@ -51,6 +53,7 @@ export class MasterComponent {
     { labelKey: 'master.tabs.roles', icon: 'shield', key: 'roles', permission: PERMS.ROLE_VIEW },
     { labelKey: 'master.tabs.permissions', icon: 'lock', key: 'permissions', permission: PERMS.PERMISSION_VIEW },
     { labelKey: 'master.tabs.masterData', icon: 'dataset', key: 'master-data', permission: PERMS.MASTER },
+    { labelKey: 'master.tabs.rtoMapping', icon: 'location_on', key: 'rto-mapping', permission: PERMS.MASTER },
   ];
 
   readonly allTabs = computed(() => {
