@@ -47,6 +47,21 @@ const EMPTY_FORM: RcDetailsRequest = {
   standalone: true,
   imports: [FormsModule, TranslatePipe],
   templateUrl: './device-rc-details-dialog.component.html',
+  styles: [`
+    .rc-field-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-xs);
+    }
+    .rc-fetch-btn {
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--font-xs);
+      gap: var(--space-xs);
+    }
+    .rc-fetch-btn .material-icons { font-size: 16px; }
+  `],
 })
 export class DeviceRcDetailsDialogComponent {
   private readonly fitment = inject(FitmentService);
@@ -63,9 +78,15 @@ export class DeviceRcDetailsDialogComponent {
   readonly saving = signal(false);
   readonly deleting = signal(false);
   readonly loading = signal(false);
+  readonly vahanLoading = signal(false);
   readonly hasExisting = signal(false);
   readonly error = signal('');
   readonly showDeleteConfirm = signal(false);
+
+  readonly canFetchVahan = computed(() => {
+    const rc = this.form().rcNumber.trim();
+    return rc.length >= 6 && !this.vahanLoading() && !this.saving() && !this.deleting() && !this.loading();
+  });
 
   readonly canSubmit = computed(() => {
     const f = this.form();
@@ -132,6 +153,49 @@ export class DeviceRcDetailsDialogComponent {
 
   setField<K extends keyof RcDetailsRequest>(key: K, value: RcDetailsRequest[K]): void {
     this.form.update((f) => ({ ...f, [key]: value }));
+  }
+
+  fetchFromVahan(): void {
+    const rc = this.form().rcNumber.trim().toUpperCase();
+    if (!rc || !this.canFetchVahan()) return;
+    this.vahanLoading.set(true);
+    this.error.set('');
+    this.fitment.fetchRcFromVahan(rc).subscribe({
+      next: (res) => {
+        this.vahanLoading.set(false);
+        const msg = getApiResponseError(res, this.i18n.instant('devices.rcDetails.errors.fetchVahanFailed'));
+        if (msg) {
+          this.error.set(msg);
+          return;
+        }
+        const d = res.data;
+        if (!d) {
+          this.error.set(this.i18n.instant('devices.rcDetails.errors.fetchVahanFailed'));
+          return;
+        }
+        this.form.update((f) => ({
+          ...f,
+          rcNumber: d.rcNumber ?? f.rcNumber,
+          registrationDate: toDateInput(d.registrationDate),
+          vehiclesChasiNumber: d.vehiclesChasiNumber ?? '',
+          vehicleEngineNumber: d.vehicleEngineNumber ?? '',
+          makerDescription: d.makerDescription ?? '',
+          makerModel: d.makerModel ?? '',
+          mobileNumber: d.mobileNumber || f.mobileNumber,
+          manufacturingDateFormatted: toMonthFirstDay(d.manufacturingDateFormatted),
+          fuelType: d.fuelType || 'PETROL',
+          ownerName: d.ownerName ?? '',
+          presentAddress: d.presentAddress ?? '',
+          permanentAddress: d.permanentAddress ?? '',
+        }));
+      },
+      error: (err) => {
+        this.vahanLoading.set(false);
+        this.error.set(
+          extractApiError(err, this.i18n.instant('devices.rcDetails.errors.fetchVahanFailed')),
+        );
+      },
+    });
   }
 
   setMonth(key: 'manufacturingDateFormatted', value: string): void {

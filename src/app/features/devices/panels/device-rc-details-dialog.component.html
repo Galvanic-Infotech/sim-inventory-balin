@@ -41,7 +41,23 @@
 
       <div class="grid grid-2">
         <div class="form-group">
-          <label>{{ 'devices.rcDetails.fields.rcNumber' | translate }} *</label>
+          <div class="rc-field-header">
+            <label>{{ 'devices.rcDetails.fields.rcNumber' | translate }} *</label>
+            <button
+              type="button"
+              class="btn btn-ghost rc-fetch-btn"
+              (click)="fetchFromVahan()"
+              [disabled]="!canFetchVahan()"
+              [title]="'devices.rcDetails.fetchVahanHint' | translate"
+            >
+              @if (vahanLoading()) {
+                <span class="spinner spinner--dark"></span>
+              } @else {
+                <span class="material-icons">autorenew</span>
+              }
+              {{ 'devices.rcDetails.fetchVahan' | translate }}
+            </button>
+          </div>
           <input
             class="form-control"
             [ngModel]="form().rcNumber"
@@ -136,7 +152,7 @@
           />
         </div>
 
-        <div class="form-group" style="grid-column: 1 / -1">
+        <div class="form-group">
           <label>{{ 'devices.rcDetails.fields.ownerName' | translate }} *</label>
           <input
             class="form-control"

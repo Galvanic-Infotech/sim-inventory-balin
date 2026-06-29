@@ -8,6 +8,7 @@ import {
   FitmentStatusCount,
   FitmentVehicleDetailsResponse,
   RcDetailsRequest,
+  RcVahanDetails,
   ResendFitmentOtpRequest,
   ValidateFitmentOtpRequest,
 } from '../../shared/models/fitment.model';
@@ -79,5 +80,10 @@ export class FitmentService {
     return this.http.delete<RbacResponse<{ message: string }>>(
       `${this.EP.FITMENT_DELETE_RC_DETAILS}/${encodeURIComponent(serialNo)}/delete-device-rc-details`,
     );
+  }
+
+  fetchRcFromVahan(vehicleNo: string): Observable<RbacResponse<RcVahanDetails>> {
+    const params = new HttpParams().set('vehicleNo', vehicleNo);
+    return this.http.get<RbacResponse<RcVahanDetails>>(this.EP.FITMENT_FETCH_RC_VAHAN, { params });
   }
 }

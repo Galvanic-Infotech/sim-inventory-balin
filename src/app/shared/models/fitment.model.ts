@@ -22,6 +22,8 @@ export interface FitmentVehicleDetailsResponse {
 
 export type RcDetailsRequest = FitmentVehicleDetails;
 
+export type RcVahanDetails = FitmentVehicleDetails;
+
 export interface CreateFitmentRequest {
   itemId: string;
   rtoId: string;

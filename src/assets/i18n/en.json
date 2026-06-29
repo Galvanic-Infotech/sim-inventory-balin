@@ -509,6 +509,8 @@
       "title": "RC Details",
       "save": "Save",
       "delete": "Delete RC",
+      "fetchVahan": "Fetch Details",
+      "fetchVahanHint": "Auto-fill from Vahan using RC Number",
       "confirmDeleteTitle": "Delete RC Details?",
       "confirmDeleteMessage": "This will remove saved RC details for this device. This action cannot be undone.",
       "fields": {
@@ -538,7 +540,8 @@
       },
       "errors": {
         "saveFailed": "Failed to save RC details",
-        "deleteFailed": "Failed to delete RC details"
+        "deleteFailed": "Failed to delete RC details",
+        "fetchVahanFailed": "Failed to fetch RC details from Vahan"
       }
     }
   },

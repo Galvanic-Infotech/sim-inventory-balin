@@ -509,6 +509,8 @@
       "title": "RC विवरण",
       "save": "सहेजें",
       "delete": "RC हटाएं",
+      "fetchVahan": "विवरण लाएं",
+      "fetchVahanHint": "RC नंबर से Vahan से स्वतः भरें",
       "confirmDeleteTitle": "RC विवरण हटाएं?",
       "confirmDeleteMessage": "इस डिवाइस के लिए सहेजे गए RC विवरण हट जाएंगे। यह कार्रवाई वापस नहीं की जा सकती।",
       "fields": {
@@ -538,7 +540,8 @@
       },
       "errors": {
         "saveFailed": "RC विवरण सहेजने में विफल",
-        "deleteFailed": "RC विवरण हटाने में विफल"
+        "deleteFailed": "RC विवरण हटाने में विफल",
+        "fetchVahanFailed": "Vahan से RC विवरण लाने में विफल"
       }
     }
   },
