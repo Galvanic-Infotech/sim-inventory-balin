@@ -62,6 +62,7 @@ export class SidebarComponent {
         route: '/fitment',
       },
       { label: t('layout.nav.master'), icon: 'dataset', route: '/master' },
+      { label: t('layout.nav.reports'), icon: 'assessment', route: '/reports' },
       {
         label: t('layout.nav.onboarding'),
         icon: 'rocket_launch',

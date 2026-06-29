@@ -1,0 +1,103 @@
+<div class="outstanding">
+  <div class="outstanding__head">
+    <div>
+      <h3>{{ 'reports.outstanding.title' | translate }}</h3>
+      <p class="outstanding__sub">{{ 'reports.outstanding.subtitle' | translate }}</p>
+    </div>
+    @if (pagination(); as pg) {
+      <span class="count-badge">{{ pg.totalCount }}</span>
+    }
+    <button class="btn btn-ghost" (click)="refresh()" [title]="'common.refresh' | translate" [disabled]="loading()">
+      <span class="material-icons">refresh</span>
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-danger">
+      <span class="material-icons">error</span>
+      <span>{{ error() }}</span>
+      <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else {
+    <p-table
+      [value]="rows()"
+      [lazy]="true"
+      (onLazyLoad)="onLazyLoad($event)"
+      [paginator]="true"
+      [rows]="tableQuery().pageSize ?? 10"
+      [rowsPerPageOptions]="[10, 25, 50, 100]"
+      [totalRecords]="totalRecords()"
+      [loading]="loading()"
+      [first]="tableFirst()"
+      styleClass="app-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'reports.outstanding.columns.entity' | translate }}</th>
+          <th class="num">{{ 'reports.outstanding.columns.simOutstanding' | translate }}</th>
+          <th class="num">{{ 'reports.outstanding.columns.simCreditLimit' | translate }}</th>
+          <th class="num">{{ 'reports.outstanding.columns.licenseOutstanding' | translate }}</th>
+          <th class="num">{{ 'reports.outstanding.columns.licenseCreditLimit' | translate }}</th>
+          <th>{{ 'reports.outstanding.columns.status' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-r>
+        <tr>
+          <td>
+            <div class="cell-stack">
+              <span class="cell-primary">{{ r.entityName }}</span>
+              <span class="cell-sub" style="font-size: var(--font-xs)">{{ r.entityId }}</span>
+            </div>
+          </td>
+          <td class="num">
+            <strong [class.outstanding__over]="r.simOverLimit">
+              {{ r.simOutstanding | currency:'INR':'symbol-narrow':'1.2-2' }}
+            </strong>
+          </td>
+          <td class="num">
+            @if (r.simCreditLimit != null) {
+              {{ r.simCreditLimit | currency:'INR':'symbol-narrow':'1.2-2' }}
+            } @else {
+              <span class="cell-sub">—</span>
+            }
+          </td>
+          <td class="num">
+            <strong [class.outstanding__over]="r.licenseOverLimit">
+              {{ r.licenseOutstanding | currency:'INR':'symbol-narrow':'1.2-2' }}
+            </strong>
+          </td>
+          <td class="num">
+            @if (r.licenseCreditLimit != null) {
+              {{ r.licenseCreditLimit | currency:'INR':'symbol-narrow':'1.2-2' }}
+            } @else {
+              <span class="cell-sub">—</span>
+            }
+          </td>
+          <td>
+            @if (r.simOverLimit || r.licenseOverLimit) {
+              <span class="outstanding__chip outstanding__chip--danger">
+                <span class="material-icons">warning</span>
+                {{ 'reports.outstanding.overLimit' | translate }}
+              </span>
+            } @else {
+              <span class="outstanding__chip outstanding__chip--ok">
+                <span class="material-icons">check_circle</span>
+                {{ 'reports.outstanding.ok' | translate }}
+              </span>
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6">
+            <div class="tab-empty">
+              <span class="material-icons">assessment</span>
+              <p>{{ 'reports.outstanding.empty' | translate }}</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

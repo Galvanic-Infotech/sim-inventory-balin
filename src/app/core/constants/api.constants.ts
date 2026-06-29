@@ -76,6 +76,7 @@ export const API_ENDPOINTS = {
     FITMENT_FILL_RC_DETAILS: '/Fitment', // /{serialNo}/fill-device-rc-details
     FITMENT_DELETE_RC_DETAILS: '/Fitment', // /{serialNo}/delete-device-rc-details
     FITMENT_FETCH_RC_VAHAN: '/Fitment/fetch-rc-vahan', // ?vehicleNo=XXX
+    REPORTS_OUTSTANDING: '/Reports/outstanding',
   },
   SIM: {
     BASKET: '/SimActivation/fetch_basket_details',

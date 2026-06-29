@@ -1,0 +1,30 @@
+<div class="reports-page">
+  <div class="reports-heading">
+    <div class="reports-eyebrow">
+      <span class="material-icons">assessment</span>
+      <span>{{ 'reports.title' | translate }}</span>
+    </div>
+    <p class="reports-subtitle">{{ 'reports.subtitle' | translate }}</p>
+  </div>
+
+  <section class="reports-panel">
+    <div class="tab-bar">
+      @for (tab of tabs(); track tab.key) {
+        <button
+          class="tab-item"
+          [class.active]="activeTabKey() === tab.key"
+          (click)="selectTab(tab.key)"
+        >
+          <span class="material-icons">{{ tab.icon }}</span>
+          <span class="tab-label">{{ tab.label }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="tab-content">
+      @switch (activeTabKey()) {
+        @case ('outstanding') { <app-outstanding-tab /> }
+      }
+    </div>
+  </section>
+</div>

@@ -107,6 +107,7 @@
       "simInventory": "सिम इन्वेंटरी",
       "billing": "बिलिंग इतिहास",
       "master": "मास्टर",
+      "reports": "रिपोर्ट्स",
       "onboarding": "ऑनबोर्डिंग",
       "oem": "OEM",
       "devices": "डिवाइस",
@@ -1425,6 +1426,31 @@
     "errors": {
       "failed": "ऑनबोर्डिंग विफल",
       "loadEntityTypes": "इकाई प्रकार लोड करने में विफल"
+    }
+  },
+  "reports": {
+    "title": "रिपोर्ट्स",
+    "subtitle": "इकाइयों में परिचालन और वित्तीय रिपोर्ट्स।",
+    "tabs": {
+      "outstanding": "बकाया"
+    },
+    "outstanding": {
+      "title": "बकाया रिपोर्ट",
+      "subtitle": "इकाई-वार SIM और लाइसेंस बकाया बनाम क्रेडिट सीमा।",
+      "overLimit": "सीमा से अधिक",
+      "ok": "सीमा के भीतर",
+      "empty": "कोई बकाया रिकॉर्ड नहीं",
+      "columns": {
+        "entity": "इकाई",
+        "simOutstanding": "SIM बकाया",
+        "simCreditLimit": "SIM क्रेडिट सीमा",
+        "licenseOutstanding": "लाइसेंस बकाया",
+        "licenseCreditLimit": "लाइसेंस क्रेडिट सीमा",
+        "status": "स्थिति"
+      },
+      "errors": {
+        "load": "बकाया रिपोर्ट लोड करने में विफल"
+      }
     }
   }
 }

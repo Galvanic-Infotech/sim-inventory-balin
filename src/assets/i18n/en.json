@@ -107,6 +107,7 @@
       "simInventory": "SIM Inventory",
       "billing": "Billing History",
       "master": "Master",
+      "reports": "Reports",
       "onboarding": "Onboarding",
       "oem": "OEM",
       "devices": "Devices",
@@ -1425,6 +1426,31 @@
     "errors": {
       "failed": "Onboarding failed",
       "loadEntityTypes": "Failed to load entity types"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Operational and financial reports across entities.",
+    "tabs": {
+      "outstanding": "Outstanding"
+    },
+    "outstanding": {
+      "title": "Outstanding Report",
+      "subtitle": "Entity-wise SIM and License outstanding vs credit limit.",
+      "overLimit": "Over Limit",
+      "ok": "Within Limit",
+      "empty": "No outstanding records",
+      "columns": {
+        "entity": "Entity",
+        "simOutstanding": "SIM Outstanding",
+        "simCreditLimit": "SIM Credit Limit",
+        "licenseOutstanding": "License Outstanding",
+        "licenseCreditLimit": "License Credit Limit",
+        "status": "Status"
+      },
+      "errors": {
+        "load": "Failed to load outstanding report"
+      }
     }
   }
 }
