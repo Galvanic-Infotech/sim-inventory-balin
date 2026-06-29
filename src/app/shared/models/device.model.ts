@@ -14,7 +14,9 @@ export type AisDeviceStatus = ItemStatus;
 export const AIS_DEVICE_STATUSES: AisDeviceStatus[] = [...ITEM_STATUSES];
 
 /** Status chips shown on device list / inventory filters */
-export const AIS_DEVICE_FILTER_STATUSES: AisDeviceStatus[] = [...DEVICE_FILTER_STATUSES];
+export const AIS_DEVICE_FILTER_STATUSES: AisDeviceStatus[] = DEVICE_FILTER_STATUSES.filter(
+  (s) => s !== ITEM_STATUS.Activated,
+);
 
 export interface AisDeviceRef {
   id: string;

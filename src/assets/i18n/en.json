@@ -14,7 +14,8 @@
     "language": "Language",
     "sending": "Sending...",
     "save": "Save",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "noResults": "No results"
   },
   "auth": {
     "footerCopy": "© 2026 Balin Inventory Portal. All rights reserved.",

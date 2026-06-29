@@ -69,6 +69,23 @@ export class FitmentCreateStepperComponent implements OnInit {
   readonly categories = signal<VehicleCategory[]>([]);
   readonly mastersLoading = signal(false);
 
+  // RTO combobox state
+  readonly rtoSearch = signal('');
+  readonly rtoOpen = signal(false);
+
+  readonly filteredRtos = computed(() => {
+    const q = this.rtoSearch().trim().toLowerCase();
+    const list = this.rtos();
+    if (!q) return list;
+    return list.filter((r) => {
+      const code = (r.rto.rtoCode ?? '').toLowerCase();
+      const name = (r.rto.rtoName ?? '').toLowerCase();
+      return code.includes(q) || name.includes(q);
+    });
+  });
+
+  readonly selectedRtoLabel = signal('');
+
   form = {
     rtoId: '',
     vehicleCategoryId: '',
@@ -243,6 +260,29 @@ export class FitmentCreateStepperComponent implements OnInit {
         this.step2Error.set(extractApiError(err, this.i18n.instant('fitment.errors.createFailed')));
       },
     });
+  }
+
+  openRto(): void {
+    if (this.mastersLoading()) return;
+    this.rtoOpen.set(true);
+  }
+
+  closeRto(): void {
+    this.rtoOpen.set(false);
+    this.rtoSearch.set('');
+  }
+
+  selectRto(r: EntityRtoItem): void {
+    this.form.rtoId = r.rto.id;
+    this.selectedRtoLabel.set(`${r.rto.rtoCode} — ${r.rto.rtoName}`);
+    this.closeRto();
+  }
+
+  clearRto(event?: Event): void {
+    event?.stopPropagation();
+    this.form.rtoId = '';
+    this.selectedRtoLabel.set('');
+    this.rtoSearch.set('');
   }
 
   onlyDigits(e: KeyboardEvent): void {

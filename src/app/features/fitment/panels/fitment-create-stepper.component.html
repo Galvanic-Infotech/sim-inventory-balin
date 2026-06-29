@@ -97,12 +97,55 @@
       <div class="form-grid">
         <div class="form-group">
           <label>RTO *</label>
-          <select [(ngModel)]="form.rtoId" class="form-control" [disabled]="mastersLoading()">
-            <option value="">{{ 'fitment.create.selectRto' | translate }}</option>
-            @for (r of rtos(); track r.rto.id) {
-              <option [value]="r.rto.id">{{ r.rto.rtoCode }} — {{ r.rto.rtoName }}</option>
+          <div class="rto-combo" [class.rto-combo--open]="rtoOpen()">
+            <button
+              type="button"
+              class="form-control rto-combo__trigger"
+              [disabled]="mastersLoading()"
+              (click)="openRto()"
+            >
+              @if (selectedRtoLabel()) {
+                <span class="rto-combo__value">{{ selectedRtoLabel() }}</span>
+                <span class="rto-combo__clear" (click)="clearRto($event)" title="Clear">
+                  <span class="material-icons">close</span>
+                </span>
+              } @else {
+                <span class="rto-combo__placeholder">{{ 'fitment.create.selectRto' | translate }}</span>
+              }
+              <span class="material-icons rto-combo__caret">arrow_drop_down</span>
+            </button>
+
+            @if (rtoOpen()) {
+              <div class="rto-combo__backdrop" (click)="closeRto()"></div>
+              <div class="rto-combo__panel">
+                <div class="rto-combo__search">
+                  <span class="material-icons">search</span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [ngModel]="rtoSearch()"
+                    (ngModelChange)="rtoSearch.set($event)"
+                    placeholder="Search RTO code or name"
+                    autofocus
+                  />
+                </div>
+                <ul class="rto-combo__list">
+                  @for (r of filteredRtos(); track r.rto.id) {
+                    <li
+                      class="rto-combo__item"
+                      [class.rto-combo__item--selected]="form.rtoId === r.rto.id"
+                      (click)="selectRto(r)"
+                    >
+                      <strong>{{ r.rto.rtoCode }}</strong>
+                      <span>{{ r.rto.rtoName }}</span>
+                    </li>
+                  } @empty {
+                    <li class="rto-combo__empty">{{ 'common.noResults' | translate }}</li>
+                  }
+                </ul>
+              </div>
             }
-          </select>
+          </div>
         </div>
 
         <div class="form-group">
