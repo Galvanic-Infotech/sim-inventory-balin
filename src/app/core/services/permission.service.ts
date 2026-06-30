@@ -2,7 +2,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { API_ENDPOINTS } from '../constants/api.constants';
 import { PermissionGroup, RbacResponse } from '../../shared/models/rbac.model';
-import { map } from 'rxjs';
+import { firstValueFrom, ReplaySubject, map } from 'rxjs';
 
 /** All known permission keys */
 export const PERMS = {
@@ -79,6 +79,13 @@ export class PermissionService {
   private readonly _permissions = signal<Set<string>>(new Set());
   readonly loading = signal(false);
   readonly loaded = signal(false);
+  private readonly loaded$ = new ReplaySubject<boolean>(1);
+
+  /** Resolves once perms are loaded (success or error). */
+  whenLoaded(): Promise<void> {
+    if (this.loaded()) return Promise.resolve();
+    return firstValueFrom(this.loaded$).then(() => void 0);
+  }
 
   /** Check single permission */
   has(perm: string): boolean {
@@ -102,6 +109,7 @@ export class PermissionService {
 
   /** Fetch permissions from API and store */
   fetch(): void {
+    if (this.loading()) return;
     this.loading.set(true);
     this.http
       .get<RbacResponse<{ permissions: PermissionGroup[] }>>(API_ENDPOINTS.RBAC.PERMISSION_GROUPS_BY_ROLE)
@@ -116,10 +124,12 @@ export class PermissionService {
           this._permissions.set(new Set(perms.map((p) => p.name)));
           this.loading.set(false);
           this.loaded.set(true);
+          this.loaded$.next(true);
         },
         error: () => {
           this.loading.set(false);
           this.loaded.set(true);
+          this.loaded$.next(true);
         },
       });
   }

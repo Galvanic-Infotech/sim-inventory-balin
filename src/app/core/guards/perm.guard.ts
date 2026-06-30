@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { filter, map, take } from 'rxjs/operators';
+import { AuthService } from '../services/auth.service';
 import { PermissionService } from '../services/permission.service';
 
 const decide = (perm: PermissionService, router: Router, perms: string[]): boolean | UrlTree => {
@@ -11,15 +10,15 @@ const decide = (perm: PermissionService, router: Router, perms: string[]): boole
 };
 
 export const permGuard = (...perms: string[]): CanActivateFn => {
-  return () => {
+  return async () => {
     const perm = inject(PermissionService);
     const router = inject(Router);
+    const auth = inject(AuthService);
     if (perms.length === 0) return true;
-    if (perm.loaded()) return decide(perm, router, perms);
-    return toObservable(perm.loaded).pipe(
-      filter((v) => v),
-      take(1),
-      map(() => decide(perm, router, perms)),
-    );
+    if (!perm.loaded() && !perm.loading() && auth.isLoggedIn()) {
+      perm.fetch();
+    }
+    await perm.whenLoaded();
+    return decide(perm, router, perms);
   };
 };
