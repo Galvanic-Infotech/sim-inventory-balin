@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { TranslationService } from '../../core/services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { OutstandingTabComponent } from './tabs/outstanding-tab.component';
+import { FitmentTabComponent } from './tabs/fitment-tab.component';
 
 interface ReportTab {
   labelKey: string;
@@ -12,7 +13,7 @@ interface ReportTab {
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [OutstandingTabComponent, TranslatePipe],
+  imports: [OutstandingTabComponent, FitmentTabComponent, TranslatePipe],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
 })
@@ -21,6 +22,7 @@ export class ReportsComponent {
 
   private readonly tabDefs: ReportTab[] = [
     { labelKey: 'reports.tabs.outstanding', icon: 'account_balance_wallet', key: 'outstanding' },
+    { labelKey: 'reports.tabs.fitment', icon: 'build_circle', key: 'fitment' },
   ];
 
   readonly activeTabKey = signal(this.tabDefs[0].key);

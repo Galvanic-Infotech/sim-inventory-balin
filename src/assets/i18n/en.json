@@ -1435,7 +1435,8 @@
     "title": "Reports",
     "subtitle": "Operational and financial reports across entities.",
     "tabs": {
-      "outstanding": "Outstanding"
+      "outstanding": "Outstanding",
+      "fitment": "Fitment"
     },
     "outstanding": {
       "title": "Outstanding Report",
@@ -1454,6 +1455,36 @@
       },
       "errors": {
         "load": "Failed to load outstanding report"
+      }
+    },
+    "fitment": {
+      "title": "Fitment Report",
+      "subtitle": "Daily fitment counts by entity and license duration.",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply",
+      "totalFitments": "Total Fitments",
+      "range": "Range",
+      "empty": "No fitments in selected range",
+      "columns": {
+        "date": "Date",
+        "entity": "Entity",
+        "duration": "License Duration",
+        "count": "Count",
+        "dayTotal": "Day Total",
+        "fitmentNo": "Fitment No",
+        "serial": "Serial No",
+        "vehicleReg": "Vehicle Reg",
+        "vehicle": "Vehicle",
+        "customer": "Customer",
+        "fitmentDate": "Fitment Date",
+        "validTill": "Valid Till",
+        "status": "Status"
+      },
+      "durationMonths": "{{months}} mo",
+      "errors": {
+        "load": "Failed to load fitment report",
+        "invalidRange": "From date must be before To date"
       }
     }
   }

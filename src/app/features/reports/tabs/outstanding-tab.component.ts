@@ -1,6 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { AuthService } from '../../../core/services/auth.service';
 import { ReportsService } from '../../../core/services/reports.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import { PermissionService, PERMS } from '../../../core/services/permission.service';
@@ -13,6 +14,7 @@ import {
   tableQueryFromLazyEvent,
   tableQuerySignature,
   isDuplicateTableFetch,
+  trackEntityIdChange,
 } from '../../../shared/utils/table-query.util';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { RowAction, RowActionsComponent } from '../../../shared/components/row-actions/row-actions.component';
@@ -39,6 +41,7 @@ import { BillingGenerateDialogComponent } from '../../../shared/components/billi
 export class OutstandingTabComponent {
   private readonly reports = inject(ReportsService);
   private readonly i18n = inject(TranslationService);
+  private readonly auth = inject(AuthService);
   readonly perm = inject(PermissionService);
 
   readonly canEditBilling = this.perm.can(PERMS.BILLING_CONFIG_UPDATE);
@@ -61,6 +64,21 @@ export class OutstandingTabComponent {
 
   private fetchGen = 0;
   private lastQuerySig = '';
+  private prevEntityId: string | undefined;
+
+  constructor() {
+    effect(() => {
+      const eid = this.auth.entityId();
+      const { changed, next } = trackEntityIdChange(this.prevEntityId, eid);
+      this.prevEntityId = next;
+      if (!changed) return;
+      this.lastQuerySig = '';
+      this.searchTerm.set('');
+      this.tableFirst.set(0);
+      this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
+      this.fetch();
+    });
+  }
 
   onLazyLoad(event: TableLazyLoadEvent): void {
     const query = tableQueryFromLazyEvent(event, { searchTerm: this.searchTerm() });

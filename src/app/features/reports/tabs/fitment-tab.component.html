@@ -1,0 +1,143 @@
+<div class="fitment">
+  <div class="fitment__head">
+    <div>
+      <h3>{{ 'reports.fitment.title' | translate }}</h3>
+      <p class="fitment__sub">{{ 'reports.fitment.subtitle' | translate }}</p>
+    </div>
+    <div class="fitment__filters">
+      <div class="form-group">
+        <label>{{ 'reports.fitment.from' | translate }}</label>
+        <input
+          class="form-control"
+          type="date"
+          [ngModel]="fromDate()"
+          (ngModelChange)="onFromChange($event)"
+          [max]="maxDate"
+        />
+      </div>
+      <div class="form-group">
+        <label>{{ 'reports.fitment.to' | translate }}</label>
+        <input
+          class="form-control"
+          type="date"
+          [ngModel]="toDate()"
+          (ngModelChange)="onToChange($event)"
+          [max]="maxDate"
+        />
+      </div>
+      <button class="btn btn-primary" (click)="apply()" [disabled]="loadingDetail() || loadingSummary()">
+        <span class="material-icons">search</span>
+        {{ 'reports.fitment.apply' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (summary(); as s) {
+    <div class="fitment__summary">
+      <div class="stat-card">
+        <span class="material-icons">build_circle</span>
+        <div>
+          <div class="stat-card__label">{{ 'reports.fitment.totalFitments' | translate }}</div>
+          <div class="stat-card__value">{{ totalFitments() }}</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="material-icons">date_range</span>
+        <div>
+          <div class="stat-card__label">{{ 'reports.fitment.range' | translate }}</div>
+          <div class="stat-card__value">
+            {{ s.from | date:'mediumDate' }} — {{ s.to | date:'mediumDate' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger">
+      <span class="material-icons">error</span>
+      <span>{{ error() }}</span>
+      <button class="btn btn-ghost" (click)="apply()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else {
+    <p-table
+      [value]="rows()"
+      [lazy]="true"
+      (onLazyLoad)="onLazyLoad($event)"
+      [paginator]="true"
+      [rows]="pageSize()"
+      [rowsPerPageOptions]="[10, 25, 50, 100]"
+      [totalRecords]="totalRecords()"
+      [loading]="loadingDetail()"
+      [first]="tableFirst()"
+      styleClass="app-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'reports.fitment.columns.entity' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.fitmentNo' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.serial' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.vehicleReg' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.vehicle' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.customer' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.fitmentDate' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.validTill' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.duration' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.status' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-r>
+        <tr>
+          @if (r.isFirstOfEntity) {
+            <td [attr.rowspan]="r.entityRowSpan" class="fitment__entity-cell">
+              <div class="cell-stack">
+                <strong>{{ r.entityName }}</strong>
+                <span class="cell-sub">{{ r.entityType }}</span>
+              </div>
+            </td>
+          }
+          <td>{{ r.fitment.fitmentNo }}</td>
+          <td><span class="cell-mono">{{ r.fitment.serialNumber }}</span></td>
+          <td><strong>{{ r.fitment.vehicleRegistrationNo }}</strong></td>
+          <td>
+            <div class="cell-stack">
+              <span class="cell-primary">{{ r.fitment.vehicleMake }}</span>
+              <span class="cell-sub">{{ r.fitment.vehicleModel }} · {{ r.fitment.mafYear }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="cell-stack">
+              <span class="cell-primary">{{ r.fitment.customerName }}</span>
+              <span class="cell-sub">{{ r.fitment.mobileNo }}</span>
+            </div>
+          </td>
+          <td>{{ r.fitment.fitmentDate | date:'mediumDate' }}</td>
+          <td>{{ r.fitment.fitmentValidTill | date:'mediumDate' }}</td>
+          <td>
+            <span class="fitment__chip">
+              {{ 'reports.fitment.durationMonths' | translate:{ months: r.fitment.durationMonths } }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="fitment__chip"
+              [class.fitment__chip--ok]="r.fitment.status === 'Completed'"
+            >
+              {{ r.fitment.status }}
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="10">
+            <div class="tab-empty">
+              <span class="material-icons">build_circle</span>
+              <p>{{ 'reports.fitment.empty' | translate }}</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
