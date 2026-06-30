@@ -1440,6 +1440,7 @@
     "outstanding": {
       "title": "Outstanding Report",
       "subtitle": "Entity-wise SIM and License outstanding vs credit limit.",
+      "searchPlaceholder": "Search entity...",
       "overLimit": "Over Limit",
       "ok": "Within Limit",
       "empty": "No outstanding records",

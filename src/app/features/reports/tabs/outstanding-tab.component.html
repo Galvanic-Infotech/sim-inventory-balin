@@ -7,6 +7,10 @@
     @if (pagination(); as pg) {
       <span class="count-badge">{{ pg.totalCount }}</span>
     }
+    <app-search-bar
+      [placeholder]="'reports.outstanding.searchPlaceholder' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
     <button class="btn btn-ghost" (click)="refresh()" [title]="'common.refresh' | translate" [disabled]="loading()">
       <span class="material-icons">refresh</span>
     </button>
@@ -39,6 +43,7 @@
           <th class="num">{{ 'reports.outstanding.columns.licenseOutstanding' | translate }}</th>
           <th class="num">{{ 'reports.outstanding.columns.licenseCreditLimit' | translate }}</th>
           <th>{{ 'reports.outstanding.columns.status' | translate }}</th>
+          <th style="width: 4rem"></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-r>
@@ -86,11 +91,14 @@
               </span>
             }
           </td>
+          <td>
+            <app-row-actions [items]="rowActions(r)" />
+          </td>
         </tr>
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="6">
+          <td colspan="7">
             <div class="tab-empty">
               <span class="material-icons">assessment</span>
               <p>{{ 'reports.outstanding.empty' | translate }}</p>
@@ -101,3 +109,27 @@
     </p-table>
   }
 </div>
+
+@if (billingEntity(); as e) {
+  <app-billing-config-drawer
+    [entityId]="e.id"
+    [entityName]="e.name"
+    (closed)="closeBillingDrawer($event)"
+  />
+}
+
+@if (creditEntity(); as e) {
+  <app-billing-credit-dialog
+    [entityId]="e.id"
+    [entityName]="e.name"
+    (closed)="closeCreditDialog($event)"
+  />
+}
+
+@if (generateEntity(); as e) {
+  <app-billing-generate-dialog
+    [entityId]="e.id"
+    [entityName]="e.name"
+    (closed)="closeGenerateDialog($event)"
+  />
+}
