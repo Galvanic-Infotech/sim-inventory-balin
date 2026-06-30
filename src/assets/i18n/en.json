@@ -106,7 +106,7 @@
     "greetingEvening": "Good evening, {{name}}",
     "nav": {
       "dashboard": "Dashboard",
-      "simInventory": "SIM Inventory",
+      "simInventory": "SIM Management",
       "billing": "Billing History",
       "master": "Master",
       "reports": "Reports",

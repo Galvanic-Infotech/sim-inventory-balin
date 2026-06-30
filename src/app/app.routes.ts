@@ -29,7 +29,6 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        canMatch: [permGuard(PERMS.SIM_DASHBOARD)],
         loadComponent: () =>
           import('./features/sim-dashboard/sim-dashboard.component').then(
             (m) => m.SimDashboardComponent,
@@ -37,7 +36,7 @@ export const routes: Routes = [
       },
       {
         path: 'sim-inventory',
-        canMatch: [permGuard(PERMS.SIM_VIEW)],
+        canActivate: [permGuard(PERMS.SIM_VIEW)],
         loadComponent: () =>
           import('./features/sim-inventory/sim-inventory.component').then(
             (m) => m.SimInventoryComponent,
@@ -45,7 +44,7 @@ export const routes: Routes = [
       },
       {
         path: 'billing',
-        canMatch: [permGuard(PERMS.BILLING_VIEW)],
+        canActivate: [permGuard(PERMS.BILLING_VIEW)],
         loadComponent: () =>
           import('./features/billing/billing.component').then(
             (m) => m.BillingComponent,
@@ -53,7 +52,7 @@ export const routes: Routes = [
       },
       {
         path: 'devices',
-        canMatch: [permGuard(PERMS.AIS_DEVICE_VIEW)],
+        canActivate: [permGuard(PERMS.AIS_DEVICE_VIEW)],
         loadComponent: () =>
           import('./features/devices/devices.component').then(
             (m) => m.DevicesComponent,
@@ -61,7 +60,7 @@ export const routes: Routes = [
       },
       {
         path: 'fitment',
-        canMatch: [permGuard(PERMS.FITMENT_VIEW)],
+        canActivate: [permGuard(PERMS.FITMENT_VIEW)],
         loadComponent: () =>
           import('./features/fitment/fitment.component').then(
             (m) => m.FitmentComponent,
@@ -69,7 +68,7 @@ export const routes: Routes = [
       },
       {
         path: 'master',
-        canMatch: [permGuard(PERMS.MASTER)],
+        canActivate: [permGuard(PERMS.MASTER)],
         loadComponent: () =>
           import('./features/master/master.component').then(
             (m) => m.MasterComponent,
@@ -77,7 +76,7 @@ export const routes: Routes = [
       },
       {
         path: 'onboarding',
-        canMatch: [permGuard(PERMS.ENTITY_CREATE)],
+        canActivate: [permGuard(PERMS.ENTITY_CREATE)],
         loadComponent: () =>
           import('./features/onboarding/onboarding.component').then(
             (m) => m.OnboardingComponent,
@@ -85,7 +84,7 @@ export const routes: Routes = [
       },
       {
         path: 'reports',
-        canMatch: [permGuard(PERMS.REPORTS_VIEW)],
+        canActivate: [permGuard(PERMS.REPORTS_VIEW)],
         loadComponent: () =>
           import('./features/reports/reports.component').then(
             (m) => m.ReportsComponent,

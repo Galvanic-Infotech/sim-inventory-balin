@@ -106,7 +106,7 @@
     "greetingEvening": "शुभ संध्या, {{name}}",
     "nav": {
       "dashboard": "डैशबोर्ड",
-      "simInventory": "सिम इन्वेंटरी",
+      "simInventory": "सिम प्रबंधन",
       "billing": "बिलिंग इतिहास",
       "master": "मास्टर",
       "reports": "रिपोर्ट्स",
