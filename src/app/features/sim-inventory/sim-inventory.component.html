@@ -44,11 +44,14 @@
         <button class="btn btn-outline" (click)="clearSelection()">
           <span class="material-icons">close</span> {{ 'simInventory.clear' | translate }}
         </button>
-        @if (canEditPerm()) {
-          <button class="btn btn-primary" (click)="openEditForSelection()">
-            <span class="material-icons">edit</span> {{ 'simInventory.editSelected' | translate }}
-          </button>
-        }
+        <button
+          class="btn btn-primary"
+          (click)="openEditForSelection()"
+          [disabled]="!canEditPerm()"
+          [title]="canEditPerm() ? '' : ('common.noPermission' | translate)"
+        >
+          <span class="material-icons">edit</span> {{ 'simInventory.editSelected' | translate }}
+        </button>
       </div>
     }
 
@@ -87,9 +90,7 @@
             <th>{{ 'simInventory.columns.customer' | translate }}</th>
             <th>{{ 'simInventory.columns.activated' | translate }}</th>
             <th>{{ 'simInventory.columns.validTill' | translate }}</th>
-            @if (canEditPerm()) {
-              <th style="width: 6rem"></th>
-            }
+            <th style="width: 6rem"></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-it>
@@ -113,16 +114,14 @@
             <td>{{ it.customerName || '—' }}</td>
             <td>{{ fmtDate(it.activationAt) }}</td>
             <td>{{ fmtDate(it.validTill) }}</td>
-            @if (canEditPerm()) {
-              <td>
-                <app-row-actions [items]="rowActions(it)" />
-              </td>
-            }
+            <td>
+              <app-row-actions [items]="rowActions(it)" />
+            </td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td [attr.colspan]="canEditPerm() ? 8 : 7">
+            <td colspan="8">
               <div class="tab-empty">
                 <span class="material-icons">sim_card</span>
                 <p>{{ 'simInventory.empty' | translate }}</p>

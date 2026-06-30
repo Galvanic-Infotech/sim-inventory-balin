@@ -16,7 +16,7 @@ import { AisDevice } from '../../../shared/models/device.model';
 export class DeviceDetailsDrawerComponent {
   private readonly i18n = inject(TranslationService);
   readonly perm = inject(PermissionService);
-  readonly canDeviceMapping = this.perm.can(PERMS.FITMENT_DEVICE_MAPPING);
+  readonly canDeviceMapping = this.perm.canAny(PERMS.AIS_DEVICE_EDIT, PERMS.FITMENT_DEVICE_MAPPING);
 
   readonly open = input(false);
   readonly device = input<AisDevice | null>(null);

@@ -42,7 +42,7 @@ export class SimInventoryComponent {
   private readonly i18n = inject(TranslationService);
   readonly perm = inject(PermissionService);
 
-  readonly canEditPerm = this.perm.can(PERMS.SIM_ACTIVATE);
+  readonly canEditPerm = this.perm.canAny(PERMS.SIM_EDIT, PERMS.SIM_ACTIVATE);
 
   readonly statusOptions = SIM_INVENTORY_STATUSES;
 
@@ -224,6 +224,7 @@ export class SimInventoryComponent {
         label: this.i18n.instant('simInventory.editLabel'),
         icon: 'edit',
         iconColor: 'var(--color-primary)',
+        disabled: !this.canEditPerm(),
         onClick: () => this.openEditForRow(item),
       },
     ];

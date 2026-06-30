@@ -178,16 +178,15 @@
           <td>{{ d.activationAt ? (d.activationAt | date: 'mediumDate') : '—' }}</td>
           <td>
             <div class="action-cell">
-              @if (canStartFitment(d)) {
-                <button
-                  class="btn btn-outline btn-icon"
-                  style="border-color: var(--color-text-primary); color: var(--color-text-primary); background: #fff;"
-                  (click)="startFitment(d)"
-                  [title]="'devices.list.startFitment' | translate"
-                >
-                  <span class="material-icons">description</span>
-                </button>
-              }
+              <button
+                class="btn btn-outline btn-icon"
+                style="border-color: var(--color-text-primary); color: var(--color-text-primary); background: #fff;"
+                (click)="startFitment(d)"
+                [disabled]="!canStartFitment(d)"
+                [title]="canStartFitment(d) ? ('devices.list.startFitment' | translate) : ('common.noPermission' | translate)"
+              >
+                <span class="material-icons">description</span>
+              </button>
               <button
                 class="btn btn-outline btn-icon"
                 style="border-color: var(--color-primary); color: var(--color-primary); background: #fff;"

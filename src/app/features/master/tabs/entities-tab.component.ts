@@ -42,6 +42,9 @@ export class EntitiesTabComponent {
   readonly canCreate = this.perm.can(PERMS.ENTITY_CREATE);
   readonly canUpdate = this.perm.can(PERMS.ENTITY_UPDATE);
   readonly canAssignType = this.perm.can(PERMS.ENTITY_ENTITY_TYPES_MAP);
+  readonly canEditBilling = this.perm.can(PERMS.BILLING_CONFIG_UPDATE);
+  readonly canAddCredit = this.perm.can(PERMS.BILLING_AMOUNT_CREDIT);
+  readonly canGenerateBill = this.perm.can(PERMS.BILLING_GENERATE);
   readonly menuLabel = computed(() => {
     this.i18n.lang();
     this.i18n.revision();
@@ -116,6 +119,7 @@ export class EntitiesTabComponent {
       {
         label: t('master.entities.assignType'),
         icon: 'category',
+        disabled: !this.canAssignType(),
         onClick: () => this.openAssignDialog(e),
       },
     ];
@@ -126,18 +130,21 @@ export class EntitiesTabComponent {
           icon: 'receipt_long',
           iconColor: 'var(--color-primary)',
           dividerBefore: true,
+          disabled: !this.canEditBilling(),
           onClick: () => this.openBillingDrawer(e),
         },
         {
           label: t('master.entities.addCredit'),
           icon: 'savings',
           iconColor: 'var(--color-success)',
+          disabled: !this.canAddCredit(),
           onClick: () => this.openCreditDialog(e),
         },
         {
           label: t('master.entities.generateBill'),
           icon: 'play_circle',
           iconColor: 'var(--color-warning)',
+          disabled: !this.canGenerateBill(),
           onClick: () => this.openGenerateDialog(e),
         },
       );

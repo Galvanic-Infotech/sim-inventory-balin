@@ -15,7 +15,8 @@
     "sending": "Sending...",
     "save": "Save",
     "saving": "Saving…",
-    "noResults": "No results"
+    "noResults": "No results",
+    "noPermission": "You don't have permission for this action"
   },
   "auth": {
     "footerCopy": "© 2026 Balin Inventory Portal. All rights reserved.",
