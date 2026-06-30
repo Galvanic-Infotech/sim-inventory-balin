@@ -966,6 +966,7 @@
       "billing": "Billing",
       "billingEnabled": "Billing enabled",
       "editBilling": "Edit billing config",
+      "enableBilling": "Enable billing",
       "addCredit": "Add credit",
       "generateBill": "Generate bill"
     },

@@ -93,7 +93,12 @@ export class BillingConfigDrawerComponent {
       error: (err) => {
         this.loading.set(false);
         this.configs.set([]);
-        this.loadError.set(extractApiError(err, this.i18n.instant('billing.errors.loadConfig')));
+        const msg = extractApiError(err, this.i18n.instant('billing.errors.loadConfig'));
+        if (/not\s*found|no\s+billing\s+config/i.test(msg)) {
+          this.loadError.set('');
+        } else {
+          this.loadError.set(msg);
+        }
       },
     });
   }

@@ -966,6 +966,7 @@
       "billing": "बिलिंग",
       "billingEnabled": "बिलिंग सक्षम",
       "editBilling": "बिलिंग कॉन्फ़िग संपादित करें",
+      "enableBilling": "बिलिंग सक्षम करें",
       "addCredit": "क्रेडिट जोड़ें",
       "generateBill": "बिल जेनरेट करें"
     },

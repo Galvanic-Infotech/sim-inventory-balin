@@ -162,7 +162,8 @@ export class BillingComponent {
         if (gen !== this.configGen) return;
         this.configLoading.set(false);
         this.configs.set([]);
-        this.configError.set(extractApiError(err, this.i18n.instant('billing.errors.loadConfig')));
+        const msg = extractApiError(err, this.i18n.instant('billing.errors.loadConfig'));
+        this.configError.set(/not\s*found|no\s+billing\s+config/i.test(msg) ? '' : msg);
       },
     });
   }

@@ -115,41 +115,36 @@ export class EntitiesTabComponent {
 
   rowActions(e: RbacEntity): RowAction[] {
     const t = (key: string) => this.i18n.instant(key);
-    const items: RowAction[] = [
+    return [
       {
         label: t('master.entities.assignType'),
         icon: 'category',
         disabled: !this.canAssignType(),
         onClick: () => this.openAssignDialog(e),
       },
+      {
+        label: t(e.isBillingEnabled ? 'master.entities.editBilling' : 'master.entities.enableBilling'),
+        icon: 'receipt_long',
+        iconColor: 'var(--color-primary)',
+        dividerBefore: true,
+        disabled: !this.canEditBilling(),
+        onClick: () => this.openBillingDrawer(e),
+      },
+      {
+        label: t('master.entities.addCredit'),
+        icon: 'savings',
+        iconColor: 'var(--color-success)',
+        disabled: !this.canAddCredit() || !e.isBillingEnabled,
+        onClick: () => this.openCreditDialog(e),
+      },
+      {
+        label: t('master.entities.generateBill'),
+        icon: 'play_circle',
+        iconColor: 'var(--color-warning)',
+        disabled: !this.canGenerateBill() || !e.isBillingEnabled,
+        onClick: () => this.openGenerateDialog(e),
+      },
     ];
-    if (e.isBillingEnabled) {
-      items.push(
-        {
-          label: t('master.entities.editBilling'),
-          icon: 'receipt_long',
-          iconColor: 'var(--color-primary)',
-          dividerBefore: true,
-          disabled: !this.canEditBilling(),
-          onClick: () => this.openBillingDrawer(e),
-        },
-        {
-          label: t('master.entities.addCredit'),
-          icon: 'savings',
-          iconColor: 'var(--color-success)',
-          disabled: !this.canAddCredit(),
-          onClick: () => this.openCreditDialog(e),
-        },
-        {
-          label: t('master.entities.generateBill'),
-          icon: 'play_circle',
-          iconColor: 'var(--color-warning)',
-          disabled: !this.canGenerateBill(),
-          onClick: () => this.openGenerateDialog(e),
-        },
-      );
-    }
-    return items;
   }
 
   openBillingDrawer(entity: RbacEntity): void {
