@@ -9,7 +9,18 @@ interface NavItem {
   icon: string;
   route: string;
   permission?: string;
+  anyOfPermissions?: string[];
 }
+
+const MASTER_SECTION_PERMS = [
+  PERMS.MASTER,
+  PERMS.USER_VIEW,
+  PERMS.ROLE_VIEW,
+  PERMS.PERMISSION_VIEW,
+  PERMS.PERMISSION_GROUP_VIEW,
+  PERMS.ENTITY_VIEW,
+  PERMS.ENTITY_TYPE_VIEW,
+];
 
 @Component({
   selector: 'app-sidebar',
@@ -68,7 +79,7 @@ export class SidebarComponent {
         label: t('layout.nav.master'),
         icon: 'dataset',
         route: '/master',
-        permission: PERMS.MASTER,
+        anyOfPermissions: MASTER_SECTION_PERMS,
       },
       {
         label: t('layout.nav.reports'),
@@ -86,7 +97,11 @@ export class SidebarComponent {
   });
 
   readonly navItems = computed(() =>
-    this.allNavItems().filter((item) => !item.permission || this.perm.has(item.permission)),
+    this.allNavItems().filter((item) => {
+      if (item.anyOfPermissions?.length) return this.perm.hasAny(...item.anyOfPermissions);
+      if (item.permission) return this.perm.has(item.permission);
+      return true;
+    }),
   );
 
   toggle(): void {

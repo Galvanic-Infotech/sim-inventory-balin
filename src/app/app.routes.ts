@@ -68,7 +68,17 @@ export const routes: Routes = [
       },
       {
         path: 'master',
-        canActivate: [permGuard(PERMS.MASTER)],
+        canActivate: [
+          permGuard(
+            PERMS.MASTER,
+            PERMS.USER_VIEW,
+            PERMS.ROLE_VIEW,
+            PERMS.PERMISSION_VIEW,
+            PERMS.PERMISSION_GROUP_VIEW,
+            PERMS.ENTITY_VIEW,
+            PERMS.ENTITY_TYPE_VIEW,
+          ),
+        ],
         loadComponent: () =>
           import('./features/master/master.component').then(
             (m) => m.MasterComponent,
