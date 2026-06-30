@@ -60,8 +60,14 @@
           </div>
           <input
             class="form-control"
+            style="text-transform: uppercase"
+            maxlength="20"
+            autocomplete="off"
+            spellcheck="false"
             [ngModel]="form().rcNumber"
-            (ngModelChange)="setField('rcNumber', $event)"
+            (ngModelChange)="setRcNumber($event)"
+            (keypress)="onRcKeyPress($event)"
+            (paste)="onRcPaste($event)"
             [placeholder]="'devices.rcDetails.placeholders.rcNumber' | translate"
           />
         </div>

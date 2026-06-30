@@ -155,6 +155,26 @@ export class DeviceRcDetailsDialogComponent {
     this.form.update((f) => ({ ...f, [key]: value }));
   }
 
+  setRcNumber(value: string): void {
+    const sanitized = (value ?? '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    this.form.update((f) => ({ ...f, rcNumber: sanitized }));
+  }
+
+  onRcKeyPress(e: KeyboardEvent): void {
+    if (e.key.length === 1 && !/^[A-Za-z0-9]$/.test(e.key)) {
+      e.preventDefault();
+    }
+  }
+
+  onRcPaste(e: ClipboardEvent): void {
+    const text = e.clipboardData?.getData('text') ?? '';
+    e.preventDefault();
+    const sanitized = text.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    if (sanitized) {
+      this.form.update((f) => ({ ...f, rcNumber: (f.rcNumber + sanitized).slice(0, 20) }));
+    }
+  }
+
   fetchFromVahan(): void {
     const rc = this.form().rcNumber.trim().toUpperCase();
     if (!rc || !this.canFetchVahan()) return;
