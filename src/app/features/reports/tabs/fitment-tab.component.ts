@@ -14,13 +14,49 @@ import {
 } from '../../../shared/models/reports.model';
 import { PaginationMeta } from '../../../shared/models/rbac.model';
 import { trackEntityIdChange } from '../../../shared/utils/table-query.util';
+import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 
 interface FitmentFlatRow {
   entityName: string;
   entityType: string;
-  isFirstOfEntity: boolean;
-  entityRowSpan: number;
   fitment: FitmentDetailRow;
+}
+
+interface EntityChip {
+  key: string;
+  label: string;
+  count: number;
+  color: string;
+}
+
+interface TrendCoord {
+  x: number;
+  y: number;
+  count: number;
+  date: string;
+}
+
+interface TrendGeometry {
+  width: number;
+  height: number;
+  coords: TrendCoord[];
+  linePath: string;
+  areaPath: string;
+}
+
+const ENTITY_COLORS = [
+  '#4f46e5',
+  '#0891b2',
+  '#059669',
+  '#d97706',
+  '#dc2626',
+  '#7c3aed',
+  '#db2777',
+  '#0d9488',
+];
+
+function colorForIndex(i: number): string {
+  return ENTITY_COLORS[i % ENTITY_COLORS.length];
 }
 
 function toIsoStart(date: string): string {
@@ -47,7 +83,7 @@ function firstOfMonthIso(): string {
 @Component({
   selector: 'app-fitment-tab',
   standalone: true,
-  imports: [DatePipe, FormsModule, TableModule, TranslatePipe],
+  imports: [DatePipe, FormsModule, TableModule, TranslatePipe, SearchBarComponent],
   templateUrl: './fitment-tab.component.html',
   styleUrl: './fitment-tab.component.scss',
 })
@@ -71,29 +107,105 @@ export class FitmentTabComponent {
   readonly loadingDetail = signal(false);
   readonly error = signal('');
 
+  readonly entityFilter = signal<string>('');
+  readonly searchTerm = signal('');
+
   readonly totalRecords = computed(() => this.pagination()?.totalCount ?? 0);
   readonly totalFitments = computed(() => this.summary()?.totalFitments ?? 0);
-  readonly entityCount = computed(() => this.groups().length);
 
-  readonly rows = computed<FitmentFlatRow[]>(() => {
+  readonly entityChips = computed<EntityChip[]>(() => {
+    return this.groups().map((g, i) => ({
+      key: g.entityName,
+      label: g.entityName,
+      count: g.totalFitments,
+      color: colorForIndex(i),
+    }));
+  });
+
+  readonly allRows = computed<FitmentFlatRow[]>(() => {
     const out: FitmentFlatRow[] = [];
     for (const g of this.groups()) {
-      const list = g.fitments ?? [];
-      const span = Math.max(list.length, 1);
-      let first = true;
-      for (const f of list) {
-        out.push({
-          entityName: g.entityName,
-          entityType: g.entityType,
-          isFirstOfEntity: first,
-          entityRowSpan: span,
-          fitment: f,
-        });
-        first = false;
+      for (const f of g.fitments ?? []) {
+        out.push({ entityName: g.entityName, entityType: g.entityType, fitment: f });
       }
     }
     return out;
   });
+
+  readonly rows = computed<FitmentFlatRow[]>(() => {
+    const ef = this.entityFilter();
+    const term = this.searchTerm().trim().toLowerCase();
+    return this.allRows().filter((r) => {
+      if (ef && r.entityName !== ef) return false;
+      if (!term) return true;
+      const f = r.fitment;
+      return (
+        f.fitmentNo?.toLowerCase().includes(term) ||
+        f.serialNumber?.toLowerCase().includes(term) ||
+        f.vehicleRegistrationNo?.toLowerCase().includes(term) ||
+        f.vehicleMake?.toLowerCase().includes(term) ||
+        f.vehicleModel?.toLowerCase().includes(term) ||
+        f.customerName?.toLowerCase().includes(term) ||
+        f.mobileNo?.toLowerCase().includes(term) ||
+        r.entityName?.toLowerCase().includes(term)
+      );
+    });
+  });
+
+  readonly trendGeometry = computed<TrendGeometry | null>(() => {
+    const points = this.summary()?.days ?? [];
+    if (points.length === 0) return null;
+    const width = 320;
+    const height = 56;
+    const max = points.reduce((m, p) => Math.max(m, p.totalFitments ?? 0), 0);
+    const stepX = points.length > 1 ? width / (points.length - 1) : 0;
+    const coords = points.map((p, i) => {
+      const x = points.length === 1 ? width / 2 : i * stepX;
+      const y = max === 0 ? height : height - ((p.totalFitments ?? 0) / max) * height;
+      return { x, y, count: p.totalFitments ?? 0, date: p.date };
+    });
+    const linePath = coords
+      .map((c, i) => `${i === 0 ? 'M' : 'L'}${c.x.toFixed(2)},${c.y.toFixed(2)}`)
+      .join(' ');
+    const areaPath = `${linePath} L${width},${height} L0,${height} Z`;
+    return { width, height, coords, linePath, areaPath };
+  });
+
+  readonly trendHover = signal<{ x: number; y: number; date: string; count: number } | null>(null);
+
+  onTrendMove(event: MouseEvent): void {
+    const geo = this.trendGeometry();
+    if (!geo) return;
+    const svg = event.currentTarget as SVGSVGElement;
+    const rect = svg.getBoundingClientRect();
+    if (rect.width === 0) return;
+    const ratio = (event.clientX - rect.left) / rect.width;
+    const xViewBox = ratio * geo.width;
+    let nearest = geo.coords[0];
+    let bestDist = Math.abs(nearest.x - xViewBox);
+    for (const c of geo.coords) {
+      const d = Math.abs(c.x - xViewBox);
+      if (d < bestDist) {
+        bestDist = d;
+        nearest = c;
+      }
+    }
+    const pxX = (nearest.x / geo.width) * rect.width;
+    const pxY = (nearest.y / geo.height) * rect.height;
+    this.trendHover.set({ x: pxX, y: pxY, date: nearest.date, count: nearest.count });
+  }
+
+  onTrendLeave(): void {
+    this.trendHover.set(null);
+  }
+
+  selectEntity(key: string): void {
+    this.entityFilter.set(key);
+  }
+
+  onSearchChange(value: string): void {
+    this.searchTerm.set(value);
+  }
 
   private fetchGen = 0;
   private prevEntityId: string | undefined;
@@ -105,6 +217,8 @@ export class FitmentTabComponent {
       const { changed, next } = trackEntityIdChange(this.prevEntityId, eid);
       this.prevEntityId = next;
       if (!changed) return;
+      this.entityFilter.set('');
+      this.searchTerm.set('');
       this.pageNumber.set(1);
       this.tableFirst.set(0);
       this.fetchAll();
@@ -112,8 +226,13 @@ export class FitmentTabComponent {
   }
 
   apply(): void {
+    this.entityFilter.set('');
     this.pageNumber.set(1);
     this.tableFirst.set(0);
+    this.fetchAll();
+  }
+
+  refresh(): void {
     this.fetchAll();
   }
 
@@ -125,6 +244,22 @@ export class FitmentTabComponent {
     this.pageNumber.set(page);
     this.tableFirst.set(first);
     this.fetchDetail();
+  }
+
+  statusChipColor(status: string): string {
+    switch ((status ?? '').toLowerCase()) {
+      case 'completed':
+        return 'var(--color-success)';
+      case 'pending':
+      case 'inprogress':
+      case 'in_progress':
+        return 'var(--color-warning)';
+      case 'failed':
+      case 'rejected':
+        return 'var(--color-danger)';
+      default:
+        return 'var(--color-text-muted)';
+    }
   }
 
   private validateRange(): boolean {

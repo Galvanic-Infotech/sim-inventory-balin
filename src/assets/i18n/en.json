@@ -1,5 +1,6 @@
 {
   "common": {
+    "all": "All",
     "cancel": "Cancel",
     "close": "Close",
     "retry": "Retry",
@@ -1465,6 +1466,9 @@
       "apply": "Apply",
       "totalFitments": "Total Fitments",
       "range": "Range",
+      "dailyTrend": "Daily Fitment Trend",
+      "fitments": "fitments",
+      "searchPlaceholder": "Search fitment, serial, vehicle, customer...",
       "empty": "No fitments in selected range",
       "columns": {
         "date": "Date",

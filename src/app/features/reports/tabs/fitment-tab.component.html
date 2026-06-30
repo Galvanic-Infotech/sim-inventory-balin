@@ -1,11 +1,87 @@
-<div class="fitment">
-  <div class="fitment__head">
-    <div>
-      <h3>{{ 'reports.fitment.title' | translate }}</h3>
-      <p class="fitment__sub">{{ 'reports.fitment.subtitle' | translate }}</p>
+<div class="ft-filters">
+  <button
+    type="button"
+    class="ft-chip"
+    [class.ft-chip--active]="entityFilter() === ''"
+    (click)="selectEntity('')"
+  >
+    <span class="material-icons">all_inclusive</span>
+    {{ 'common.all' | translate }}
+    <span class="ft-chip-count">{{ totalFitments() }}</span>
+  </button>
+  @for (c of entityChips(); track c.key) {
+    <button
+      type="button"
+      class="ft-chip"
+      [class.ft-chip--active]="entityFilter() === c.key"
+      [style.--chip-color]="c.color"
+      (click)="selectEntity(c.key)"
+    >
+      <span class="material-icons">business</span>
+      {{ c.label }}
+      <span class="ft-chip-count">{{ c.count }}</span>
+    </button>
+  }
+</div>
+
+@if (trendGeometry(); as geo) {
+  <div class="ft-trend">
+    <div class="ft-trend-info">
+      <div class="ft-trend-label">
+        <span class="material-icons">trending_up</span>
+        {{ 'reports.fitment.dailyTrend' | translate }}
+      </div>
+      <div class="ft-trend-value">{{ totalFitments() }}</div>
+      <div class="ft-trend-sub">
+        {{ summary()?.from | date:'mediumDate' }} — {{ summary()?.to | date:'mediumDate' }}
+      </div>
     </div>
-    <div class="fitment__filters">
-      <div class="form-group">
+    <div class="ft-trend-chart">
+      <svg
+        class="ft-trend-svg"
+        [attr.viewBox]="'0 0 ' + geo.width + ' ' + geo.height"
+        preserveAspectRatio="none"
+        role="img"
+        [attr.aria-label]="'reports.fitment.dailyTrend' | translate"
+        (mousemove)="onTrendMove($event)"
+        (mouseleave)="onTrendLeave()"
+      >
+        <path [attr.d]="geo.areaPath" class="ft-trend-area" />
+        <path [attr.d]="geo.linePath" class="ft-trend-line" />
+        @for (c of geo.coords; track c.date) {
+          <circle [attr.cx]="c.x" [attr.cy]="c.y" r="2" class="ft-trend-dot" />
+        }
+      </svg>
+      @if (trendHover(); as h) {
+        <div class="ft-trend-tooltip" [style.left.px]="h.x" [style.top.px]="h.y">
+          <div class="ft-trend-tooltip-date">{{ h.date | date:'mediumDate' }}</div>
+          <div class="ft-trend-tooltip-count">
+            <span class="ft-trend-tooltip-dot"></span>
+            {{ h.count }} {{ 'reports.fitment.fitments' | translate }}
+          </div>
+        </div>
+        <div class="ft-trend-marker" [style.left.px]="h.x" [style.top.px]="h.y"></div>
+      }
+    </div>
+  </div>
+}
+
+<div class="card ft-card">
+  <div class="tab-toolbar">
+    <div class="tab-toolbar-left">
+      <h3>
+        @if (entityFilter(); as ef) {
+          {{ ef }}
+        } @else {
+          {{ 'reports.fitment.title' | translate }}
+        }
+      </h3>
+      @if (pagination(); as pg) {
+        <span class="count-badge">{{ pg.totalCount }}</span>
+      }
+    </div>
+    <div class="tab-toolbar-right">
+      <div class="ft-date">
         <label>{{ 'reports.fitment.from' | translate }}</label>
         <input
           class="form-control"
@@ -15,7 +91,7 @@
           [max]="maxDate"
         />
       </div>
-      <div class="form-group">
+      <div class="ft-date">
         <label>{{ 'reports.fitment.to' | translate }}</label>
         <input
           class="form-control"
@@ -29,34 +105,20 @@
         <span class="material-icons">search</span>
         {{ 'reports.fitment.apply' | translate }}
       </button>
+      <app-search-bar
+        [placeholder]="'reports.fitment.searchPlaceholder' | translate"
+        [initialValue]="searchTerm()"
+        (searchChange)="onSearchChange($event)"
+      />
+      <button class="btn btn-ghost" (click)="refresh()" [title]="'common.refresh' | translate" [disabled]="loadingDetail()">
+        <span class="material-icons">refresh</span>
+      </button>
     </div>
   </div>
 
-  @if (summary(); as s) {
-    <div class="fitment__summary">
-      <div class="stat-card">
-        <span class="material-icons">build_circle</span>
-        <div>
-          <div class="stat-card__label">{{ 'reports.fitment.totalFitments' | translate }}</div>
-          <div class="stat-card__value">{{ totalFitments() }}</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <span class="material-icons">date_range</span>
-        <div>
-          <div class="stat-card__label">{{ 'reports.fitment.range' | translate }}</div>
-          <div class="stat-card__value">
-            {{ s.from | date:'mediumDate' }} — {{ s.to | date:'mediumDate' }}
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-
   @if (error()) {
     <div class="alert alert-danger">
-      <span class="material-icons">error</span>
-      <span>{{ error() }}</span>
+      <span class="material-icons">error</span> {{ error() }}
       <button class="btn btn-ghost" (click)="apply()">{{ 'common.retry' | translate }}</button>
     </div>
   } @else {
@@ -74,54 +136,55 @@
     >
       <ng-template pTemplate="header">
         <tr>
+          <th style="width: 4rem">#</th>
           <th>{{ 'reports.fitment.columns.entity' | translate }}</th>
           <th>{{ 'reports.fitment.columns.fitmentNo' | translate }}</th>
           <th>{{ 'reports.fitment.columns.serial' | translate }}</th>
           <th>{{ 'reports.fitment.columns.vehicleReg' | translate }}</th>
           <th>{{ 'reports.fitment.columns.vehicle' | translate }}</th>
           <th>{{ 'reports.fitment.columns.customer' | translate }}</th>
+          <th>{{ 'reports.fitment.columns.duration' | translate }}</th>
           <th>{{ 'reports.fitment.columns.fitmentDate' | translate }}</th>
           <th>{{ 'reports.fitment.columns.validTill' | translate }}</th>
-          <th>{{ 'reports.fitment.columns.duration' | translate }}</th>
           <th>{{ 'reports.fitment.columns.status' | translate }}</th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-r>
+      <ng-template pTemplate="body" let-r let-rowIndex="rowIndex">
         <tr>
-          @if (r.isFirstOfEntity) {
-            <td [attr.rowspan]="r.entityRowSpan" class="fitment__entity-cell">
-              <div class="cell-stack">
-                <strong>{{ r.entityName }}</strong>
-                <span class="cell-sub">{{ r.entityType }}</span>
-              </div>
-            </td>
-          }
-          <td>{{ r.fitment.fitmentNo }}</td>
-          <td><span class="cell-mono">{{ r.fitment.serialNumber }}</span></td>
+          <td>{{ rowIndex + 1 }}</td>
+          <td>
+            <div class="ft-stack">
+              <span class="ft-stack-primary">{{ r.entityName }}</span>
+              <span class="ft-stack-secondary">{{ r.entityType }}</span>
+            </div>
+          </td>
+          <td><strong>{{ r.fitment.fitmentNo }}</strong></td>
+          <td><span class="ft-mono">{{ r.fitment.serialNumber }}</span></td>
           <td><strong>{{ r.fitment.vehicleRegistrationNo }}</strong></td>
           <td>
-            <div class="cell-stack">
-              <span class="cell-primary">{{ r.fitment.vehicleMake }}</span>
-              <span class="cell-sub">{{ r.fitment.vehicleModel }} · {{ r.fitment.mafYear }}</span>
+            <div class="ft-stack">
+              <span class="ft-stack-primary">{{ r.fitment.vehicleMake }}</span>
+              <span class="ft-stack-secondary">{{ r.fitment.vehicleModel }} · {{ r.fitment.mafYear }}</span>
             </div>
           </td>
           <td>
-            <div class="cell-stack">
-              <span class="cell-primary">{{ r.fitment.customerName }}</span>
-              <span class="cell-sub">{{ r.fitment.mobileNo }}</span>
+            <div class="ft-stack">
+              <span class="ft-stack-primary">{{ r.fitment.customerName }}</span>
+              <span class="ft-stack-secondary">{{ r.fitment.mobileNo }}</span>
             </div>
+          </td>
+          <td>
+            <span class="chip ft-duration-chip">
+              {{ 'reports.fitment.durationMonths' | translate:{ months: r.fitment.durationMonths } }}
+            </span>
           </td>
           <td>{{ r.fitment.fitmentDate | date:'mediumDate' }}</td>
           <td>{{ r.fitment.fitmentValidTill | date:'mediumDate' }}</td>
           <td>
-            <span class="fitment__chip">
-              {{ 'reports.fitment.durationMonths' | translate:{ months: r.fitment.durationMonths } }}
-            </span>
-          </td>
-          <td>
             <span
-              class="fitment__chip"
-              [class.fitment__chip--ok]="r.fitment.status === 'Completed'"
+              class="chip ft-status-chip"
+              [style.background]="statusChipColor(r.fitment.status) + '22'"
+              [style.color]="statusChipColor(r.fitment.status)"
             >
               {{ r.fitment.status }}
             </span>
@@ -130,8 +193,8 @@
       </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="10">
-            <div class="tab-empty">
+          <td colspan="11">
+            <div class="tab-empty" style="padding: var(--space-lg)">
               <span class="material-icons">build_circle</span>
               <p>{{ 'reports.fitment.empty' | translate }}</p>
             </div>
