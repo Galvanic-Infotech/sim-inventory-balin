@@ -985,6 +985,8 @@
         "code": "कोड",
         "manufactureName": "निर्माता नाम",
         "establishmentYear": "स्थापना वर्ष",
+        "officeName": "कार्यालय का नाम",
+        "officeAddressNo": "कार्यालय पता संख्या",
         "cinNumber": "CIN नंबर",
         "gstnNumber": "GSTN नंबर",
         "houseNo": "मकान नं",

@@ -133,7 +133,7 @@ export class RbacService {
   ): Observable<RbacResponse<EntityAttributesGet>> {
     return this.http.put<RbacResponse<EntityAttributesGet>>(
       `${this.EP.ENTITY_ATTRIBUTES}/${entityId}/attributes`,
-      attributes,
+      { attributes },
     );
   }
 

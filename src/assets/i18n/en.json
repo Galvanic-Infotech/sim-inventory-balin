@@ -985,6 +985,8 @@
         "code": "Code",
         "manufactureName": "Manufacturer Name",
         "establishmentYear": "Establishment Year",
+        "officeName": "Office Name",
+        "officeAddressNo": "Office Address No",
         "cinNumber": "CIN Number",
         "gstnNumber": "GSTN Number",
         "houseNo": "House No",
