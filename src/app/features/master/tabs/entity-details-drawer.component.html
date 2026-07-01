@@ -1,0 +1,307 @@
+<div class="drawer-backdrop" (click)="cancel()" aria-hidden="true"></div>
+<aside class="drawer-panel drawer-panel--wide edd" role="dialog" aria-modal="true" aria-labelledby="entity-details-title">
+  <div class="dialog-header">
+    <div class="edd-title">
+      <h3 id="entity-details-title">{{ 'master.entityDetails.title' | translate }}</h3>
+      @if (entityName(); as n) {
+        <span class="edd-entity">{{ n }}</span>
+      }
+    </div>
+    <button type="button" class="btn btn-ghost" (click)="cancel()" [attr.aria-label]="'common.close' | translate">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    @if (error()) {
+      <div class="alert alert-danger">
+        <span class="material-icons">error</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+    @if (success()) {
+      <div class="alert alert-success">
+        <span class="material-icons">check_circle</span>
+        <span>{{ success() }}</span>
+      </div>
+    }
+    @if (loading()) {
+      <div class="tab-loading"><div class="spinner spinner--dark spinner--lg"></div></div>
+    } @else {
+      <!-- Basic Details -->
+      <section class="edd-section">
+        <h4 class="edd-section__title">
+          <span class="material-icons">business</span>
+          {{ 'master.entityDetails.sections.basicDetails' | translate }}
+        </h4>
+        <div class="edd-grid">
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.code' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.code"
+              (ngModelChange)="setBasic('code', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.manufactureName' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.manufactureName"
+              (ngModelChange)="setBasic('manufactureName', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.establishmentYear' | translate }}</label>
+            <input
+              class="form-control"
+              type="number"
+              [ngModel]="form().basicDetails.establishmentYear"
+              (ngModelChange)="setBasic('establishmentYear', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.cinNumber' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.cinNumber"
+              (ngModelChange)="setBasic('cinNumber', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.gstnNumber' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.gstnNumber"
+              (ngModelChange)="setBasic('gstnNumber', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Address -->
+      <section class="edd-section">
+        <h4 class="edd-section__title">
+          <span class="material-icons">location_on</span>
+          {{ 'master.entityDetails.sections.address' | translate }}
+        </h4>
+        <div class="edd-grid">
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.houseNo' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.address.houseNo"
+              (ngModelChange)="setAddress('houseNo', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.street' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.address.street"
+              (ngModelChange)="setAddress('street', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.city' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.address.city"
+              (ngModelChange)="setAddress('city', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.district' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.address.district"
+              (ngModelChange)="setAddress('district', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.state' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.address.state"
+              (ngModelChange)="setAddress('state', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.pinCode' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().basicDetails.address.pinCode"
+              (ngModelChange)="setAddress('pinCode', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Contacts -->
+      <section class="edd-section">
+        <div class="edd-section__head">
+          <h4 class="edd-section__title">
+            <span class="material-icons">contact_phone</span>
+            {{ 'master.entityDetails.sections.contacts' | translate }}
+          </h4>
+          @if (canEdit()) {
+            <button type="button" class="btn btn-outline btn-sm" (click)="addContact()">
+              <span class="material-icons">add</span>
+              {{ 'master.entityDetails.addContact' | translate }}
+            </button>
+          }
+        </div>
+        @for (c of form().contacts; track $index; let i = $index) {
+          <div class="edd-contact-card">
+            <div class="edd-contact-card__head">
+              <label class="edd-primary-toggle">
+                <input
+                  type="checkbox"
+                  [checked]="c.isPrimary"
+                  (change)="togglePrimary(i)"
+                  [disabled]="!canEdit()"
+                />
+                <span>{{ 'master.entityDetails.fields.isPrimary' | translate }}</span>
+              </label>
+              @if (canEdit()) {
+                <button type="button" class="btn btn-ghost btn-sm edd-remove" (click)="removeContact(i)">
+                  <span class="material-icons">delete</span>
+                  {{ 'master.entityDetails.removeContact' | translate }}
+                </button>
+              }
+            </div>
+            <div class="edd-grid">
+              <div class="form-group">
+                <label>{{ 'master.entityDetails.fields.personName' | translate }}</label>
+                <input
+                  class="form-control"
+                  [ngModel]="c.personName"
+                  (ngModelChange)="setContact(i, 'personName', $event)"
+                  [disabled]="!canEdit()"
+                />
+              </div>
+              <div class="form-group">
+                <label>{{ 'master.entityDetails.fields.email' | translate }}</label>
+                <input
+                  class="form-control"
+                  type="email"
+                  [ngModel]="c.email"
+                  (ngModelChange)="setContact(i, 'email', $event)"
+                  [disabled]="!canEdit()"
+                />
+              </div>
+              <div class="form-group">
+                <label>{{ 'master.entityDetails.fields.mobileNumber' | translate }}</label>
+                <input
+                  class="form-control"
+                  [ngModel]="c.mobileNumber"
+                  (ngModelChange)="setContact(i, 'mobileNumber', $event)"
+                  [disabled]="!canEdit()"
+                />
+              </div>
+              <div class="form-group">
+                <label>{{ 'master.entityDetails.fields.landLine' | translate }}</label>
+                <input
+                  class="form-control"
+                  [ngModel]="c.landLine"
+                  (ngModelChange)="setContact(i, 'landLine', $event)"
+                  [disabled]="!canEdit()"
+                />
+              </div>
+              <div class="form-group">
+                <label>{{ 'master.entityDetails.fields.fax' | translate }}</label>
+                <input
+                  class="form-control"
+                  [ngModel]="c.fax"
+                  (ngModelChange)="setContact(i, 'fax', $event)"
+                  [disabled]="!canEdit()"
+                />
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="tab-empty edd-empty">
+            <span class="material-icons">contact_phone</span>
+            <p>—</p>
+          </div>
+        }
+      </section>
+
+      <!-- VTS -->
+      <section class="edd-section">
+        <h4 class="edd-section__title">
+          <span class="material-icons">link</span>
+          {{ 'master.entityDetails.sections.vts' | translate }}
+        </h4>
+        <div class="edd-grid">
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.vtsUserId' | translate }}</label>
+            <input
+              class="form-control"
+              type="number"
+              [ngModel]="form().vts.userId"
+              (ngModelChange)="setVts('userId', $event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Other -->
+      <section class="edd-section">
+        <h4 class="edd-section__title">
+          <span class="material-icons">settings</span>
+          {{ 'master.entityDetails.sections.other' | translate }}
+        </h4>
+        <div class="edd-grid">
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.basketId' | translate }}</label>
+            <input
+              class="form-control"
+              type="number"
+              [ngModel]="form().basketId"
+              (ngModelChange)="setBasketId($event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+          <div class="form-group">
+            <label>{{ 'master.entityDetails.fields.telegramChatId' | translate }}</label>
+            <input
+              class="form-control"
+              [ngModel]="form().telegramChatId"
+              (ngModelChange)="setTelegram($event)"
+              [disabled]="!canEdit()"
+            />
+          </div>
+        </div>
+      </section>
+    }
+  </div>
+
+  <div class="dialog-footer">
+    <button type="button" class="btn btn-outline" (click)="cancel()" [disabled]="saving()">
+      {{ 'common.cancel' | translate }}
+    </button>
+    @if (canEdit()) {
+      <button type="button" class="btn btn-primary" (click)="save()" [disabled]="saving() || loading()">
+        @if (saving()) {
+          <span class="spinner"></span>
+          {{ 'master.entityDetails.saving' | translate }}
+        } @else {
+          {{ 'master.entityDetails.save' | translate }}
+        }
+      </button>
+    }
+  </div>
+</aside>

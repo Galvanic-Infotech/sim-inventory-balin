@@ -969,7 +969,48 @@
       "editBilling": "बिलिंग कॉन्फ़िग संपादित करें",
       "enableBilling": "बिलिंग सक्षम करें",
       "addCredit": "क्रेडिट जोड़ें",
-      "generateBill": "बिल जेनरेट करें"
+      "generateBill": "बिल जेनरेट करें",
+      "viewDetails": "विवरण देखें"
+    },
+    "entityDetails": {
+      "title": "इकाई विवरण",
+      "sections": {
+        "basicDetails": "मूल विवरण",
+        "address": "पता",
+        "contacts": "संपर्क",
+        "vts": "VTS एकीकरण",
+        "other": "अन्य"
+      },
+      "fields": {
+        "code": "कोड",
+        "manufactureName": "निर्माता नाम",
+        "establishmentYear": "स्थापना वर्ष",
+        "cinNumber": "CIN नंबर",
+        "gstnNumber": "GSTN नंबर",
+        "houseNo": "मकान नं",
+        "street": "गली",
+        "city": "शहर",
+        "district": "ज़िला",
+        "state": "राज्य",
+        "pinCode": "पिन कोड",
+        "personName": "व्यक्ति का नाम",
+        "email": "ईमेल",
+        "mobileNumber": "मोबाइल",
+        "landLine": "लैंडलाइन",
+        "fax": "फ़ैक्स",
+        "isPrimary": "प्राथमिक",
+        "vtsUserId": "VTS यूज़र ID",
+        "vtsExcludeSubUser": "उप-यूज़र अपवर्जित (कॉमा से अलग IDs)",
+        "basketId": "बास्केट ID",
+        "telegramChatId": "टेलीग्राम चैट ID"
+      },
+      "addContact": "संपर्क जोड़ें",
+      "removeContact": "हटाएं",
+      "save": "बदलाव सहेजें",
+      "saving": "सहेजा जा रहा है…",
+      "loadFailed": "इकाई विवरण लोड करने में विफल",
+      "saveFailed": "इकाई विवरण सहेजने में विफल",
+      "saved": "इकाई विवरण सहेजे गए"
     },
     "roles": {
       "title": "भूमिकाएँ",

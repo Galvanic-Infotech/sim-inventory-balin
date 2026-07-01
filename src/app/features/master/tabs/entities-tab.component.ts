@@ -17,6 +17,7 @@ import { BillingConfigDrawerComponent } from '../../../shared/components/billing
 import { BillingCreditDialogComponent } from '../../../shared/components/billing-credit-dialog/billing-credit-dialog.component';
 import { BillingGenerateDialogComponent } from '../../../shared/components/billing-generate-dialog/billing-generate-dialog.component';
 import { RowAction, RowActionsComponent } from '../../../shared/components/row-actions/row-actions.component';
+import { EntityDetailsDrawerComponent } from './entity-details-drawer.component';
 
 @Component({
   selector: 'app-entities-tab',
@@ -31,6 +32,7 @@ import { RowAction, RowActionsComponent } from '../../../shared/components/row-a
     BillingCreditDialogComponent,
     BillingGenerateDialogComponent,
     RowActionsComponent,
+    EntityDetailsDrawerComponent,
   ],
   templateUrl: './entities-tab.component.html',
 })
@@ -112,10 +114,17 @@ export class EntitiesTabComponent {
   readonly billingEntity = signal<RbacEntity | null>(null);
   readonly creditEntity = signal<RbacEntity | null>(null);
   readonly generateEntity = signal<RbacEntity | null>(null);
+  readonly detailsEntity = signal<RbacEntity | null>(null);
 
   rowActions(e: RbacEntity): RowAction[] {
     const t = (key: string) => this.i18n.instant(key);
     return [
+      {
+        label: t('master.entities.viewDetails'),
+        icon: 'visibility',
+        iconColor: 'var(--color-primary)',
+        onClick: () => this.openDetailsDrawer(e),
+      },
       {
         label: t('master.entities.assignType'),
         icon: 'category',
@@ -170,6 +179,14 @@ export class EntitiesTabComponent {
 
   closeGenerateDialog(_saved: boolean): void {
     this.generateEntity.set(null);
+  }
+
+  openDetailsDrawer(entity: RbacEntity): void {
+    this.detailsEntity.set(entity);
+  }
+
+  closeDetailsDrawer(_saved: boolean): void {
+    this.detailsEntity.set(null);
   }
 
   name = '';

@@ -52,9 +52,7 @@
         <th pSortableColumn="name">{{ 'master.entities.columns.name' | translate }} <p-sortIcon field="name" /></th>
         <th pSortableColumn="description">{{ 'master.entities.columns.description' | translate }} <p-sortIcon field="description" /></th>
         <th pSortableColumn="entityType">{{ 'master.entities.columns.type' | translate }} <p-sortIcon field="entityType" /></th>
-        @if (canAssignType()) {
-          <th style="width: 5rem">{{ 'master.common.action' | translate }}</th>
-        }
+        <th style="width: 5rem">{{ 'master.common.action' | translate }}</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-e let-rowIndex="rowIndex">
@@ -71,16 +69,14 @@
             </span>
           }
         </td>
-        @if (canAssignType()) {
-          <td>
-            <app-row-actions [items]="rowActions(e)" [ariaLabel]="'master.common.action' | translate" />
-          </td>
-        }
+        <td>
+          <app-row-actions [items]="rowActions(e)" [ariaLabel]="'master.common.action' | translate" />
+        </td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td [attr.colspan]="canAssignType() ? 5 : 4">
+        <td colspan="5">
           <div class="tab-empty" style="padding: var(--space-lg)">
             <span class="material-icons">business</span>
             <p>{{ 'master.entities.empty' | translate: { label: menuLabel() } }}</p>
@@ -267,5 +263,14 @@
     [entityId]="ge.id"
     [entityName]="ge.name"
     (closed)="closeGenerateDialog($event)"
+  />
+}
+
+<!-- Entity Details Drawer -->
+@if (detailsEntity(); as de) {
+  <app-entity-details-drawer
+    [entityId]="de.id"
+    [entityName]="de.name"
+    (closed)="closeDetailsDrawer($event)"
   />
 }

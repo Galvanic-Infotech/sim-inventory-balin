@@ -379,16 +379,27 @@ export interface EntityBasicDetails {
   address?: EntityAddress;
 }
 
+export interface EntityVts {
+  userId?: number | null;
+  excludeSubUser?: number[];
+}
+
 /** GET /Entity/{id}/attributes response shape */
 export interface EntityAttributesGet {
   basicDetails?: EntityBasicDetails;
   contacts?: EntityContact[];
+  vts?: EntityVts;
+  basketId?: number | null;
+  telegramChatId?: string | null;
 }
 
 /** PUT /Entity/{id}/attributes request body — replace approach */
 export interface EntityAttributesUpdate {
   basicDetails?: EntityBasicDetails;
   contacts?: EntityContact[];
+  vts?: EntityVts;
+  basketId?: number | null;
+  telegramChatId?: string | null;
 }
 
 // ── Entity Profile (/Entity/Profile) ──

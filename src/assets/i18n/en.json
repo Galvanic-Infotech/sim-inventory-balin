@@ -969,7 +969,48 @@
       "editBilling": "Edit billing config",
       "enableBilling": "Enable billing",
       "addCredit": "Add credit",
-      "generateBill": "Generate bill"
+      "generateBill": "Generate bill",
+      "viewDetails": "View Details"
+    },
+    "entityDetails": {
+      "title": "Entity Details",
+      "sections": {
+        "basicDetails": "Basic Details",
+        "address": "Address",
+        "contacts": "Contacts",
+        "vts": "VTS Integration",
+        "other": "Other"
+      },
+      "fields": {
+        "code": "Code",
+        "manufactureName": "Manufacturer Name",
+        "establishmentYear": "Establishment Year",
+        "cinNumber": "CIN Number",
+        "gstnNumber": "GSTN Number",
+        "houseNo": "House No",
+        "street": "Street",
+        "city": "City",
+        "district": "District",
+        "state": "State",
+        "pinCode": "PIN Code",
+        "personName": "Person Name",
+        "email": "Email",
+        "mobileNumber": "Mobile",
+        "landLine": "Landline",
+        "fax": "Fax",
+        "isPrimary": "Primary",
+        "vtsUserId": "VTS User ID",
+        "vtsExcludeSubUser": "Exclude Sub-Users (comma-separated IDs)",
+        "basketId": "Basket ID",
+        "telegramChatId": "Telegram Chat ID"
+      },
+      "addContact": "Add Contact",
+      "removeContact": "Remove",
+      "save": "Save Changes",
+      "saving": "Saving…",
+      "loadFailed": "Failed to load entity details",
+      "saveFailed": "Failed to save entity details",
+      "saved": "Entity details saved"
     },
     "roles": {
       "title": "Roles",
