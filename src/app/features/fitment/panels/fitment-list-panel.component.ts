@@ -51,7 +51,7 @@ export class FitmentListPanelComponent {
   readonly error = signal('');
 
   readonly pagination = signal<PaginationMeta | null>(null);
-  readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 5 });
+  readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 10 });
   readonly tableFirst = signal(0);
   readonly searchTerm = signal('');
   readonly statusFilter = signal<string | undefined>(undefined);
@@ -162,9 +162,9 @@ export class FitmentListPanelComponent {
       this.searchTerm.set('');
       this.statusFilter.set(undefined);
       this.tableFirst.set(0);
-      this.tableQuery.set({ pageNumber: 1, pageSize: 5 });
+      this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
       this.fetchStatusCount();
-      if (this.tableReady) this.load({ pageNumber: 1, pageSize: 5 });
+      if (this.tableReady) this.load({ pageNumber: 1, pageSize: 10 });
     });
   }
 
@@ -226,7 +226,7 @@ export class FitmentListPanelComponent {
   }
 
   private fetchAllFitmentsForExport() {
-    const pageSize = this.tableQuery().pageSize ?? 5;
+    const pageSize = this.tableQuery().pageSize ?? 10;
     const baseQuery: TableQueryParams = {
       pageNumber: 1,
       pageSize,
