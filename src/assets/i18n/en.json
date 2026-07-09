@@ -1543,6 +1543,9 @@
       "subtitle": "Entity-wise AIS device counts grouped by license duration.",
       "searchPlaceholder": "Search entity...",
       "totalDevices": "Total Devices",
+      "chartTitle": "Duration Trend",
+      "chartSub": "Devices by license duration",
+      "tooltipDevices": "Devices",
       "monthAbbr": "mo",
       "empty": "No device duration data",
       "columns": {

@@ -1,0 +1,48 @@
+<div class="dchart">
+  <div class="dchart__info">
+    <div class="dchart__label">
+      <span class="material-icons">insights</span>
+      {{ titleKey() | translate }}
+    </div>
+    <div class="dchart__value">{{ total() }}</div>
+    <div class="dchart__sub">{{ subKey() | translate }}</div>
+  </div>
+
+  @if (geometry(); as geo) {
+    <div class="dchart__chart">
+      <svg
+        class="dchart__svg"
+        [attr.viewBox]="'0 0 ' + geo.width + ' ' + geo.height"
+        preserveAspectRatio="none"
+        role="img"
+        [attr.aria-label]="titleKey() | translate"
+        (mousemove)="onMove($event)"
+        (mouseleave)="onLeave()"
+      >
+        <path [attr.d]="geo.areaPath" class="dchart__area" />
+        <path [attr.d]="geo.linePath" class="dchart__line" />
+        @for (c of geo.coords; track c.months) {
+          <circle [attr.cx]="c.x" [attr.cy]="c.y" r="2" class="dchart__dot" />
+        }
+      </svg>
+      @if (hover(); as h) {
+        <div
+          class="dchart__tooltip"
+          [style.left.px]="h.x"
+          [style.top.px]="h.y"
+        >
+          <div class="dchart__tooltip-title">{{ h.months }} {{ 'reports.duration.monthAbbr' | translate }}</div>
+          <div class="dchart__tooltip-count">
+            <span class="dchart__tooltip-dot"></span>
+            {{ h.count }} {{ 'reports.duration.tooltipDevices' | translate }}
+          </div>
+        </div>
+        <div
+          class="dchart__marker"
+          [style.left.px]="h.x"
+          [style.top.px]="h.y"
+        ></div>
+      }
+    </div>
+  }
+</div>

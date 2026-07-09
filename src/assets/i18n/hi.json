@@ -1543,6 +1543,9 @@
       "subtitle": "लाइसेंस अवधि के अनुसार इकाई-वार AIS डिवाइस गणना।",
       "searchPlaceholder": "इकाई खोजें...",
       "totalDevices": "कुल डिवाइस",
+      "chartTitle": "अवधि प्रवृत्ति",
+      "chartSub": "लाइसेंस अवधि के अनुसार डिवाइस",
+      "tooltipDevices": "डिवाइस",
       "monthAbbr": " माह",
       "empty": "कोई डिवाइस अवधि डेटा नहीं",
       "columns": {

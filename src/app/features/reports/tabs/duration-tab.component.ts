@@ -15,6 +15,7 @@ import {
   trackEntityIdChange,
 } from '../../../shared/utils/table-query.util';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
+import { DurationChartComponent } from '../../../shared/components/duration-chart/duration-chart.component';
 
 const DURATION_COLORS = [
   '#4f46e5',
@@ -36,7 +37,7 @@ interface DurationTotal {
 @Component({
   selector: 'app-duration-tab',
   standalone: true,
-  imports: [TableModule, TranslatePipe, SearchBarComponent],
+  imports: [TableModule, TranslatePipe, SearchBarComponent, DurationChartComponent],
   templateUrl: './duration-tab.component.html',
   styleUrl: './duration-tab.component.scss',
 })
@@ -73,6 +74,10 @@ export class DurationTabComponent {
       color: DURATION_COLORS[i % DURATION_COLORS.length],
     }));
   });
+
+  readonly durationBuckets = computed<DurationBucket[]>(() =>
+    this.durationTotals().map((t) => ({ durationMonths: t.durationMonths, count: t.count })),
+  );
 
   private colorMap = computed<Map<number, string>>(() => {
     const m = new Map<number, string>();

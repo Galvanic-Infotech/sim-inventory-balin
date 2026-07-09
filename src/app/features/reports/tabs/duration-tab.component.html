@@ -17,21 +17,10 @@
   </div>
 
   @if (rows().length > 0) {
-    <div class="duration__summary">
-      <div class="duration__stat">
-        <span class="duration__stat-label">{{ 'reports.duration.totalDevices' | translate }}</span>
-        <span class="duration__stat-value">{{ grandTotalDevices() }}</span>
-      </div>
-      <div class="duration__legend">
-        @for (t of durationTotals(); track t.durationMonths) {
-          <span class="duration__legend-item">
-            <span class="duration__swatch" [style.background]="t.color"></span>
-            <span class="duration__legend-label">{{ t.durationMonths }}{{ 'reports.duration.monthAbbr' | translate }}</span>
-            <span class="duration__legend-count">{{ t.count }}</span>
-          </span>
-        }
-      </div>
-    </div>
+    <app-duration-chart
+      [buckets]="durationBuckets()"
+      [total]="grandTotalDevices()"
+    />
   }
 
   @if (error()) {
