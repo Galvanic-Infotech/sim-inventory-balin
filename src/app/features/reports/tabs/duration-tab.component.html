@@ -1,0 +1,106 @@
+<div class="duration">
+  <div class="duration__head">
+    <div>
+      <h3>{{ 'reports.duration.title' | translate }}</h3>
+      <p class="duration__sub">{{ 'reports.duration.subtitle' | translate }}</p>
+    </div>
+    @if (pagination(); as pg) {
+      <span class="count-badge">{{ pg.totalCount }}</span>
+    }
+    <app-search-bar
+      [placeholder]="'reports.duration.searchPlaceholder' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+    <button class="btn btn-ghost" (click)="refresh()" [title]="'common.refresh' | translate" [disabled]="loading()">
+      <span class="material-icons">refresh</span>
+    </button>
+  </div>
+
+  @if (rows().length > 0) {
+    <div class="duration__summary">
+      <div class="duration__stat">
+        <span class="duration__stat-label">{{ 'reports.duration.totalDevices' | translate }}</span>
+        <span class="duration__stat-value">{{ grandTotalDevices() }}</span>
+      </div>
+      <div class="duration__legend">
+        @for (t of durationTotals(); track t.durationMonths) {
+          <span class="duration__legend-item">
+            <span class="duration__swatch" [style.background]="t.color"></span>
+            <span class="duration__legend-label">{{ t.durationMonths }}{{ 'reports.duration.monthAbbr' | translate }}</span>
+            <span class="duration__legend-count">{{ t.count }}</span>
+          </span>
+        }
+      </div>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="alert alert-danger">
+      <span class="material-icons">error</span>
+      <span>{{ error() }}</span>
+      <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else {
+    <p-table
+      [value]="rows()"
+      [lazy]="true"
+      (onLazyLoad)="onLazyLoad($event)"
+      [paginator]="true"
+      [rows]="tableQuery().pageSize ?? 10"
+      [rowsPerPageOptions]="[10, 25, 50, 100]"
+      [totalRecords]="totalRecords()"
+      [loading]="loading()"
+      [first]="tableFirst()"
+      styleClass="app-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'reports.duration.columns.entity' | translate }}</th>
+          <th>{{ 'reports.duration.columns.entityType' | translate }}</th>
+          <th class="num">{{ 'reports.duration.columns.totalDevices' | translate }}</th>
+          <th>{{ 'reports.duration.columns.breakdown' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-r>
+        <tr>
+          <td>
+            <div class="cell-stack">
+              <span class="cell-primary">{{ r.entityName }}</span>
+              <span class="cell-sub" style="font-size: var(--font-xs)">{{ r.entityId }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="duration__type" [attr.data-type]="entityTypeChip(r.entityType)">
+              {{ r.entityType }}
+            </span>
+          </td>
+          <td class="num">
+            <strong>{{ r.totalDevices }}</strong>
+          </td>
+          <td>
+            <div class="duration__buckets">
+              @for (b of sortedBuckets(r); track b.durationMonths) {
+                <span class="duration__bucket" [style.--bg]="colorFor(b.durationMonths)">
+                  <span class="duration__bucket-months">
+                    {{ b.durationMonths }}{{ 'reports.duration.monthAbbr' | translate }}
+                  </span>
+                  <span class="duration__bucket-count">{{ b.count }}</span>
+                </span>
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4">
+            <div class="tab-empty">
+              <span class="material-icons">devices</span>
+              <p>{{ 'reports.duration.empty' | translate }}</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

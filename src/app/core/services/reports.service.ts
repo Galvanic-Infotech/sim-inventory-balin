@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { API_ENDPOINTS } from '../constants/api.constants';
 import { RbacResponse } from '../../shared/models/rbac.model';
 import {
+  AisDurationCountRow,
   FitmentDetailGroup,
   FitmentReport,
   OutstandingReportRow,
@@ -40,6 +41,15 @@ export class ReportsService {
       .set('pageNumber', String(pageNumber))
       .set('pageSize', String(pageSize));
     return this.http.get<RbacResponse<FitmentDetailGroup[]>>(this.EP.REPORTS_FITMENTS_DETAILED, {
+      params,
+    });
+  }
+
+  getAisDurationCount(query: TableQueryParams = {}): Observable<RbacResponse<AisDurationCountRow[]>> {
+    const record = toQueryRecord(query);
+    let params = new HttpParams();
+    Object.entries(record).forEach(([k, v]) => (params = params.set(k, v)));
+    return this.http.get<RbacResponse<AisDurationCountRow[]>>(this.EP.REPORTS_AIS_DURATION_COUNT, {
       params,
     });
   }

@@ -1483,7 +1483,8 @@
     "subtitle": "Operational and financial reports across entities.",
     "tabs": {
       "outstanding": "Outstanding",
-      "fitment": "Fitment"
+      "fitment": "Fitment",
+      "duration": "Duration"
     },
     "outstanding": {
       "title": "Outstanding Report",
@@ -1535,6 +1536,23 @@
       "errors": {
         "load": "Failed to load fitment report",
         "invalidRange": "From date must be before To date"
+      }
+    },
+    "duration": {
+      "title": "AIS Device Duration Report",
+      "subtitle": "Entity-wise AIS device counts grouped by license duration.",
+      "searchPlaceholder": "Search entity...",
+      "totalDevices": "Total Devices",
+      "monthAbbr": "mo",
+      "empty": "No device duration data",
+      "columns": {
+        "entity": "Entity",
+        "entityType": "Type",
+        "totalDevices": "Total Devices",
+        "breakdown": "Duration Breakdown"
+      },
+      "errors": {
+        "load": "Failed to load duration report"
       }
     }
   }

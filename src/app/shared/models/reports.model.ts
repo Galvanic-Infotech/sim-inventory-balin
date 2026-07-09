@@ -57,3 +57,16 @@ export interface FitmentDetailGroup {
   durationSummary: FitmentDuration[];
   fitments: FitmentDetailRow[];
 }
+
+export interface DurationBucket {
+  durationMonths: number;
+  count: number;
+}
+
+export interface AisDurationCountRow {
+  entityId: string;
+  entityName: string;
+  entityType: string;
+  totalDevices: number;
+  durationCounts: DurationBucket[];
+}

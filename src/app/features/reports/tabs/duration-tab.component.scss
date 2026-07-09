@@ -1,0 +1,144 @@
+.duration {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+
+    h3 {
+      margin: 0;
+      font-size: var(--font-lg);
+    }
+    > div:first-child {
+      flex: 1;
+    }
+  }
+
+  &__sub {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-sm);
+  }
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    flex-wrap: wrap;
+    padding: var(--space-md);
+    background: var(--color-surface-2, var(--color-surface));
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-right: var(--space-lg);
+    border-right: 1px solid var(--color-border);
+  }
+
+  &__stat-label {
+    font-size: var(--font-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  &__stat-value {
+    font-size: var(--font-xl, 22px);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    flex: 1;
+  }
+
+  &__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--font-sm);
+  }
+
+  &__swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  &__legend-label {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  &__legend-count {
+    color: var(--color-text-muted);
+  }
+
+  &__type {
+    display: inline-block;
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-pill, 999px);
+    background: var(--color-surface-2, rgba(0, 0, 0, 0.04));
+    color: var(--color-text-muted);
+    font-size: var(--font-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+
+    &[data-type='dealer'] {
+      background: rgba(79, 70, 229, 0.12);
+      color: #4f46e5;
+    }
+    &[data-type='distributor'] {
+      background: rgba(8, 145, 178, 0.12);
+      color: #0891b2;
+    }
+    &[data-type='manufacturer'] {
+      background: rgba(5, 150, 105, 0.12);
+      color: #059669;
+    }
+  }
+
+  &__buckets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  &__bucket {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xxs, 4px);
+    padding: 2px var(--space-sm);
+    border-radius: var(--radius-pill, 999px);
+    font-size: var(--font-xs);
+    font-weight: 500;
+    background: color-mix(in srgb, var(--bg) 14%, transparent);
+    color: var(--bg);
+    border: 1px solid color-mix(in srgb, var(--bg) 30%, transparent);
+  }
+
+  &__bucket-months {
+    font-weight: 600;
+  }
+
+  &__bucket-count {
+    color: var(--color-text);
+    background: var(--color-surface);
+    border-radius: var(--radius-pill, 999px);
+    padding: 0 6px;
+    min-width: 20px;
+    text-align: center;
+  }
+}
