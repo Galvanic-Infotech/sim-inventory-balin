@@ -183,7 +183,8 @@
       "district": "District",
       "rtoCode": "RTO Code",
       "rtoName": "RTO Name",
-      "created": "Created"
+      "created": "Created",
+      "exportExcel": "Export to Excel"
     },
     "status": {
       "OtpPending": "OTP Pending",
@@ -239,6 +240,7 @@
       "deleteFailed": "Failed to delete fitment",
       "regenerateFailed": "Failed to regenerate certificate",
       "loadFailed": "Failed to load fitments",
+      "exportFailed": "Failed to export fitments",
       "enterSerial": "Enter serial number",
       "fetchVehicleFailed": "Failed to fetch vehicle details",
       "invalidResponse": "Invalid response from server",

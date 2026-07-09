@@ -183,7 +183,8 @@
       "district": "जिला",
       "rtoCode": "RTO कोड",
       "rtoName": "RTO नाम",
-      "created": "बनाया गया"
+      "created": "बनाया गया",
+      "exportExcel": "Excel में निर्यात करें"
     },
     "status": {
       "OtpPending": "OTP लंबित",
@@ -239,6 +240,7 @@
       "deleteFailed": "फिटमेंट हटाने में विफल",
       "regenerateFailed": "प्रमाणपत्र पुनः जनरेट करने में विफल",
       "loadFailed": "फिटमेंट लोड करने में विफल",
+      "exportFailed": "फिटमेंट निर्यात करने में विफल",
       "enterSerial": "सीरियल नंबर दर्ज करें",
       "fetchVehicleFailed": "वाहन विवरण प्राप्त करने में विफल",
       "invalidResponse": "सर्वर से अमान्य प्रतिक्रिया",

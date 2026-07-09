@@ -15,6 +15,7 @@ import { DeleteConfirmDialogComponent } from '../../../shared/components/delete-
 import { FitmentOtpDialogComponent } from './fitment-otp-dialog.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../core/services/translation.service';
+import { downloadExcel } from '../../../shared/utils/excel-export.util';
 
 @Component({
   selector: 'app-fitment-list-panel',
@@ -60,6 +61,7 @@ export class FitmentListPanelComponent {
   readonly regeneratingId = signal<string | null>(null);
   readonly deletingId = signal<string | null>(null);
   readonly deleteTarget = signal<Fitment | null>(null);
+  readonly exporting = signal(false);
 
   askDeleteFitment(f: Fitment): void {
     if (this.deletingId()) return;
@@ -201,6 +203,63 @@ export class FitmentListPanelComponent {
   refresh(): void {
     this.load();
     this.fetchStatusCount();
+  }
+
+  exportExcel(): void {
+    if (this.exporting() || this.totalRecords() === 0) return;
+
+    this.exporting.set(true);
+    this.error.set('');
+    const query: TableQueryParams = {
+      pageNumber: 1,
+      pageSize: this.totalRecords(),
+      searchTerm: this.searchTerm(),
+      status: this.statusFilter(),
+    };
+    this.fitment.getFitments(query).subscribe({
+      next: (res) => {
+        this.exporting.set(false);
+        const rows = res.data ?? [];
+        if (!rows.length) return;
+        downloadExcel(this.fitmentsToExportRows(rows), 'fitments.xlsx', 'Fitments');
+      },
+      error: (err) => {
+        this.exporting.set(false);
+        this.error.set(extractApiError(err, this.i18n.instant('fitment.errors.exportFailed')));
+      },
+    });
+  }
+
+  private fitmentsToExportRows(rows: Fitment[]): Record<string, unknown>[] {
+    const t = (key: string) => this.i18n.instant(key);
+    return rows.map((f) => ({
+      [t('fitment.list.colVehicleFitment')]: f.fitmentNo,
+      [t('fitment.list.registration')]: f.vehicleRegistrationNo,
+      [t('fitment.list.entityName')]: f.entity?.name ?? '',
+      [t('fitment.list.entityType')]: f.entity?.entityType?.name ?? '',
+      [t('fitment.list.chassis')]: f.chassisNo,
+      [t('fitment.list.engine')]: f.engineNo,
+      [t('fitment.list.makeModel')]: [f.vehicleMake, f.vehicleModel].filter(Boolean).join(' / '),
+      [t('fitment.list.mfgYear')]: f.mafYear,
+      [t('fitment.list.category')]: f.vehicleCategory?.name ?? '',
+      [t('fitment.list.name')]: f.customerName,
+      [t('fitment.list.mobile')]: f.mobileNo,
+      [t('fitment.list.address')]: f.address,
+      [t('fitment.list.state')]: f.rto?.district?.state?.stateName ?? '',
+      [t('fitment.list.rtoCode')]: f.rto?.rtoCode ?? '',
+      [t('fitment.list.rtoName')]: f.rto?.rtoName ?? '',
+      [t('fitment.list.colFitmentDate')]: this.formatExportDate(f.fitmentDate),
+      [t('fitment.list.colValidTill')]: this.formatExportDate(f.fitmentValidTill),
+      [t('fitment.list.colStatus')]: f.status ? t(`fitment.status.${f.status}`) : '',
+      [t('fitment.list.created')]: this.formatExportDate(f.createdAt),
+    }));
+  }
+
+  private formatExportDate(value: string | null | undefined): string {
+    if (!value) return '';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   private load(query?: TableQueryParams): void {
