@@ -1199,6 +1199,7 @@
       "date": "Date",
       "type": "Type",
       "activeSims": "Active SIMs",
+      "activeLicenses": "Active Licenses",
       "rate": "Rate per SIM",
       "debited": "Debited",
       "tax": "Tax",

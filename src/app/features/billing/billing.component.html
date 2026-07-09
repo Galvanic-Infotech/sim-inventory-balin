@@ -229,7 +229,7 @@
             <tr>
               <th>{{ 'billing.columns.date' | translate }}</th>
               <th>{{ 'billing.columns.type' | translate }}</th>
-              <th class="num">{{ 'billing.columns.activeSims' | translate }}</th>
+              <th class="num">{{ (selectedProductType() === BillingProductType.License ? 'billing.columns.activeLicenses' : 'billing.columns.activeSims') | translate }}</th>
               <th class="num">{{ 'billing.columns.rate' | translate }}</th>
               <th class="num">{{ 'billing.columns.debited' | translate }}</th>
               <th class="num">{{ 'billing.columns.tax' | translate }}</th>
