@@ -1,0 +1,113 @@
+<div class="edt">
+  <div class="edt__head">
+    <div>
+      <h3>{{ 'reports.entityDevices.title' | translate }}</h3>
+      <p class="edt__sub">{{ 'reports.entityDevices.subtitle' | translate }}</p>
+    </div>
+    @if (pagination(); as pg) {
+      <span class="count-badge">{{ pg.totalCount }}</span>
+    }
+    <app-search-bar
+      [placeholder]="'reports.entityDevices.searchPlaceholder' | translate"
+      (searchChange)="onSearchChange($event)"
+    />
+    <button class="btn btn-ghost" (click)="refresh()" [title]="'common.refresh' | translate" [disabled]="loading()">
+      <span class="material-icons">refresh</span>
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-danger">
+      <span class="material-icons">error</span>
+      <span>{{ error() }}</span>
+      <button class="btn btn-ghost" (click)="fetch()">{{ 'common.retry' | translate }}</button>
+    </div>
+  } @else {
+    <p-table
+      [value]="rows()"
+      [lazy]="true"
+      (onLazyLoad)="onLazyLoad($event)"
+      [paginator]="true"
+      [rows]="tableQuery().pageSize ?? 10"
+      [rowsPerPageOptions]="[10, 25, 50, 100]"
+      [totalRecords]="totalRecords()"
+      [loading]="loading()"
+      [first]="tableFirst()"
+      styleClass="app-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'reports.entityDevices.columns.entity' | translate }}</th>
+          <th>{{ 'reports.entityDevices.columns.entityType' | translate }}</th>
+          <th>{{ 'reports.entityDevices.columns.status' | translate }}</th>
+          <th class="num">{{ 'reports.entityDevices.columns.available' | translate }}</th>
+          <th class="num">{{ 'reports.entityDevices.columns.active' | translate }}</th>
+          <th class="num">{{ 'reports.entityDevices.columns.fitted' | translate }}</th>
+          <th class="num">{{ 'reports.entityDevices.columns.total' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-r>
+        <tr>
+          <td>
+            <div class="cell-stack">
+              <span class="cell-primary">{{ r.name }}</span>
+              <span class="cell-sub" style="font-size: var(--font-xs)">{{ r.id }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="edt__type" [attr.data-type]="entityTypeChip(r.entityType?.name)">
+              {{ r.entityType?.name }}
+            </span>
+          </td>
+          <td>
+            @if (r.isActive) {
+              <span class="edt__chip edt__chip--ok">
+                <span class="material-icons">check_circle</span>
+                {{ 'reports.entityDevices.active' | translate }}
+              </span>
+            } @else {
+              <span class="edt__chip edt__chip--muted">
+                <span class="material-icons">block</span>
+                {{ 'reports.entityDevices.inactive' | translate }}
+              </span>
+            }
+          </td>
+          <td class="num">
+            @if (r.availableDeviceCount > 0) {
+              <strong class="edt__num edt__num--available">{{ r.availableDeviceCount }}</strong>
+            } @else {
+              <span class="cell-sub">0</span>
+            }
+          </td>
+          <td class="num">
+            @if (r.activeDeviceCount > 0) {
+              <strong class="edt__num edt__num--active">{{ r.activeDeviceCount }}</strong>
+            } @else {
+              <span class="cell-sub">0</span>
+            }
+          </td>
+          <td class="num">
+            @if (r.fittedDeviceCount > 0) {
+              <strong class="edt__num edt__num--fitted">{{ r.fittedDeviceCount }}</strong>
+            } @else {
+              <span class="cell-sub">0</span>
+            }
+          </td>
+          <td class="num">
+            <strong>{{ rowTotal(r) }}</strong>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <div class="tab-empty">
+              <span class="material-icons">business</span>
+              <p>{{ 'reports.entityDevices.empty' | translate }}</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

@@ -1484,7 +1484,8 @@
     "tabs": {
       "outstanding": "बकाया",
       "fitment": "फिटमेंट",
-      "duration": "अवधि"
+      "duration": "अवधि",
+      "entityDevices": "इकाई डिवाइस"
     },
     "outstanding": {
       "title": "बकाया रिपोर्ट",
@@ -1556,6 +1557,32 @@
       },
       "errors": {
         "load": "अवधि रिपोर्ट लोड करने में विफल"
+      }
+    },
+    "entityDevices": {
+      "title": "इकाई डिवाइस गणना",
+      "subtitle": "प्रति इकाई उपलब्ध, सक्रिय और फिट डिवाइस गणना।",
+      "searchPlaceholder": "इकाई खोजें...",
+      "active": "सक्रिय",
+      "inactive": "निष्क्रिय",
+      "empty": "कोई इकाई डेटा नहीं",
+      "stats": {
+        "total": "कुल डिवाइस",
+        "available": "उपलब्ध",
+        "active": "सक्रिय",
+        "fitted": "फिट"
+      },
+      "columns": {
+        "entity": "इकाई",
+        "entityType": "प्रकार",
+        "status": "स्थिति",
+        "available": "उपलब्ध",
+        "active": "सक्रिय",
+        "fitted": "फिट",
+        "total": "कुल"
+      },
+      "errors": {
+        "load": "इकाई डिवाइस गणना लोड करने में विफल"
       }
     }
   }

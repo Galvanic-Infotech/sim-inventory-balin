@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from '../constants/api.constants';
 import { RbacResponse } from '../../shared/models/rbac.model';
 import {
   AisDurationCountRow,
+  EntityDeviceCountRow,
   FitmentDetailGroup,
   FitmentReport,
   OutstandingReportRow,
@@ -50,6 +51,15 @@ export class ReportsService {
     let params = new HttpParams();
     Object.entries(record).forEach(([k, v]) => (params = params.set(k, v)));
     return this.http.get<RbacResponse<AisDurationCountRow[]>>(this.EP.REPORTS_AIS_DURATION_COUNT, {
+      params,
+    });
+  }
+
+  getEntityDeviceCounts(query: TableQueryParams = {}): Observable<RbacResponse<EntityDeviceCountRow[]>> {
+    const record = toQueryRecord(query);
+    let params = new HttpParams();
+    Object.entries(record).forEach(([k, v]) => (params = params.set(k, v)));
+    return this.http.get<RbacResponse<EntityDeviceCountRow[]>>(this.EP.REPORTS_ENTITY_DEVICE_COUNTS, {
       params,
     });
   }

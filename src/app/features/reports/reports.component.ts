@@ -4,6 +4,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { OutstandingTabComponent } from './tabs/outstanding-tab.component';
 import { FitmentTabComponent } from './tabs/fitment-tab.component';
 import { DurationTabComponent } from './tabs/duration-tab.component';
+import { EntityDevicesTabComponent } from './tabs/entity-devices-tab.component';
 
 interface ReportTab {
   labelKey: string;
@@ -14,7 +15,13 @@ interface ReportTab {
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [OutstandingTabComponent, FitmentTabComponent, DurationTabComponent, TranslatePipe],
+  imports: [
+    OutstandingTabComponent,
+    FitmentTabComponent,
+    DurationTabComponent,
+    EntityDevicesTabComponent,
+    TranslatePipe,
+  ],
   templateUrl: './reports.component.html',
   styleUrl: './reports.component.scss',
 })
@@ -25,6 +32,7 @@ export class ReportsComponent {
     { labelKey: 'reports.tabs.outstanding', icon: 'account_balance_wallet', key: 'outstanding' },
     { labelKey: 'reports.tabs.fitment', icon: 'build_circle', key: 'fitment' },
     { labelKey: 'reports.tabs.duration', icon: 'schedule', key: 'duration' },
+    { labelKey: 'reports.tabs.entityDevices', icon: 'business', key: 'entity-devices' },
   ];
 
   readonly activeTabKey = signal(this.tabDefs[0].key);

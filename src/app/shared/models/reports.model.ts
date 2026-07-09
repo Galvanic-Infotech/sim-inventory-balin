@@ -70,3 +70,18 @@ export interface AisDurationCountRow {
   totalDevices: number;
   durationCounts: DurationBucket[];
 }
+
+export interface EntityDeviceCountRow {
+  id: string;
+  name: string;
+  entityType: {
+    id: string;
+    name: string;
+    description?: string;
+    menuName?: string | null;
+  };
+  isActive: boolean;
+  availableDeviceCount: number;
+  activeDeviceCount: number;
+  fittedDeviceCount: number;
+}

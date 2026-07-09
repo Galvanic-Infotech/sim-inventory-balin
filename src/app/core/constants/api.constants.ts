@@ -80,6 +80,7 @@ export const API_ENDPOINTS = {
     REPORTS_FITMENTS: '/Reports/fitments/count',
     REPORTS_FITMENTS_DETAILED: '/Reports/fitments/detailed',
     REPORTS_AIS_DURATION_COUNT: '/Reports/ais-devices/duration-count',
+    REPORTS_ENTITY_DEVICE_COUNTS: '/Entity/with-device-counts',
   },
   SIM: {
     BASKET: '/SimActivation/fetch_basket_details',

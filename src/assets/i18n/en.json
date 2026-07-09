@@ -1484,7 +1484,8 @@
     "tabs": {
       "outstanding": "Outstanding",
       "fitment": "Fitment",
-      "duration": "Duration"
+      "duration": "Duration",
+      "entityDevices": "Entity Devices"
     },
     "outstanding": {
       "title": "Outstanding Report",
@@ -1556,6 +1557,32 @@
       },
       "errors": {
         "load": "Failed to load duration report"
+      }
+    },
+    "entityDevices": {
+      "title": "Entity Device Counts",
+      "subtitle": "Available, active and fitted device counts per entity.",
+      "searchPlaceholder": "Search entity...",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": "No entity data",
+      "stats": {
+        "total": "Total Devices",
+        "available": "Available",
+        "active": "Active",
+        "fitted": "Fitted"
+      },
+      "columns": {
+        "entity": "Entity",
+        "entityType": "Type",
+        "status": "Status",
+        "available": "Available",
+        "active": "Active",
+        "fitted": "Fitted",
+        "total": "Total"
+      },
+      "errors": {
+        "load": "Failed to load entity device counts"
       }
     }
   }
