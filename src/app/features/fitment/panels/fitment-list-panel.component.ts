@@ -2,6 +2,8 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
+import { forkJoin, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth.service';
 import { FitmentService } from '../../../core/services/fitment.service';
 import { PermissionService, PERMS } from '../../../core/services/permission.service';
@@ -49,7 +51,7 @@ export class FitmentListPanelComponent {
   readonly error = signal('');
 
   readonly pagination = signal<PaginationMeta | null>(null);
-  readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 10 });
+  readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 5 });
   readonly tableFirst = signal(0);
   readonly searchTerm = signal('');
   readonly statusFilter = signal<string | undefined>(undefined);
@@ -160,9 +162,9 @@ export class FitmentListPanelComponent {
       this.searchTerm.set('');
       this.statusFilter.set(undefined);
       this.tableFirst.set(0);
-      this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
+      this.tableQuery.set({ pageNumber: 1, pageSize: 5 });
       this.fetchStatusCount();
-      if (this.tableReady) this.load({ pageNumber: 1, pageSize: 10 });
+      if (this.tableReady) this.load({ pageNumber: 1, pageSize: 5 });
     });
   }
 
@@ -210,16 +212,9 @@ export class FitmentListPanelComponent {
 
     this.exporting.set(true);
     this.error.set('');
-    const query: TableQueryParams = {
-      pageNumber: 1,
-      pageSize: this.totalRecords(),
-      searchTerm: this.searchTerm(),
-      status: this.statusFilter(),
-    };
-    this.fitment.getFitments(query).subscribe({
-      next: (res) => {
+    this.fetchAllFitmentsForExport().subscribe({
+      next: (rows) => {
         this.exporting.set(false);
-        const rows = res.data ?? [];
         if (!rows.length) return;
         downloadExcel(this.fitmentsToExportRows(rows), 'fitments.xlsx', 'Fitments');
       },
@@ -228,6 +223,35 @@ export class FitmentListPanelComponent {
         this.error.set(extractApiError(err, this.i18n.instant('fitment.errors.exportFailed')));
       },
     });
+  }
+
+  private fetchAllFitmentsForExport() {
+    const pageSize = this.tableQuery().pageSize ?? 5;
+    const baseQuery: TableQueryParams = {
+      pageNumber: 1,
+      pageSize,
+      searchTerm: this.searchTerm(),
+      status: this.statusFilter(),
+    };
+
+    return this.fitment.getFitments(baseQuery).pipe(
+      switchMap((firstRes) => {
+        const firstRows = firstRes.data ?? [];
+        const totalPages = firstRes.metadata?.pagination?.totalPages ?? 1;
+
+        if (totalPages <= 1) {
+          return of(firstRows);
+        }
+
+        const pageRequests = Array.from({ length: totalPages - 1 }, (_, i) =>
+          this.fitment.getFitments({ ...baseQuery, pageNumber: i + 2 }),
+        );
+
+        return forkJoin(pageRequests).pipe(
+          map((responses) => [...firstRows, ...responses.flatMap((r) => r.data ?? [])]),
+        );
+      }),
+    );
   }
 
   private fitmentsToExportRows(rows: Fitment[]): Record<string, unknown>[] {
