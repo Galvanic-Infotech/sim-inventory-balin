@@ -1260,6 +1260,7 @@
     "tableTitle": "SIMs",
     "searchPlaceholder": "Search ICCID / mobile / customer…",
     "empty": "No SIMs found",
+    "exportExcel": "Export to Excel",
     "editLabel": "Edit",
     "editSelected": "Edit Selected",
     "selected": "selected",
@@ -1300,7 +1301,8 @@
       }
     },
     "errors": {
-      "load": "Failed to load SIM inventory"
+      "load": "Failed to load SIM inventory",
+      "export": "Failed to export SIM inventory"
     }
   },
   "simDashboard": {

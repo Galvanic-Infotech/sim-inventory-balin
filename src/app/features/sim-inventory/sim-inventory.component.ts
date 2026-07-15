@@ -12,6 +12,8 @@ import { SearchBarComponent } from '../../shared/components/search-bar/search-ba
 import { PaginationMeta } from '../../shared/models/rbac.model';
 import { TableQueryParams } from '../../shared/models/table-query.model';
 import { tableQueryFromLazyEvent, tableQuerySignature, isDuplicateTableFetch, trackEntityIdChange } from '../../shared/utils/table-query.util';
+import { downloadExcel } from '../../shared/utils/excel-export.util';
+import { fetchAllPages } from '../../shared/utils/paged-export.util';
 import { itemStatusChipClass, itemStatusLabel } from '../../shared/models/item-status.model';
 import {
   SIM_INVENTORY_STATUSES,
@@ -20,6 +22,7 @@ import {
 } from '../../shared/models/sim-inventory.model';
 import { ActivateDialogComponent } from './activate-dialog.component';
 import { RowAction, RowActionsComponent } from '../../shared/components/row-actions/row-actions.component';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sim-inventory',
@@ -48,6 +51,7 @@ export class SimInventoryComponent {
 
   readonly items = signal<SimInventoryItem[]>([]);
   readonly loading = signal(false);
+  readonly exporting = signal(false);
   readonly error = signal('');
   readonly pagination = signal<PaginationMeta | null>(null);
   readonly tableQuery = signal<TableQueryParams>({
@@ -127,6 +131,53 @@ export class SimInventoryComponent {
     this.tableFirst.set(0);
     this.tableQuery.update((q) => ({ ...q, pageNumber: 1, status: value }));
     this.fetch();
+  }
+
+  exportExcel(): void {
+    if (this.exporting() || this.totalRecords() === 0) return;
+
+    const pageSize = this.tableQuery().pageSize ?? 10;
+    const baseQuery: TableQueryParams = {
+      pageNumber: 1,
+      pageSize,
+      searchTerm: this.searchTerm(),
+      status: this.status(),
+      sortBy: this.tableQuery().sortBy ?? 'activationAt',
+      sortOrder: this.tableQuery().sortOrder ?? 'desc',
+    };
+
+    this.exporting.set(true);
+    this.error.set('');
+    fetchAllPages((pageNumber) =>
+      this.sim.fetchSimInventory({ ...baseQuery, pageNumber }).pipe(
+        map((res) => ({
+          rows: res.items,
+          totalPages: res.pagination?.totalPages ?? 1,
+        })),
+      ),
+    ).subscribe({
+      next: (rows) => {
+        this.exporting.set(false);
+        if (!rows.length) return;
+        const t = (key: string) => this.i18n.instant(key);
+        downloadExcel(
+          rows.map((it) => ({
+            [t('simInventory.columns.iccid')]: it.iccid,
+            [t('simInventory.columns.mobile')]: it.mobileNo || '',
+            [t('simInventory.columns.status')]: it.status ? itemStatusLabel(it.status) : '',
+            [t('simInventory.columns.customer')]: it.customerName || '',
+            [t('simInventory.columns.activated')]: formatInventoryDate(it.activationAt),
+            [t('simInventory.columns.validTill')]: formatInventoryDate(it.validTill),
+          })),
+          'sim-inventory.xlsx',
+          'SIM Inventory',
+        );
+      },
+      error: (err) => {
+        this.exporting.set(false);
+        this.error.set(extractApiError(err, this.i18n.instant('simInventory.errors.export')));
+      },
+    });
   }
 
   fetch(query?: TableQueryParams): void {
