@@ -310,6 +310,7 @@
       "devicesSuffix": "डिवाइस",
       "searchPlaceholder": "सीरियल, IMEI, ICCID, इकाई से खोजें...",
       "refreshTable": "टेबल रीफ्रेश करें",
+      "exportExcel": "Excel में निर्यात करें",
       "bulkUpload": "बल्क अपलोड",
       "noDevices": "कोई डिवाइस नहीं मिली",
       "startFitment": "फिटमेंट शुरू करें",
@@ -504,6 +505,7 @@
     },
     "errors": {
       "loadDevices": "डिवाइस लोड करने में विफल",
+      "exportFailed": "डिवाइस निर्यात करने में विफल",
       "loadEntityCounts": "इकाई डिवाइस गणना लोड करने में विफल",
       "loadInstallation": "इंस्टॉलेशन ग्राफ लोड करने में विफल",
       "loadMovement": "मूवमेंट सारांश लोड करने में विफल",

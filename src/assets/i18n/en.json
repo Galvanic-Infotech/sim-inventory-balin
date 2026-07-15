@@ -310,6 +310,7 @@
       "devicesSuffix": "Devices",
       "searchPlaceholder": "Search by serial, IMEI, ICCID, entity...",
       "refreshTable": "Refresh table",
+      "exportExcel": "Export to Excel",
       "bulkUpload": "Bulk Upload",
       "noDevices": "No devices found",
       "startFitment": "Start fitment",
@@ -504,6 +505,7 @@
     },
     "errors": {
       "loadDevices": "Failed to load devices",
+      "exportFailed": "Failed to export devices",
       "loadEntityCounts": "Failed to load entity device counts",
       "loadInstallation": "Failed to load installation graph",
       "loadMovement": "Failed to load movement summary",

@@ -20,6 +20,8 @@ import { isItemActive } from '../../../shared/models/item-status.model';
 import { PaginationMeta } from '../../../shared/models/rbac.model';
 import { TableQueryParams } from '../../../shared/models/table-query.model';
 import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util';
+import { downloadExcel } from '../../../shared/utils/excel-export.util';
+import { fetchAllPagedRows } from '../../../shared/utils/paged-export.util';
 import { BulkUploadDialogComponent } from '../../../shared/components/bulk-upload-dialog/bulk-upload-dialog.component';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { DeviceRcDetailsDialogComponent } from './device-rc-details-dialog.component';
@@ -68,6 +70,7 @@ export class DevicesListPanelComponent {
 
   readonly rows = signal<AisDevice[]>([]);
   readonly loading = signal(false);
+  readonly exporting = signal(false);
   readonly error = signal('');
 
   readonly pagination = signal<PaginationMeta | null>(null);
@@ -255,6 +258,62 @@ export class DevicesListPanelComponent {
   fetch(): void {
     this.scheduleLoad();
     this.fetchSummary();
+  }
+
+  exportExcel(): void {
+    if (this.exporting() || this.totalRecords() === 0) return;
+
+    const status = this.statusFilter();
+    const pageSize = this.tableQuery().pageSize ?? 10;
+    const baseQuery: TableQueryParams = {
+      pageNumber: 1,
+      pageSize,
+      searchTerm: this.searchTerm(),
+      sortBy: this.tableQuery().sortBy,
+      sortOrder: this.tableQuery().sortOrder,
+    };
+    const filters = status ? { status } : {};
+
+    this.exporting.set(true);
+    this.error.set('');
+    fetchAllPagedRows((pageNumber) =>
+      this.devices.getDevices({ ...baseQuery, pageNumber }, filters),
+    ).subscribe({
+      next: (rows) => {
+        this.exporting.set(false);
+        if (!rows.length) return;
+        downloadExcel(this.toExportRows(rows), 'devices.xlsx', 'Devices');
+      },
+      error: (err) => {
+        this.exporting.set(false);
+        this.error.set(extractApiError(err, this.i18n.instant('devices.errors.exportFailed')));
+      },
+    });
+  }
+
+  private toExportRows(rows: AisDevice[]): Record<string, unknown>[] {
+    const t = (key: string) => this.i18n.instant(key);
+    return rows.map((d) => ({
+      [t('devices.columns.deviceModel')]: d.deviceModel?.name ?? '',
+      [t('devices.columns.imei')]: d.imei ?? '',
+      [t('devices.columns.serialNumber')]: d.serialNumber ?? '',
+      [t('devices.columns.simProvider')]: d.simProvider?.name ?? '',
+      [t('devices.columns.iccid')]: d.iccid ?? '',
+      [t('devices.columns.primarySim')]: d.primarySimPhone ?? '',
+      [t('devices.columns.primarySimValidity')]: this.formatExportDate(d.primarySimValidity),
+      [t('devices.columns.secondarySim')]: d.secondarySimPhone ?? '',
+      [t('devices.columns.secondarySimValidity')]: this.formatExportDate(d.secondarySimValidity),
+      [t('devices.columns.oemRfc')]: d.entityName ?? '',
+      [t('devices.columns.status')]: this.statusInfo(d.status).label,
+      [t('devices.columns.activationDate')]: this.formatExportDate(d.activationAt),
+    }));
+  }
+
+  private formatExportDate(value: string | null | undefined): string {
+    if (!value) return '';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   private resetListState(): void {
