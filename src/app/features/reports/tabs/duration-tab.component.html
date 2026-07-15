@@ -11,6 +11,18 @@
       [placeholder]="'reports.duration.searchPlaceholder' | translate"
       (searchChange)="onSearchChange($event)"
     />
+    <button
+      class="btn btn-ghost"
+      (click)="exportExcel()"
+      [disabled]="exporting() || totalRecords() === 0"
+      [title]="'reports.exportExcel' | translate"
+    >
+      @if (exporting()) {
+        <div class="spinner spinner--dark"></div>
+      } @else {
+        <span class="material-icons">download</span>
+      }
+    </button>
     <button class="btn btn-ghost" (click)="refresh()" [title]="'common.refresh' | translate" [disabled]="loading()">
       <span class="material-icons">refresh</span>
     </button>

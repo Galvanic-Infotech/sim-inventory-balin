@@ -15,6 +15,9 @@ import {
 import { PaginationMeta } from '../../../shared/models/rbac.model';
 import { trackEntityIdChange } from '../../../shared/utils/table-query.util';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
+import { downloadExcel } from '../../../shared/utils/excel-export.util';
+import { fetchAllPagedRows } from '../../../shared/utils/paged-export.util';
+import { map } from 'rxjs/operators';
 
 interface FitmentFlatRow {
   entityName: string;
@@ -105,6 +108,7 @@ export class FitmentTabComponent {
 
   readonly loadingSummary = signal(false);
   readonly loadingDetail = signal(false);
+  readonly exporting = signal(false);
   readonly error = signal('');
 
   readonly entityFilter = signal<string>('');
@@ -234,6 +238,89 @@ export class FitmentTabComponent {
 
   refresh(): void {
     this.fetchAll();
+  }
+
+  exportExcel(): void {
+    if (this.exporting() || this.totalRecords() === 0) return;
+    if (!this.validateRange()) return;
+
+    const from = toIsoStart(this.fromDate());
+    const to = toIsoEnd(this.toDate());
+    const pageSize = this.pageSize();
+
+    this.exporting.set(true);
+    this.error.set('');
+    fetchAllPagedRows((pageNumber) =>
+      this.reports.getFitmentsDetailed(from, to, pageNumber, pageSize),
+    )
+      .pipe(map((groups) => this.flattenAndFilterGroups(groups)))
+      .subscribe({
+        next: (rows) => {
+          this.exporting.set(false);
+          if (!rows.length) return;
+          downloadExcel(this.toExportRows(rows), 'fitment-report.xlsx', 'Fitments');
+        },
+        error: (err) => {
+          this.exporting.set(false);
+          this.error.set(extractApiError(err, this.i18n.instant('reports.fitment.errors.export')));
+        },
+      });
+  }
+
+  private flattenAndFilterGroups(groups: FitmentDetailGroup[]): FitmentFlatRow[] {
+    const ef = this.entityFilter();
+    const term = this.searchTerm().trim().toLowerCase();
+    const out: FitmentFlatRow[] = [];
+    for (const g of groups) {
+      for (const f of g.fitments ?? []) {
+        const row: FitmentFlatRow = { entityName: g.entityName, entityType: g.entityType, fitment: f };
+        if (ef && row.entityName !== ef) continue;
+        if (term) {
+          const match =
+            f.fitmentNo?.toLowerCase().includes(term) ||
+            f.serialNumber?.toLowerCase().includes(term) ||
+            f.vehicleRegistrationNo?.toLowerCase().includes(term) ||
+            f.vehicleMake?.toLowerCase().includes(term) ||
+            f.vehicleModel?.toLowerCase().includes(term) ||
+            f.customerName?.toLowerCase().includes(term) ||
+            f.mobileNo?.toLowerCase().includes(term) ||
+            row.entityName?.toLowerCase().includes(term);
+          if (!match) continue;
+        }
+        out.push(row);
+      }
+    }
+    return out;
+  }
+
+  private toExportRows(rows: FitmentFlatRow[]): Record<string, unknown>[] {
+    const t = (key: string, params?: Record<string, string | number>) =>
+      this.i18n.instant(key, params);
+    return rows.map((r) => ({
+      [t('reports.fitment.columns.entity')]: r.entityName,
+      [t('reports.fitment.entityType')]: r.entityType,
+      [t('reports.fitment.columns.fitmentNo')]: r.fitment.fitmentNo,
+      [t('reports.fitment.columns.serial')]: r.fitment.serialNumber,
+      [t('reports.fitment.columns.vehicleReg')]: r.fitment.vehicleRegistrationNo,
+      [t('reports.fitment.columns.vehicle')]: [r.fitment.vehicleMake, r.fitment.vehicleModel]
+        .filter(Boolean)
+        .join(' / '),
+      [t('reports.fitment.columns.customer')]: r.fitment.customerName,
+      [t('reports.fitment.columns.mobile')]: r.fitment.mobileNo,
+      [t('reports.fitment.columns.duration')]: t('reports.fitment.durationMonths', {
+        months: r.fitment.durationMonths,
+      }),
+      [t('reports.fitment.columns.fitmentDate')]: this.formatExportDate(r.fitment.fitmentDate),
+      [t('reports.fitment.columns.validTill')]: this.formatExportDate(r.fitment.fitmentValidTill),
+      [t('reports.fitment.columns.status')]: r.fitment.status,
+    }));
+  }
+
+  private formatExportDate(value: string | null | undefined): string {
+    if (!value) return '';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
   onLazyLoad(event: TableLazyLoadEvent): void {

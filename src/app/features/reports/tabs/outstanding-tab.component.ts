@@ -21,6 +21,8 @@ import { RowAction, RowActionsComponent } from '../../../shared/components/row-a
 import { BillingConfigDrawerComponent } from '../../../shared/components/billing-config-drawer/billing-config-drawer.component';
 import { BillingCreditDialogComponent } from '../../../shared/components/billing-credit-dialog/billing-credit-dialog.component';
 import { BillingGenerateDialogComponent } from '../../../shared/components/billing-generate-dialog/billing-generate-dialog.component';
+import { downloadExcel } from '../../../shared/utils/excel-export.util';
+import { fetchAllPagedRows } from '../../../shared/utils/paged-export.util';
 
 @Component({
   selector: 'app-outstanding-tab',
@@ -50,6 +52,7 @@ export class OutstandingTabComponent {
 
   readonly rows = signal<OutstandingReportRow[]>([]);
   readonly loading = signal(false);
+  readonly exporting = signal(false);
   readonly error = signal('');
   readonly pagination = signal<PaginationMeta | null>(null);
   readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 10 });
@@ -97,6 +100,48 @@ export class OutstandingTabComponent {
   refresh(): void {
     this.lastQuerySig = '';
     this.fetch();
+  }
+
+  exportExcel(): void {
+    if (this.exporting() || this.totalRecords() === 0) return;
+
+    const pageSize = this.tableQuery().pageSize ?? 10;
+    const baseQuery: TableQueryParams = {
+      pageNumber: 1,
+      pageSize,
+      searchTerm: this.searchTerm(),
+    };
+
+    this.exporting.set(true);
+    this.error.set('');
+    fetchAllPagedRows((pageNumber) =>
+      this.reports.getOutstanding({ ...baseQuery, pageNumber }),
+    ).subscribe({
+      next: (rows) => {
+        this.exporting.set(false);
+        if (!rows.length) return;
+        const t = (key: string) => this.i18n.instant(key);
+        downloadExcel(
+          rows.map((r) => ({
+            [t('reports.outstanding.columns.entity')]: r.entityName,
+            [t('reports.outstanding.columns.simOutstanding')]: r.simOutstanding,
+            [t('reports.outstanding.columns.simCreditLimit')]: r.simCreditLimit ?? '',
+            [t('reports.outstanding.columns.licenseOutstanding')]: r.licenseOutstanding,
+            [t('reports.outstanding.columns.licenseCreditLimit')]: r.licenseCreditLimit ?? '',
+            [t('reports.outstanding.columns.status')]:
+              r.simOverLimit || r.licenseOverLimit
+                ? t('reports.outstanding.overLimit')
+                : t('reports.outstanding.ok'),
+          })),
+          'outstanding-report.xlsx',
+          'Outstanding',
+        );
+      },
+      error: (err) => {
+        this.exporting.set(false);
+        this.error.set(extractApiError(err, this.i18n.instant('reports.outstanding.errors.export')));
+      },
+    });
   }
 
   fetch(query?: TableQueryParams): void {

@@ -1481,6 +1481,7 @@
   "reports": {
     "title": "Reports",
     "subtitle": "Operational and financial reports across entities.",
+    "exportExcel": "Export to Excel",
     "tabs": {
       "outstanding": "Outstanding",
       "fitment": "Fitment",
@@ -1503,7 +1504,8 @@
         "status": "Status"
       },
       "errors": {
-        "load": "Failed to load outstanding report"
+        "load": "Failed to load outstanding report",
+        "export": "Failed to export outstanding report"
       }
     },
     "fitment": {
@@ -1518,6 +1520,7 @@
       "fitments": "fitments",
       "searchPlaceholder": "Search fitment, serial, vehicle, customer...",
       "empty": "No fitments in selected range",
+      "entityType": "Entity Type",
       "columns": {
         "date": "Date",
         "entity": "Entity",
@@ -1529,6 +1532,7 @@
         "vehicleReg": "Vehicle Reg",
         "vehicle": "Vehicle",
         "customer": "Customer",
+        "mobile": "Mobile",
         "fitmentDate": "Fitment Date",
         "validTill": "Valid Till",
         "status": "Status"
@@ -1536,7 +1540,8 @@
       "durationMonths": "{{months}} mo",
       "errors": {
         "load": "Failed to load fitment report",
-        "invalidRange": "From date must be before To date"
+        "invalidRange": "From date must be before To date",
+        "export": "Failed to export fitment report"
       }
     },
     "duration": {
@@ -1556,7 +1561,8 @@
         "breakdown": "Duration Breakdown"
       },
       "errors": {
-        "load": "Failed to load duration report"
+        "load": "Failed to load duration report",
+        "export": "Failed to export duration report"
       }
     },
     "entityDevices": {
@@ -1582,7 +1588,8 @@
         "total": "Total"
       },
       "errors": {
-        "load": "Failed to load entity device counts"
+        "load": "Failed to load entity device counts",
+        "export": "Failed to export entity device counts"
       }
     }
   }

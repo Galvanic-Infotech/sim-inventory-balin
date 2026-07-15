@@ -16,6 +16,8 @@ import {
 } from '../../../shared/utils/table-query.util';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { DurationChartComponent } from '../../../shared/components/duration-chart/duration-chart.component';
+import { downloadExcel } from '../../../shared/utils/excel-export.util';
+import { fetchAllPagedRows } from '../../../shared/utils/paged-export.util';
 
 const DURATION_COLORS = [
   '#4f46e5',
@@ -48,6 +50,7 @@ export class DurationTabComponent {
 
   readonly rows = signal<AisDurationCountRow[]>([]);
   readonly loading = signal(false);
+  readonly exporting = signal(false);
   readonly error = signal('');
   readonly pagination = signal<PaginationMeta | null>(null);
   readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 10 });
@@ -132,6 +135,47 @@ export class DurationTabComponent {
   refresh(): void {
     this.lastQuerySig = '';
     this.fetch();
+  }
+
+  exportExcel(): void {
+    if (this.exporting() || this.totalRecords() === 0) return;
+
+    const pageSize = this.tableQuery().pageSize ?? 10;
+    const baseQuery: TableQueryParams = {
+      pageNumber: 1,
+      pageSize,
+      searchTerm: this.searchTerm(),
+    };
+    const mo = this.i18n.instant('reports.duration.monthAbbr');
+
+    this.exporting.set(true);
+    this.error.set('');
+    fetchAllPagedRows((pageNumber) =>
+      this.reports.getAisDurationCount({ ...baseQuery, pageNumber }),
+    ).subscribe({
+      next: (rows) => {
+        this.exporting.set(false);
+        if (!rows.length) return;
+        const t = (key: string) => this.i18n.instant(key);
+        downloadExcel(
+          rows.map((r) => ({
+            [t('reports.duration.columns.entity')]: r.entityName,
+            [t('reports.duration.columns.entityType')]: r.entityType,
+            [t('reports.duration.columns.totalDevices')]: r.totalDevices,
+            [t('reports.duration.columns.breakdown')]: [...(r.durationCounts ?? [])]
+              .sort((a, b) => a.durationMonths - b.durationMonths)
+              .map((b) => `${b.durationMonths}${mo}: ${b.count}`)
+              .join(', '),
+          })),
+          'duration-report.xlsx',
+          'Duration',
+        );
+      },
+      error: (err) => {
+        this.exporting.set(false);
+        this.error.set(extractApiError(err, this.i18n.instant('reports.duration.errors.export')));
+      },
+    });
   }
 
   fetch(query?: TableQueryParams): void {

@@ -15,6 +15,8 @@ import {
   trackEntityIdChange,
 } from '../../../shared/utils/table-query.util';
 import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
+import { downloadExcel } from '../../../shared/utils/excel-export.util';
+import { fetchAllPagedRows } from '../../../shared/utils/paged-export.util';
 
 @Component({
   selector: 'app-entity-devices-tab',
@@ -30,6 +32,7 @@ export class EntityDevicesTabComponent {
 
   readonly rows = signal<EntityDeviceCountRow[]>([]);
   readonly loading = signal(false);
+  readonly exporting = signal(false);
   readonly error = signal('');
   readonly pagination = signal<PaginationMeta | null>(null);
   readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 10 });
@@ -81,6 +84,50 @@ export class EntityDevicesTabComponent {
   refresh(): void {
     this.lastQuerySig = '';
     this.fetch();
+  }
+
+  exportExcel(): void {
+    if (this.exporting() || this.totalRecords() === 0) return;
+
+    const pageSize = this.tableQuery().pageSize ?? 10;
+    const baseQuery: TableQueryParams = {
+      pageNumber: 1,
+      pageSize,
+      searchTerm: this.searchTerm(),
+    };
+
+    this.exporting.set(true);
+    this.error.set('');
+    fetchAllPagedRows((pageNumber) =>
+      this.reports.getEntityDeviceCounts({ ...baseQuery, pageNumber }),
+    ).subscribe({
+      next: (rows) => {
+        this.exporting.set(false);
+        if (!rows.length) return;
+        const t = (key: string) => this.i18n.instant(key);
+        downloadExcel(
+          rows.map((r) => ({
+            [t('reports.entityDevices.columns.entity')]: r.name,
+            [t('reports.entityDevices.columns.entityType')]: r.entityType?.name ?? '',
+            [t('reports.entityDevices.columns.status')]: r.isActive
+              ? t('reports.entityDevices.active')
+              : t('reports.entityDevices.inactive'),
+            [t('reports.entityDevices.columns.available')]: r.availableDeviceCount,
+            [t('reports.entityDevices.columns.active')]: r.activeDeviceCount,
+            [t('reports.entityDevices.columns.fitted')]: r.fittedDeviceCount,
+            [t('reports.entityDevices.columns.total')]: this.rowTotal(r),
+          })),
+          'entity-devices-report.xlsx',
+          'Entity Devices',
+        );
+      },
+      error: (err) => {
+        this.exporting.set(false);
+        this.error.set(
+          extractApiError(err, this.i18n.instant('reports.entityDevices.errors.export')),
+        );
+      },
+    });
   }
 
   fetch(query?: TableQueryParams): void {
