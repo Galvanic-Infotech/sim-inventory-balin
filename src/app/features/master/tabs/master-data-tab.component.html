@@ -33,20 +33,26 @@
       </div>
       <div class="tab-toolbar-right">
         @if (activeSection() === 'districts' || activeSection() === 'rtos') {
-          <select class="form-control filter-select" [ngModel]="filterStateId()" (ngModelChange)="onStateFilterChange($event)">
-            <option value="">{{ 'master.common.selectState' | translate }}</option>
-            @for (s of filterStates(); track s.id) {
-              <option [value]="s.id">{{ s.stateName }}</option>
-            }
-          </select>
+          <app-select
+            [options]="filterStates()"
+            optionLabel="stateName"
+            optionValue="id"
+            [showClear]="true"
+            [placeholder]="'master.common.selectState' | translate"
+            [ngModel]="filterStateId()"
+            (ngModelChange)="onStateFilterChange($event)"
+          />
         }
         @if (activeSection() === 'rtos') {
-          <select class="form-control filter-select" [ngModel]="filterDistrictId()" (ngModelChange)="onDistrictFilterChange($event)">
-            <option value="">{{ 'master.common.selectDistrict' | translate }}</option>
-            @for (d of filterDistricts(); track d.id) {
-              <option [value]="d.id">{{ d.districtName }}</option>
-            }
-          </select>
+          <app-select
+            [options]="filterDistricts()"
+            optionLabel="districtName"
+            optionValue="id"
+            [showClear]="true"
+            [placeholder]="'master.common.selectDistrict' | translate"
+            [ngModel]="filterDistrictId()"
+            (ngModelChange)="onDistrictFilterChange($event)"
+          />
         }
         <app-search-bar
           [placeholder]="'master.common.search' | translate"

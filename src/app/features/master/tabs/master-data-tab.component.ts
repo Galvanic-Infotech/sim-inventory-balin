@@ -2,6 +2,7 @@ import { Component, inject, signal, effect, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
+import { SelectComponent } from '../../../shared/components/select/select.component';
 import { AuthService } from '../../../core/services/auth.service';
 import { RbacService } from '../../../core/services/rbac.service';
 import { PermissionService, PERMS } from '../../../core/services/permission.service';
@@ -46,7 +47,7 @@ interface SectionMeta {
 @Component({
   selector: 'app-master-data-tab',
   standalone: true,
-  imports: [FormsModule, TableModule, InputTextModule, SearchBarComponent, TranslatePipe, RowActionsComponent],
+  imports: [FormsModule, TableModule, InputTextModule, SelectComponent, SearchBarComponent, TranslatePipe, RowActionsComponent],
   templateUrl: './master-data-tab.component.html',
   styleUrl: './master-data-tab.component.scss',
 })
@@ -361,7 +362,8 @@ export class MasterDataTabComponent {
     }
   }
 
-  onStateFilterChange(stateId: string): void {
+  onStateFilterChange(stateId: string | null): void {
+    stateId = stateId ?? '';
     this.filterStateId.set(stateId);
     this.filterDistrictId.set('');
     this.filterDistricts.set([]);
@@ -373,8 +375,8 @@ export class MasterDataTabComponent {
     this.loadFilterDistricts(stateId, this.activeSection() === 'rtos', () => this.fetchSection());
   }
 
-  onDistrictFilterChange(districtId: string): void {
-    this.filterDistrictId.set(districtId);
+  onDistrictFilterChange(districtId: string | null): void {
+    this.filterDistrictId.set(districtId ?? '');
     this.tableFirst.set(0);
     this.fetchSection();
   }

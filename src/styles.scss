@@ -483,6 +483,116 @@ table.table {
   font-size: var(--font-xs);
 }
 
+// PrimeNG p-select styled with .filter-select — match theme pill inputs
+.p-select.filter-select {
+  min-width: 160px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-subtle);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+
+  .p-select-label {
+    padding: 6px 12px;
+    font-size: var(--font-xs);
+    font-family: var(--font-family);
+    color: var(--color-text-primary);
+    background: transparent;
+
+    &.p-placeholder {
+      color: var(--color-text-muted);
+    }
+  }
+
+  .p-select-dropdown {
+    width: auto;
+    padding: 0 10px 0 4px;
+    color: var(--color-text-secondary);
+    background: transparent;
+  }
+
+  .p-select-clear-icon {
+    color: var(--color-text-muted);
+    right: 32px;
+  }
+
+  &:not(.p-disabled):hover {
+    border-color: var(--color-primary-light);
+  }
+
+  &.p-focus {
+    border-color: var(--color-primary);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px var(--color-primary-bg);
+  }
+
+  &.p-disabled {
+    background: var(--color-bg-page);
+    color: var(--color-text-secondary);
+  }
+}
+
+// p-select dropdown panel — theme it
+.p-select-overlay {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-md, 0 8px 24px rgba(15, 46, 54, 0.08));
+  overflow: hidden;
+
+  .p-select-header {
+    padding: var(--space-sm);
+    background: var(--color-bg-subtle);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .p-select-filter {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: var(--font-xs);
+    font-family: var(--font-family);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: #ffffff;
+    color: var(--color-text-primary);
+    outline: none;
+
+    &:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-bg);
+    }
+    &::placeholder { color: var(--color-text-muted); }
+  }
+
+  .p-select-list-container { max-height: 260px; }
+  .p-select-list { padding: 4px; }
+
+  .p-select-option {
+    padding: 8px 12px;
+    font-size: var(--font-xs);
+    color: var(--color-text-primary);
+    border-radius: var(--radius-sm);
+
+    &.p-select-option-selected {
+      background: var(--color-primary-bg);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    &:not(.p-disabled).p-focus,
+    &:not(.p-disabled):hover {
+      background: var(--color-bg-subtle);
+    }
+  }
+
+  .p-select-empty-message {
+    padding: var(--space-sm) var(--space-md);
+    color: var(--color-text-muted);
+    font-size: var(--font-xs);
+  }
+}
+
 .tab-loading {
   display: flex;
   align-items: center;
