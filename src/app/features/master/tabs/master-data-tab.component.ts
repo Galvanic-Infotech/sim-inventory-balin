@@ -119,6 +119,34 @@ export class MasterDataTabComponent {
   readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 10 });
   readonly tableFirst = signal(0);
   readonly searchTerm = signal('');
+
+  // ponytail: sections whose backend returns full list — filter+paginate in browser
+  private static readonly CLIENT_SECTIONS: ReadonlySet<Section> = new Set<Section>([
+    'testingAgencies', 'documentTypes', 'entityTypes', 'states', 'districts', 'rtos',
+  ]);
+  private static readonly FETCH_ALL: TableQueryParams = { pageNumber: 1, pageSize: 1000 };
+
+  private isClientSection(s: Section = this.activeSection()): boolean {
+    return MasterDataTabComponent.CLIENT_SECTIONS.has(s);
+  }
+
+  private filterList<T>(list: T[], fields: (keyof T)[]): T[] {
+    const term = this.searchTerm().trim().toLowerCase();
+    if (!term) return list;
+    return list.filter((item) =>
+      fields.some((f) => String((item as Record<string, unknown>)[f as string] ?? '').toLowerCase().includes(term)),
+    );
+  }
+
+  readonly filteredTestingAgencies = computed(() =>
+    this.filterList(this.testingAgencies(), ['testingAgencyId', 'testingAgencyName']),
+  );
+  readonly filteredDocumentTypes = computed(() => this.filterList(this.documentTypes(), ['name']));
+  readonly filteredEntityTypes = computed(() => this.filterList(this.entityTypes(), ['name', 'description']));
+  readonly filteredStates = computed(() => this.filterList(this.tableStates(), ['stateCode', 'stateName']));
+  readonly filteredDistricts = computed(() => this.filterList(this.districts(), ['districtCode', 'districtName']));
+  readonly filteredRtos = computed(() => this.filterList(this.rtos(), ['rtoCode', 'rtoName']));
+
   readonly sectionDataLength = computed(() => {
     switch (this.activeSection()) {
       case 'simProviders':
@@ -126,17 +154,17 @@ export class MasterDataTabComponent {
       case 'vehicleCategories':
         return this.vehicleCategories().length;
       case 'testingAgencies':
-        return this.testingAgencies().length;
+        return this.filteredTestingAgencies().length;
       case 'documentTypes':
-        return this.documentTypes().length;
+        return this.filteredDocumentTypes().length;
       case 'entityTypes':
-        return this.entityTypes().length;
+        return this.filteredEntityTypes().length;
       case 'states':
-        return this.tableStates().length;
+        return this.filteredStates().length;
       case 'districts':
-        return this.districts().length;
+        return this.filteredDistricts().length;
       case 'rtos':
-        return this.rtos().length;
+        return this.filteredRtos().length;
     }
   });
 
@@ -217,13 +245,20 @@ export class MasterDataTabComponent {
   onSearchChange(value: string): void {
     this.searchTerm.set(value);
     this.tableFirst.set(0);
+    // Client-side sections: filter is a computed signal, no refetch needed.
+    if (this.isClientSection()) {
+      this.tableQuery.update((q) => ({ ...q, pageNumber: 1, searchTerm: undefined }));
+      return;
+    }
     this.tableQuery.update((q) => ({ ...q, pageNumber: 1, searchTerm: value }));
     this.fetchSection(this.activeSection(), { ...this.tableQuery(), searchTerm: value });
   }
 
   fetchSection(s?: Section, query?: TableQueryParams): void {
     const sec = s ?? this.activeSection();
-    const q = { ...this.tableQuery(), searchTerm: this.searchTerm(), ...query };
+    const q = this.isClientSection(sec)
+      ? { ...MasterDataTabComponent.FETCH_ALL }
+      : { ...this.tableQuery(), searchTerm: this.searchTerm(), ...query };
 
     if (sec === 'districts' || sec === 'rtos') {
       if (!this.filterStateId() || (sec === 'rtos' && !this.filterDistrictId())) {
@@ -248,7 +283,8 @@ export class MasterDataTabComponent {
     const onSuccess = (data: unknown[], pag?: PaginationMeta | null) => {
       if (gen !== this.fetchGen) return;
       this.loading.set(false);
-      this.pagination.set(pag ?? null);
+      // Client-side sections drive totalRecords from filtered length, not server meta.
+      this.pagination.set(this.isClientSection(sec) ? null : pag ?? null);
       switch (sec) {
         case 'simProviders': this.simProviders.set(data as SimCardProvider[]); break;
         case 'vehicleCategories': this.vehicleCategories.set(data as VehicleCategory[]); break;
@@ -281,41 +317,13 @@ export class MasterDataTabComponent {
         break;
       case 'testingAgencies':
         this.rbac.getTestingAgencies().subscribe({
-          next: (r) => {
-            const data = r.data ?? [];
-            onSuccess(
-              data,
-              {
-                pageNumber: 1,
-                pageSize: data.length,
-                totalCount: data.length,
-                totalPages: 1,
-                hasPrevious: false,
-                hasNext: false,
-              },
-            );
-          },
+          next: (r) => onSuccess(r.data ?? [], null),
           error: onError,
         });
         break;
       case 'documentTypes':
         this.rbac.getDocumentTypes().subscribe({
-          next: (r) => {
-            const raw = r.data ?? [];
-            const term = (this.searchTerm() ?? '').trim().toLowerCase();
-            const data = term ? raw.filter((d) => (d.name ?? '').toLowerCase().includes(term)) : raw;
-            onSuccess(
-              data,
-              {
-                pageNumber: 1,
-                pageSize: data.length,
-                totalCount: data.length,
-                totalPages: 1,
-                hasPrevious: false,
-                hasNext: false,
-              },
-            );
-          },
+          next: (r) => onSuccess(r.data ?? [], null),
           error: onError,
         });
         break;

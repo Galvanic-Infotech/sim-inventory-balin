@@ -177,11 +177,10 @@
 
       @if (activeSection() === 'testingAgencies') {
         <p-table
-          [value]="testingAgencies()"
+          [value]="filteredTestingAgencies()"
           [paginator]="true"
-          [rows]="tableQuery().pageSize ?? 10"
+          [rows]="10"
           [rowsPerPageOptions]="[10, 25, 50]"
-          [totalRecords]="totalRecords()"
           [loading]="loading()"
           sortMode="single"
           styleClass="app-table"
@@ -219,11 +218,10 @@
 
       @if (activeSection() === 'documentTypes') {
         <p-table
-          [value]="documentTypes()"
+          [value]="filteredDocumentTypes()"
           [paginator]="true"
-          [rows]="tableQuery().pageSize ?? 10"
+          [rows]="10"
           [rowsPerPageOptions]="[10, 25, 50]"
-          [totalRecords]="totalRecords()"
           [loading]="loading()"
           sortMode="single"
           styleClass="app-table"
@@ -265,15 +263,11 @@
 
       @if (activeSection() === 'entityTypes') {
         <p-table
-          [value]="entityTypes()"
-          [lazy]="true"
-          (onLazyLoad)="onLazyLoad($event)"
+          [value]="filteredEntityTypes()"
           [paginator]="true"
-          [rows]="tableQuery().pageSize ?? 10"
+          [rows]="10"
           [rowsPerPageOptions]="[10, 25, 50]"
-          [totalRecords]="totalRecords()"
           [loading]="loading()"
-          [first]="tableFirst()"
           sortMode="single"
           styleClass="app-table"
         >
@@ -303,15 +297,11 @@
 
       @if (activeSection() === 'states') {
         <p-table
-          [value]="tableStates()"
-          [lazy]="true"
-          (onLazyLoad)="onLazyLoad($event)"
+          [value]="filteredStates()"
           [paginator]="true"
-          [rows]="tableQuery().pageSize ?? 10"
+          [rows]="10"
           [rowsPerPageOptions]="[10, 25, 50]"
-          [totalRecords]="totalRecords()"
           [loading]="loading()"
-          [first]="tableFirst()"
           sortMode="single"
           styleClass="app-table"
         >
@@ -337,15 +327,11 @@
 
       @if (activeSection() === 'districts') {
         <p-table
-          [value]="districts()"
-          [lazy]="true"
-          (onLazyLoad)="onLazyLoad($event)"
+          [value]="filteredDistricts()"
           [paginator]="true"
-          [rows]="tableQuery().pageSize ?? 10"
+          [rows]="10"
           [rowsPerPageOptions]="[10, 25, 50]"
-          [totalRecords]="totalRecords()"
           [loading]="loading()"
-          [first]="tableFirst()"
           sortMode="single"
           styleClass="app-table"
         >
@@ -371,15 +357,11 @@
 
       @if (activeSection() === 'rtos') {
         <p-table
-          [value]="rtos()"
-          [lazy]="true"
-          (onLazyLoad)="onLazyLoad($event)"
+          [value]="filteredRtos()"
           [paginator]="true"
-          [rows]="tableQuery().pageSize ?? 10"
+          [rows]="10"
           [rowsPerPageOptions]="[10, 25, 50]"
-          [totalRecords]="totalRecords()"
           [loading]="loading()"
-          [first]="tableFirst()"
           sortMode="single"
           styleClass="app-table"
         >
