@@ -88,6 +88,8 @@ export interface Fitment {
   status?: string;
   isSuperseded: boolean;
   createdAt: string;
+  imei?: string;
+  serialNo?: string;
 }
 
 export interface ValidateFitmentOtpRequest {

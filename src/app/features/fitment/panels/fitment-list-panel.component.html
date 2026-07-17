@@ -108,7 +108,7 @@
         <th>{{ 'fitment.list.colVehicleFitment' | translate }}</th>
         <th>{{ 'fitment.list.colOemRfc' | translate }}</th>
         <th>{{ 'fitment.list.colChassisEngine' | translate }}</th>
-        <th>{{ 'fitment.list.colMakeModel' | translate }}</th>
+        <th>{{ 'fitment.list.colImeiSerial' | translate }}</th>
         <th>{{ 'fitment.list.colCustomer' | translate }}</th>
         <th>{{ 'fitment.list.colStateRto' | translate }}</th>
         <th>{{ 'fitment.list.colFitmentDate' | translate }}</th>
@@ -144,9 +144,9 @@
         </td>
         <td>
           <div class="cell-stack">
-            <strong class="cell-primary">{{ f.vehicleMake || '—' }}</strong>
-            @if (f.vehicleModel) {
-              <span class="cell-sub">{{ f.vehicleModel }}</span>
+            <strong class="cell-primary">{{ f.imei || '—' }}</strong>
+            @if (f.serialNo) {
+              <span class="cell-sub">{{ f.serialNo.trim() }}</span>
             }
           </div>
         </td>
@@ -291,6 +291,14 @@
           <div class="detail-item">
             <span class="detail-label">{{ 'fitment.list.makeModel' | translate }}</span>
             <span class="detail-value">{{ f.vehicleMake }} {{ f.vehicleModel }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.imei' | translate }}</span>
+            <span class="detail-value">{{ f.imei || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.serialNo' | translate }}</span>
+            <span class="detail-value">{{ f.serialNo?.trim() || '—' }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">{{ 'fitment.list.mfgYear' | translate }}</span>
