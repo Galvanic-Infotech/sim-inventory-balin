@@ -651,6 +651,7 @@
       "editTitle": "RTO मैपिंग संपादित करें",
       "noMappedYet": "अभी कोई RTO मैप नहीं",
       "noPool": "मूल इकाई पूल में कोई RTO उपलब्ध नहीं",
+      "noSearchResults": "कोई RTO खोज से मेल नहीं खाता",
       "currentMappings": "वर्तमान मैपिंग",
       "assignRemove": "असाइन / हटाएं",
       "mapped": "मैप किया",
@@ -1036,6 +1037,7 @@
       "title": "अनुमतियाँ",
       "addGroup": "समूह जोड़ें",
       "addPermission": "अनुमति जोड़ें",
+      "searchPlaceholder": "अनुमतियाँ खोजें...",
       "empty": "कोई अनुमति समूह नहीं मिला",
       "columns": {
         "name": "नाम",

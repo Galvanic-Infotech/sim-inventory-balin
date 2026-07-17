@@ -1,4 +1,4 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { RbacService } from '../../../core/services/rbac.service';
@@ -6,12 +6,13 @@ import { PermissionService, PERMS } from '../../../core/services/permission.serv
 import { TranslationService } from '../../../core/services/translation.service';
 import { extractApiError, getApiResponseError } from '../../../core/utils/api-error.util';
 import { PermissionGroup } from '../../../shared/models/rbac.model';
+import { SearchBarComponent } from '../../../shared/components/search-bar/search-bar.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-permissions-tab',
   standalone: true,
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, TranslatePipe, SearchBarComponent],
   templateUrl: './permissions-tab.component.html',
   styleUrl: './permissions-tab.component.scss',
 })
@@ -25,6 +26,7 @@ export class PermissionsTabComponent {
 
   readonly groups = signal<PermissionGroup[]>([]);
   readonly expandedGroups = signal<Set<string>>(new Set());
+  readonly searchTerm = signal('');
   readonly loading = signal(false);
   readonly error = signal('');
   readonly saving = signal(false);
@@ -40,9 +42,35 @@ export class PermissionsTabComponent {
   groupName = '';
   groupDescription = '';
 
+  readonly filteredGroups = computed(() => {
+    const q = this.searchTerm().toLowerCase().trim();
+    if (!q) return this.groups();
+
+    return this.groups()
+      .map((g) => {
+        const groupMatch =
+          g.name.toLowerCase().includes(q) ||
+          (g.description ?? '').toLowerCase().includes(q);
+        const matchingPerms = g.permissions.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) ||
+            (p.description ?? '').toLowerCase().includes(q),
+        );
+        if (groupMatch) return g;
+        if (matchingPerms.length) return { ...g, permissions: matchingPerms };
+        return null;
+      })
+      .filter((g): g is PermissionGroup => g !== null);
+  });
+
+  readonly totalPermCount = computed(() =>
+    this.filteredGroups().reduce((sum, g) => sum + g.permissions.length, 0),
+  );
+
   constructor() {
     effect(() => {
       this.auth.entityId();
+      this.searchTerm.set('');
       this.fetch();
     });
   }
@@ -63,11 +91,20 @@ export class PermissionsTabComponent {
     });
   }
 
-  get totalPermCount(): number {
-    return this.groups().reduce((sum, g) => sum + g.permissions.length, 0);
+  onSearchChange(value: string): void {
+    this.searchTerm.set(value);
+    if (value.trim()) {
+      this.expandedGroups.set(new Set(this.filteredGroups().map((g) => g.id)));
+    }
+  }
+
+  isGroupExpanded(groupId: string): boolean {
+    if (this.searchTerm().trim()) return true;
+    return this.expandedGroups().has(groupId);
   }
 
   toggleGroup(groupId: string): void {
+    if (this.searchTerm().trim()) return;
     const s = new Set(this.expandedGroups());
     s.has(groupId) ? s.delete(groupId) : s.add(groupId);
     this.expandedGroups.set(s);

@@ -146,10 +146,27 @@ interface MappedGroup {
             <strong>{{ 'master.rto.assignRemove' | translate }}</strong>
           </div>
 
+          <div class="input-wrapper pool-search">
+            <span class="material-icons input-icon">search</span>
+            <input
+              class="form-control form-control--icon-left"
+              [placeholder]="'master.rto.searchPlaceholder' | translate"
+              [ngModel]="poolSearch()"
+              (ngModelChange)="poolSearch.set($event)"
+            />
+            @if (poolSearch()) {
+              <button class="pool-search-clear" type="button" (click)="poolSearch.set('')" [attr.aria-label]="'common.clear' | translate">
+                <span class="material-icons">close</span>
+              </button>
+            }
+          </div>
+
           @if (loadingPool()) {
             <div class="picker-hint"><span class="spinner"></span></div>
           } @else if (parentPool().length === 0) {
             <div class="picker-hint">{{ 'master.rto.noPool' | translate }}</div>
+          } @else if (poolByState().length === 0) {
+            <div class="picker-hint">{{ 'master.rto.noSearchResults' | translate }}</div>
           } @else {
             @for (state of poolByState(); track state.stateId) {
               <div class="perm-group">
@@ -282,6 +299,30 @@ interface MappedGroup {
 
       .rto-search { min-width: 280px; }
       .rto-search .form-control { padding-left: 38px; }
+
+      .pool-search {
+        position: relative;
+        margin-bottom: var(--space-sm);
+      }
+      .pool-search .form-control { padding-left: 38px; padding-right: 36px; }
+      .pool-search-clear {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--color-text-muted);
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+      .pool-search-clear:hover { background: var(--color-bg-page); color: var(--color-text-primary); }
+      .pool-search-clear .material-icons { font-size: 16px; }
 
       .empty-state {
         text-align: center;
@@ -450,17 +491,29 @@ export class RtoMappingTabComponent {
   readonly pickedIds = signal(new Set<string>());
   readonly openStates = signal(new Set<string>());
 
+  readonly poolSearch = signal('');
+
   readonly poolByState = computed<StateGroup[]>(() => {
+    const q = this.poolSearch().toLowerCase().trim();
+    const match = (r: RtoOpt, stateName: string) =>
+      !q ||
+      r.rtoCode.toLowerCase().includes(q) ||
+      r.rtoName.toLowerCase().includes(q) ||
+      r.districtName.toLowerCase().includes(q) ||
+      stateName.toLowerCase().includes(q);
+
     const map = new Map<string, StateGroup>();
     this.parentPool().forEach((p) => {
       const s = p.rto.district.state;
-      if (!map.has(s.id)) map.set(s.id, { stateId: s.id, stateName: s.stateName, rtos: [] });
-      map.get(s.id)!.rtos.push({
+      const opt: RtoOpt = {
         id: p.rto.id,
         rtoCode: p.rto.rtoCode,
         rtoName: p.rto.rtoName,
         districtName: p.rto.district.districtName,
-      });
+      };
+      if (!match(opt, s.stateName)) return;
+      if (!map.has(s.id)) map.set(s.id, { stateId: s.id, stateName: s.stateName, rtos: [] });
+      map.get(s.id)!.rtos.push(opt);
     });
     const groups = Array.from(map.values()).sort((a, b) => a.stateName.localeCompare(b.stateName));
     groups.forEach((g) => g.rtos.sort((a, b) => a.rtoCode.localeCompare(b.rtoCode)));
@@ -507,6 +560,7 @@ export class RtoMappingTabComponent {
 
   openAdd(): void {
     this.pickedIds.set(new Set());
+    this.poolSearch.set('');
     this.addErr.set('');
     this.showAdd.set(true);
     if (this.parentPool().length === 0) this.loadParentPool();
@@ -538,6 +592,8 @@ export class RtoMappingTabComponent {
   }
 
   isStateOpen(stateId: string): boolean {
+    // Force-expand while searching so matches are visible without extra clicks.
+    if (this.poolSearch().trim()) return true;
     return this.openStates().has(stateId);
   }
 

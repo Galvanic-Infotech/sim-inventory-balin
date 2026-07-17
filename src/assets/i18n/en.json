@@ -651,6 +651,7 @@
       "editTitle": "Edit RTO Mapping",
       "noMappedYet": "No RTOs mapped yet",
       "noPool": "No RTOs available in parent entity pool",
+      "noSearchResults": "No RTOs match your search",
       "currentMappings": "Current Mappings",
       "assignRemove": "Assign / Remove",
       "mapped": "Mapped",
@@ -1036,6 +1037,7 @@
       "title": "Permissions",
       "addGroup": "Add Group",
       "addPermission": "Add Permission",
+      "searchPlaceholder": "Search permissions...",
       "empty": "No permission groups found",
       "columns": {
         "name": "Name",

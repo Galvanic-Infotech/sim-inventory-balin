@@ -2,9 +2,14 @@
 <div class="tab-toolbar">
   <div class="tab-toolbar-left">
     <h3>{{ 'master.permissions.title' | translate }}</h3>
-    <span class="count-badge">{{ totalPermCount }}</span>
+    <span class="count-badge">{{ totalPermCount() }}</span>
   </div>
   <div class="tab-toolbar-right">
+    <app-search-bar
+      [placeholder]="'master.permissions.searchPlaceholder' | translate"
+      [initialValue]="searchTerm()"
+      (searchChange)="onSearchChange($event)"
+    />
     <button class="btn btn-ghost" (click)="fetch()">
       <span class="material-icons">refresh</span>
     </button>
@@ -33,25 +38,30 @@
     <span class="material-icons">lock</span>
     <p>{{ 'master.permissions.empty' | translate }}</p>
   </div>
+} @else if (!filteredGroups().length) {
+  <div class="tab-empty">
+    <span class="material-icons">search_off</span>
+    <p>{{ 'common.noResults' | translate }}</p>
+  </div>
 } @else {
   <div class="perm-groups perm-groups--view">
-    @for (group of groups(); track group.id) {
-      <div class="perm-group" [class.perm-group--open]="expandedGroups().has(group.id)">
+    @for (group of filteredGroups(); track group.id) {
+      <div class="perm-group" [class.perm-group--open]="isGroupExpanded(group.id)">
         <button
           type="button"
           class="perm-group-header"
-          [attr.aria-expanded]="expandedGroups().has(group.id)"
+          [attr.aria-expanded]="isGroupExpanded(group.id)"
           (click)="toggleGroup(group.id)"
         >
           <div class="perm-group-header-left">
             <span class="material-icons perm-group-arrow">
-              {{ expandedGroups().has(group.id) ? 'expand_more' : 'chevron_right' }}
+              {{ isGroupExpanded(group.id) ? 'expand_more' : 'chevron_right' }}
             </span>
             <strong>{{ group.name }}</strong>
             <span class="count-badge">{{ group.permissions.length }}</span>
           </div>
         </button>
-        @if (expandedGroups().has(group.id)) {
+        @if (isGroupExpanded(group.id)) {
           @if (!group.permissions.length) {
             <div class="perm-list-empty">{{ 'master.common.noPermissionsInGroup' | translate }}</div>
           } @else {
