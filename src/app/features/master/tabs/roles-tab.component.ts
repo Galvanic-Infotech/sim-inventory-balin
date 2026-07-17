@@ -49,6 +49,28 @@ export class RolesTabComponent {
   readonly selectedPermIds = signal<Set<string>>(new Set());
   readonly permLoading = signal(false);
   readonly permDialogError = signal('');
+  readonly permSearchTerm = signal('');
+
+  readonly filteredPermissionGroups = computed(() => {
+    const q = this.permSearchTerm().toLowerCase().trim();
+    if (!q) return this.permissionGroups();
+
+    return this.permissionGroups()
+      .map((g) => {
+        const groupMatch =
+          g.name.toLowerCase().includes(q) ||
+          (g.description ?? '').toLowerCase().includes(q);
+        const matchingPerms = g.permissions.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) ||
+            (p.description ?? '').toLowerCase().includes(q),
+        );
+        if (groupMatch) return g;
+        if (matchingPerms.length) return { ...g, permissions: matchingPerms };
+        return null;
+      })
+      .filter((g): g is PermissionGroup => g !== null);
+  });
 
   readonly pagination = signal<PaginationMeta | null>(null);
   readonly tableQuery = signal<TableQueryParams>({ pageNumber: 1, pageSize: 10 });
@@ -162,6 +184,7 @@ export class RolesTabComponent {
     this.permDialogRole.set(role);
     this.permLoading.set(true);
     this.permDialogError.set('');
+    this.permSearchTerm.set('');
     this.showPermDialog.set(true);
 
     this.rbac.getPermissionGroupsByEntity().subscribe({
@@ -186,7 +209,17 @@ export class RolesTabComponent {
     });
   }
 
+  onPermSearchChange(value: string): void {
+    this.permSearchTerm.set(value);
+  }
+
+  isGroupExpanded(groupId: string): boolean {
+    if (this.permSearchTerm().trim()) return true;
+    return this.expandedGroups().has(groupId);
+  }
+
   toggleGroup(groupId: string): void {
+    if (this.permSearchTerm().trim()) return;
     const s = new Set(this.expandedGroups());
     s.has(groupId) ? s.delete(groupId) : s.add(groupId);
     this.expandedGroups.set(s);

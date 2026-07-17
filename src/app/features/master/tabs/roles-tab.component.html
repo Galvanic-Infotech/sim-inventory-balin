@@ -159,42 +159,53 @@
           <div style="margin: 0 0 var(--space-lg); height: 1px; background: var(--color-border)"></div>
 
           <!-- Assign / Remove -->
-          <label style="display: block; font-size: var(--font-sm); font-weight: 600; margin-bottom: var(--space-sm); color: var(--color-text-secondary)">
-            {{ 'master.common.assignRemove' | translate }}
-          </label>
-          <div class="perm-groups">
-            @for (group of permissionGroups(); track group.id) {
-              <div class="perm-group">
-                <div class="perm-group-header" (click)="toggleGroup(group.id)">
-                  <div class="perm-group-header-left">
-                    <input
-                      type="checkbox"
-                      [checked]="isGroupAllSelected(group)"
-                      [indeterminate]="isGroupPartial(group)"
-                      (click)="$event.stopPropagation()"
-                      (change)="toggleGroupAll(group)"
-                    />
-                    <span class="material-icons perm-group-arrow">
-                      {{ expandedGroups().has(group.id) ? 'expand_more' : 'chevron_right' }}
-                    </span>
-                    <strong>{{ group.name }}</strong>
-                    <small class="text-muted">{{ group.permissions.length }}</small>
-                  </div>
-                </div>
-                @if (expandedGroups().has(group.id)) {
-                  <div class="perm-list">
-                    @for (p of group.permissions; track p.id) {
-                      <label class="perm-item">
-                        <input type="checkbox" [checked]="selectedPermIds().has(p.id)" (change)="togglePerm(p.id)" />
-                        <span>{{ p.name }}</span>
-                        @if (p.description) { <small>{{ p.description }}</small> }
-                      </label>
-                    }
-                  </div>
-                }
-              </div>
-            }
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); margin-bottom: var(--space-sm); flex-wrap: wrap">
+            <label style="font-size: var(--font-sm); font-weight: 600; color: var(--color-text-secondary)">
+              {{ 'master.common.assignRemove' | translate }}
+            </label>
+            <app-search-bar
+              [placeholder]="'master.permissions.searchPlaceholder' | translate"
+              [initialValue]="permSearchTerm()"
+              (searchChange)="onPermSearchChange($event)"
+            />
           </div>
+          @if (!filteredPermissionGroups().length) {
+            <p class="text-muted">{{ 'common.noResults' | translate }}</p>
+          } @else {
+            <div class="perm-groups">
+              @for (group of filteredPermissionGroups(); track group.id) {
+                <div class="perm-group">
+                  <div class="perm-group-header" (click)="toggleGroup(group.id)">
+                    <div class="perm-group-header-left">
+                      <input
+                        type="checkbox"
+                        [checked]="isGroupAllSelected(group)"
+                        [indeterminate]="isGroupPartial(group)"
+                        (click)="$event.stopPropagation()"
+                        (change)="toggleGroupAll(group)"
+                      />
+                      <span class="material-icons perm-group-arrow">
+                        {{ isGroupExpanded(group.id) ? 'expand_more' : 'chevron_right' }}
+                      </span>
+                      <strong>{{ group.name }}</strong>
+                      <small class="text-muted">{{ group.permissions.length }}</small>
+                    </div>
+                  </div>
+                  @if (isGroupExpanded(group.id)) {
+                    <div class="perm-list">
+                      @for (p of group.permissions; track p.id) {
+                        <label class="perm-item">
+                          <input type="checkbox" [checked]="selectedPermIds().has(p.id)" (change)="togglePerm(p.id)" />
+                          <span>{{ p.name }}</span>
+                          @if (p.description) { <small>{{ p.description }}</small> }
+                        </label>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
         }
       </div>
       <div class="dialog-footer">
