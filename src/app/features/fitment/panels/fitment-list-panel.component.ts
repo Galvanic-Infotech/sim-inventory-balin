@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
@@ -159,12 +159,16 @@ export class FitmentListPanelComponent {
   constructor() {
     effect(() => {
       this.auth.entityId();
-      this.searchTerm.set('');
-      this.statusFilter.set(undefined);
-      this.tableFirst.set(0);
-      this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
-      this.fetchStatusCount();
-      if (this.tableReady) this.load({ pageNumber: 1, pageSize: 10 });
+      untracked(() => {
+        const wasAtFirstPage = this.tableFirst() === 0;
+        this.searchTerm.set('');
+        this.statusFilter.set(undefined);
+        this.tableFirst.set(0);
+        this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
+        this.fetchStatusCount();
+        // ponytail: primeng emits onLazyLoad when [first] resets from >0; skip manual load then
+        if (this.tableReady && wasAtFirstPage) this.load({ pageNumber: 1, pageSize: 10 });
+      });
     });
   }
 
