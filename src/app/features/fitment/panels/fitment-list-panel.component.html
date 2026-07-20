@@ -293,20 +293,29 @@
             <span class="detail-value">{{ f.vehicleMake }} {{ f.vehicleModel }}</span>
           </div>
           <div class="detail-item">
-            <span class="detail-label">{{ 'fitment.list.imei' | translate }}</span>
-            <span class="detail-value">{{ f.imei || '—' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">{{ 'fitment.list.serialNo' | translate }}</span>
-            <span class="detail-value">{{ f.serialNo?.trim() || '—' }}</span>
-          </div>
-          <div class="detail-item">
             <span class="detail-label">{{ 'fitment.list.mfgYear' | translate }}</span>
             <span class="detail-value">{{ f.mafYear || '—' }}</span>
           </div>
           <div class="detail-item">
             <span class="detail-label">{{ 'fitment.list.category' | translate }}</span>
             <span class="detail-value">{{ f.vehicleCategory?.name ?? '—' }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="drawer-section">
+        <h4 class="section-title">
+          <span class="material-icons">sensors</span>
+          {{ 'fitment.list.sectionDevice' | translate }}
+        </h4>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.imei' | translate }}</span>
+            <span class="detail-value">{{ f.imei || '—' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">{{ 'fitment.list.serialNo' | translate }}</span>
+            <span class="detail-value">{{ f.serialNo?.trim() || '—' }}</span>
           </div>
         </div>
       </section>

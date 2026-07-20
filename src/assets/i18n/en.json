@@ -165,6 +165,7 @@
       "detailEyebrow": "Fitment",
       "sectionEntity": "Entity",
       "sectionVehicle": "Vehicle",
+      "sectionDevice": "Device",
       "sectionCustomer": "Customer",
       "sectionRto": "RTO",
       "sectionDates": "Dates",
