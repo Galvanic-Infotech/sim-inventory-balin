@@ -15,7 +15,12 @@ import {
 } from '../../../shared/models/bulk-upload-job.model';
 import { PaginationMeta } from '../../../shared/models/rbac.model';
 import { TableQueryParams } from '../../../shared/models/table-query.model';
-import { tableQueryFromLazyEvent } from '../../../shared/utils/table-query.util';
+import {
+  isDuplicateTableFetch,
+  tableQueryFromLazyEvent,
+  tableQuerySignature,
+  trackEntityIdChange,
+} from '../../../shared/utils/table-query.util';
 import { TranslationService } from '../../../core/services/translation.service';
 import {
   translatedJobStatusInfo,
@@ -100,17 +105,35 @@ export class JobsListPanelComponent implements OnInit, OnDestroy {
   private pollTimer?: ReturnType<typeof setTimeout>;
   private fetchGen = 0;
   private tableReady = false;
+  private lastQuerySig = '';
+  private prevEntityId: string | undefined;
+  private prevJobTypeFilter: string | undefined;
 
   constructor() {
     effect(() => {
-      this.auth.entityId();
-      this.jobTypeFilter();
+      const eid = this.auth.entityId();
+      const jobType = this.jobTypeFilter();
+      const { changed: entityChanged, next } = trackEntityIdChange(this.prevEntityId, eid);
+      this.prevEntityId = next;
+
+      const typeChanged =
+        this.prevJobTypeFilter !== undefined && this.prevJobTypeFilter !== jobType;
+      this.prevJobTypeFilter = jobType;
+
+      if (!entityChanged && !typeChanged) return;
+
+      this.lastQuerySig = '';
       this.searchTerm.set('');
       this.statusFilter.set('');
+      this.selectedJob.set(null);
+      this.rows.set([]);
+      this.pagination.set(null);
       this.tableFirst.set(0);
       this.tableQuery.set({ pageNumber: 1, pageSize: 10 });
+      // PrimeNG only re-emits onLazyLoad when [first] changes — if already on
+      // page 1, entity switch would not trigger a lazy load without this fetch.
       if (this.tableReady) {
-        this.fetch({ pageNumber: 1, pageSize: 10 });
+        this.fetch();
       }
     });
 
@@ -145,7 +168,11 @@ export class JobsListPanelComponent implements OnInit, OnDestroy {
 
   onLazyLoad(event: TableLazyLoadEvent): void {
     this.tableReady = true;
-    const query = tableQueryFromLazyEvent(event, { searchTerm: this.searchTerm() });
+    const query = tableQueryFromLazyEvent(event, {
+      searchTerm: this.searchTerm(),
+      sortBy: this.tableQuery().sortBy,
+      sortOrder: this.tableQuery().sortOrder,
+    });
     this.tableQuery.set(query);
     this.tableFirst.set(event.first ?? 0);
     this.fetch(query);
@@ -153,17 +180,19 @@ export class JobsListPanelComponent implements OnInit, OnDestroy {
 
   onSearchChange(value: string): void {
     this.searchTerm.set(value);
+    this.lastQuerySig = '';
     this.tableFirst.set(0);
     this.tableQuery.update((q) => ({ ...q, pageNumber: 1, searchTerm: value }));
-    this.fetch({ ...this.tableQuery(), searchTerm: value });
+    this.fetch();
   }
 
   selectStatus(status: StatusFilter): void {
     if (this.statusFilter() === status) return;
     this.statusFilter.set(status);
+    this.lastQuerySig = '';
     this.tableFirst.set(0);
     this.tableQuery.update((q) => ({ ...q, pageNumber: 1 }));
-    this.fetch({ ...this.tableQuery(), pageNumber: 1 });
+    this.fetch();
   }
 
   statusInfo(status: string) {
@@ -216,6 +245,7 @@ export class JobsListPanelComponent implements OnInit, OnDestroy {
   }
 
   refresh(): void {
+    this.lastQuerySig = '';
     this.fetch();
   }
 
@@ -223,6 +253,12 @@ export class JobsListPanelComponent implements OnInit, OnDestroy {
     const q = { ...this.tableQuery(), searchTerm: this.searchTerm(), ...query };
     const status = this.statusFilter();
     const jobType = this.jobTypeFilter();
+    const sig = tableQuerySignature(q, {
+      status: status || undefined,
+      jobType: jobType || undefined,
+    });
+    if (!opts.silent && isDuplicateTableFetch(sig, this.lastQuerySig, this.loading())) return;
+    this.lastQuerySig = sig;
     const gen = ++this.fetchGen;
     if (!opts.silent) this.loading.set(true);
     this.error.set('');
