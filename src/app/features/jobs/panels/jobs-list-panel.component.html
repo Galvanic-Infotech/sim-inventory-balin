@@ -1,0 +1,286 @@
+<div class="grid grid-auto bulk-history__stats">
+  <button
+    type="button"
+    class="stat-card bulk-history__stat"
+    [class.bulk-history__stat--active]="statusFilter() === ''"
+    (click)="selectStatus('')"
+  >
+    <span class="material-icons stat-icon" style="color: var(--color-primary)">inbox</span>
+    <div>
+      <span class="stat-value">{{ totalRecords() }}</span>
+      <span class="stat-label">{{ 'jobs.allJobs' | translate }}</span>
+    </div>
+  </button>
+  @for (s of statusStats(); track s.status) {
+    <button
+      type="button"
+      class="stat-card bulk-history__stat"
+      [class.bulk-history__stat--active]="statusFilter() === s.status"
+      (click)="selectStatus(s.status)"
+    >
+      <span class="material-icons stat-icon" [style.color]="s.color">{{ s.icon }}</span>
+      <div>
+        <span class="stat-value">{{ s.count }}</span>
+        <span class="stat-label">{{ s.label }}</span>
+      </div>
+    </button>
+  }
+</div>
+
+<div class="card bulk-history__list">
+  <div class="tab-toolbar">
+    <div class="tab-toolbar-left">
+      <h3>
+        @if (statusFilter(); as sf) {
+          {{ 'jobs.filteredJobs' | translate: { status: statusInfo(sf).label } }}
+        } @else {
+          {{ 'jobs.allJobs' | translate }}
+        }
+      </h3>
+      @if (pagination(); as pg) {
+        <span class="count-badge">{{ pg.totalCount }}</span>
+      }
+    </div>
+    <div class="tab-toolbar-right">
+      @if (activeCount() > 0) {
+        <span class="bulk-history__live">
+          <span class="spinner spinner--dark spinner--xs"></span>
+          {{ 'jobs.inProgress' | translate: { count: activeCount() } }}
+        </span>
+      }
+      <app-search-bar
+        [placeholder]="'jobs.searchPlaceholder' | translate"
+        [initialValue]="searchTerm()"
+        (searchChange)="onSearchChange($event)"
+      />
+      <button class="btn btn-ghost" (click)="fetch()" [title]="'jobs.refreshTable' | translate">
+        <span class="material-icons">refresh</span>
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-danger">
+      <span class="material-icons">error</span> {{ error() }}
+      <button class="btn btn-ghost" (click)="fetch()">{{ 'jobs.retry' | translate }}</button>
+    </div>
+  } @else {
+    <p-table
+      [value]="rows()"
+      [lazy]="true"
+      (onLazyLoad)="onLazyLoad($event)"
+      [paginator]="true"
+      [rows]="tableQuery().pageSize ?? 10"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [totalRecords]="totalRecords()"
+      [loading]="loading()"
+      [first]="tableFirst()"
+      sortMode="single"
+      styleClass="app-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem">#</th>
+          <th pSortableColumn="jobType" style="width: 11rem">{{ 'jobs.type' | translate }} <p-sortIcon field="jobType" /></th>
+          <th pSortableColumn="status">{{ 'jobs.status' | translate }} <p-sortIcon field="status" /></th>
+          <th>{{ 'jobs.summary' | translate }}</th>
+          <th pSortableColumn="createdAt">{{ 'jobs.created' | translate }} <p-sortIcon field="createdAt" /></th>
+          <th pSortableColumn="completedAt">{{ 'jobs.completed' | translate }} <p-sortIcon field="completedAt" /></th>
+          <th style="width: 5rem">{{ 'jobs.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-job let-rowIndex="rowIndex">
+        @let r = jobResult(job);
+        <tr class="bulk-history__row" (click)="openDetails(job)">
+          <td>{{ rowIndex + 1 }}</td>
+          <td>
+            <span class="bulk-history__type">
+              <span class="material-icons">{{ jobTypeIcon(job.jobType) }}</span>
+              {{ jobTypeLabel(job.jobType) }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="chip bulk-history__chip"
+              [class.bulk-history__chip--active]="isActive(job.status)"
+              [style.background]="statusInfo(job.status).color + '22'"
+              [style.color]="statusInfo(job.status).color"
+            >
+              @if (isActive(job.status)) {
+                <span class="spinner spinner--dark spinner--xs"></span>
+              } @else {
+                <span class="material-icons">{{ statusInfo(job.status).icon }}</span>
+              }
+              {{ statusInfo(job.status).label }}
+            </span>
+          </td>
+          <td>
+            @if (r) {
+              <div class="bulk-history__summary">
+                <span class="bulk-history__pill bulk-history__pill--total">{{ 'jobs.pillTotal' | translate: { count: r.totalRows } }}</span>
+                <span class="bulk-history__pill bulk-history__pill--ok">{{ 'jobs.pillSuccess' | translate: { count: r.successfulRows } }}</span>
+                @if (r.skippedRows) {
+                  <span class="bulk-history__pill bulk-history__pill--skip">{{ 'jobs.pillSkip' | translate: { count: r.skippedRows } }}</span>
+                }
+                @if (r.failedRows) {
+                  <span class="bulk-history__pill bulk-history__pill--fail">{{ 'jobs.pillFail' | translate: { count: r.failedRows } }}</span>
+                }
+              </div>
+            } @else if (job.errorMessage) {
+              <span class="text-muted">{{ job.errorMessage }}</span>
+            } @else {
+              <span class="text-muted">—</span>
+            }
+          </td>
+          <td>{{ job.createdAt | date: 'medium' }}</td>
+          <td>
+            @if (job.completedAt) {
+              {{ job.completedAt | date: 'medium' }}
+            } @else {
+              <span class="text-muted">—</span>
+            }
+          </td>
+          <td>
+            <div class="bulk-history__actions">
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm"
+                [disabled]="!job.attributes?.fileUrl"
+                (click)="download(job, $event)"
+                [title]="'jobs.downloadFile' | translate"
+              >
+                <span class="material-icons">download</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <div class="tab-empty" style="padding: var(--space-lg)">
+              <span class="material-icons">history</span>
+              <p>{{ 'jobs.empty' | translate }}</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
+
+@if (selectedJob(); as job) {
+  <div class="drawer-backdrop" (click)="closeDetails()" aria-hidden="true"></div>
+  <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="job-details-title">
+    <div class="dialog-header">
+      <h3 id="job-details-title">{{ 'jobs.detailsTitle' | translate }}</h3>
+      <button type="button" class="btn btn-ghost" (click)="closeDetails()" [attr.aria-label]="'jobs.close' | translate">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <div class="bulk-history__detail-meta">
+        <div>
+          <span class="text-muted">{{ 'jobs.jobId' | translate }}</span>
+          <code>{{ job.id }}</code>
+        </div>
+        <div>
+          <span class="text-muted">{{ 'jobs.type' | translate }}</span>
+          <strong>{{ jobTypeLabel(job.jobType) }}</strong>
+        </div>
+        <div>
+          <span class="text-muted">{{ 'jobs.status' | translate }}</span>
+          <span
+            class="chip bulk-history__chip"
+            [style.background]="statusInfo(job.status).color + '22'"
+            [style.color]="statusInfo(job.status).color"
+          >
+            <span class="material-icons">{{ statusInfo(job.status).icon }}</span>
+            {{ statusInfo(job.status).label }}
+          </span>
+        </div>
+        <div>
+          <span class="text-muted">{{ 'jobs.created' | translate }}</span>
+          <span>{{ job.createdAt | date: 'medium' }}</span>
+        </div>
+        <div>
+          <span class="text-muted">{{ 'jobs.completed' | translate }}</span>
+          <span>{{ job.completedAt ? (job.completedAt | date: 'medium') : '—' }}</span>
+        </div>
+      </div>
+
+      @if (job.errorMessage) {
+        <div class="alert alert-danger">
+          <span class="material-icons">error</span> {{ job.errorMessage }}
+        </div>
+      }
+
+      @if (job.attributes?.fileUrl; as url) {
+        <div class="bulk-history__file-card">
+          <span class="material-icons">description</span>
+          <div class="bulk-history__file-card-info">
+            <strong>{{ fileName(url) }}</strong>
+            <span class="text-muted">{{ 'jobs.uploadedFile' | translate }}</span>
+          </div>
+          <button class="btn btn-outline" (click)="download(job)">
+            <span class="material-icons">download</span> {{ 'jobs.download' | translate }}
+          </button>
+        </div>
+      }
+
+      @if (selectedResult(); as r) {
+        <div class="grid grid-auto bulk-history__detail-stats">
+          <div class="stat-card">
+            <span class="material-icons stat-icon" style="color: var(--color-primary)">summarize</span>
+            <div>
+              <span class="stat-value">{{ r.totalRows }}</span>
+              <span class="stat-label">{{ 'jobs.totalRows' | translate }}</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons stat-icon" style="color: var(--color-success)">check_circle</span>
+            <div>
+              <span class="stat-value">{{ r.successfulRows }}</span>
+              <span class="stat-label">{{ 'jobs.successful' | translate }}</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons stat-icon" style="color: var(--color-warning)">skip_next</span>
+            <div>
+              <span class="stat-value">{{ r.skippedRows }}</span>
+              <span class="stat-label">{{ 'jobs.skipped' | translate }}</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="material-icons stat-icon" style="color: var(--color-danger)">cancel</span>
+            <div>
+              <span class="stat-value">{{ r.failedRows }}</span>
+              <span class="stat-label">{{ 'jobs.failed' | translate }}</span>
+            </div>
+          </div>
+        </div>
+
+        @if (r.errors.length) {
+          <h4 style="margin: var(--space-md) 0 var(--space-sm)">
+            {{ 'jobs.errorsTitle' | translate }} <span class="count-badge">{{ r.errors.length }}</span>
+          </h4>
+          <ul class="bulk-history__errors">
+            @for (err of r.errors; track $index) {
+              <li>
+                @if (err.rowNumber != null) {
+                  <strong>{{ 'jobs.rowLabel' | translate: { number: err.rowNumber } }}</strong>
+                }
+                {{ err.message }}
+              </li>
+            }
+          </ul>
+        }
+      }
+    </div>
+
+    <div class="dialog-footer">
+      <button type="button" class="btn btn-primary" (click)="closeDetails()">{{ 'jobs.close' | translate }}</button>
+    </div>
+  </aside>
+}

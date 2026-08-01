@@ -70,6 +70,12 @@ export class SidebarComponent {
         permission: PERMS.AIS_DEVICE_VIEW,
       },
       {
+        label: t('layout.nav.jobs'),
+        icon: 'work_history',
+        route: '/jobs',
+        permission: PERMS.AIS_DEVICE_VIEW,
+      },
+      {
         label: t('layout.nav.fitment'),
         icon: 'build',
         route: '/fitment',

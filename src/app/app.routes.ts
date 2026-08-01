@@ -59,6 +59,12 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'jobs',
+        canActivate: [permGuard(PERMS.AIS_DEVICE_VIEW)],
+        loadComponent: () =>
+          import('./features/jobs/jobs.component').then((m) => m.JobsComponent),
+      },
+      {
         path: 'fitment',
         canActivate: [permGuard(PERMS.FITMENT_VIEW)],
         loadComponent: () =>

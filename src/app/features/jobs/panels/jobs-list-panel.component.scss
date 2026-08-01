@@ -1,0 +1,208 @@
+:host { display: block; }
+
+.bulk-history {
+  &__stats {
+    margin-bottom: var(--space-lg);
+  }
+
+  &__stat {
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s ease, transform 0.05s ease;
+
+    &:hover {
+      border-color: var(--color-border);
+    }
+
+    &--active {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px var(--color-primary) inset;
+    }
+
+    &:active {
+      transform: scale(0.99);
+    }
+  }
+
+  &__list {
+    padding: var(--space-md) 0 0;
+    overflow: visible;
+
+    > .tab-toolbar {
+      padding: 0 var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    > .alert {
+      margin: 0 var(--space-md) var(--space-md);
+    }
+  }
+
+  &__row {
+    cursor: pointer;
+  }
+
+  &__type {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    white-space: nowrap;
+
+    .material-icons {
+      font-size: 18px;
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+
+    .material-icons {
+      font-size: 14px;
+    }
+  }
+
+  &__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  &__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-xs);
+    font-weight: 600;
+    background: var(--color-bg-page);
+    border: 1px solid var(--color-border);
+
+    &--total {
+      color: var(--color-text-secondary);
+    }
+
+    &--ok {
+      background: color-mix(in srgb, var(--color-success) 12%, transparent);
+      border-color: color-mix(in srgb, var(--color-success) 40%, transparent);
+      color: var(--color-success);
+    }
+
+    &--skip {
+      background: color-mix(in srgb, var(--color-warning) 12%, transparent);
+      border-color: color-mix(in srgb, var(--color-warning) 40%, transparent);
+      color: var(--color-warning);
+    }
+
+    &--fail {
+      background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+      border-color: color-mix(in srgb, var(--color-danger) 40%, transparent);
+      color: var(--color-danger);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--space-xs);
+  }
+
+  &__detail-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      code {
+        background: var(--color-bg-page);
+        padding: 2px 6px;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-xs);
+        word-break: break-all;
+      }
+    }
+  }
+
+  &__file-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-bg-page);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+
+    > .material-icons {
+      font-size: 28px;
+      color: var(--color-primary);
+    }
+  }
+
+  &__file-card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    strong {
+      word-break: break-all;
+    }
+  }
+
+  &__detail-stats {
+    margin-bottom: var(--space-md);
+  }
+
+  &__errors {
+    max-height: 280px;
+    overflow-y: auto;
+    background: var(--color-bg-page);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-lg);
+    margin: 0;
+    font-size: var(--font-sm);
+
+    li {
+      margin-bottom: var(--space-xs);
+    }
+  }
+
+  &__chip--active {
+    .spinner--xs {
+      border-top-color: currentColor;
+    }
+  }
+
+  &__live {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+    color: var(--color-primary);
+    font-size: var(--font-xs);
+    font-weight: 600;
+
+    .spinner--xs {
+      border-top-color: var(--color-primary);
+    }
+  }
+}
+
+.spinner--xs {
+  width: 12px;
+  height: 12px;
+  border-width: 2px;
+}

@@ -60,6 +60,7 @@ export const API_ENDPOINTS = {
     AIS_DEVICE_INSTALLATION_GRAPH: '/AisDevice/installation-graph',
     AIS_DEVICE_UPLOAD_TXT: '/AisDevice/upload-txt',
     AIS_DEVICE_STATUS: '/aisdevice/status', // /{id}
+    JOBS: '/jobs',
     AIS_DEVICE_MOVE: '/AisDevice/move',
     AIS_DEVICE_MOVEMENT_SUMMARY: '/AisDevice/movement-summary',
     AIS_DEVICE_BY_STATUS: '/AisDeviceInventory/devices-by-status',

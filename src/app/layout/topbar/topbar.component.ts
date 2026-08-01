@@ -14,6 +14,7 @@ const PAGE_META: Record<string, { icon: string; titleKey: string }> = {
   'sim-inventory': { icon: 'sim_card', titleKey: 'layout.nav.simInventory' },
   billing: { icon: 'receipt_long', titleKey: 'layout.nav.billing' },
   devices: { icon: 'memory', titleKey: 'layout.nav.devices' },
+  jobs: { icon: 'work_history', titleKey: 'layout.nav.jobs' },
   fitment: { icon: 'build', titleKey: 'layout.nav.fitment' },
   master: { icon: 'dataset', titleKey: 'layout.nav.master' },
   onboarding: { icon: 'rocket_launch', titleKey: 'layout.nav.onboarding' },
