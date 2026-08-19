@@ -134,15 +134,15 @@
 
         <div class="form-group">
           <label>{{ 'devices.rcDetails.fields.fuelType' | translate }} *</label>
-          <select
+          <input
             class="form-control"
+            style="text-transform: uppercase"
+            autocomplete="off"
+            spellcheck="false"
             [ngModel]="form().fuelType"
-            (ngModelChange)="setField('fuelType', $event)"
-          >
-            @for (ft of fuelTypes; track ft) {
-              <option [value]="ft">{{ ft }}</option>
-            }
-          </select>
+            (ngModelChange)="setFuelType($event)"
+            placeholder="PETROL"
+          />
         </div>
 
         <div class="form-group">

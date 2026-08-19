@@ -6,8 +6,6 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { extractApiError, getApiResponseError } from '../../../core/utils/api-error.util';
 import { RcDetailsRequest } from '../../../shared/models/fitment.model';
 
-const FUEL_TYPES = ['PETROL', 'DIESEL', 'CNG ONLY', 'ELECTRIC', 'HYBRID', 'LPG'] as const;
-
 function toDateInput(v: string | null | undefined): string {
   if (!v) return '';
   const idx = v.indexOf('T');
@@ -36,7 +34,7 @@ const EMPTY_FORM: RcDetailsRequest = {
   makerModel: '',
   mobileNumber: '',
   manufacturingDateFormatted: '',
-  fuelType: 'PETROL',
+  fuelType: '',
   ownerName: '',
   presentAddress: '',
   permanentAddress: '',
@@ -73,7 +71,6 @@ export class DeviceRcDetailsDialogComponent {
   readonly close = output<void>();
   readonly saved = output<void>();
 
-  readonly fuelTypes = FUEL_TYPES;
   readonly form = signal<RcDetailsRequest>({ ...EMPTY_FORM });
   readonly saving = signal(false);
   readonly deleting = signal(false);
@@ -99,7 +96,7 @@ export class DeviceRcDetailsDialogComponent {
       !!f.makerModel.trim() &&
       /^\d{10}$/.test(f.mobileNumber.trim()) &&
       !!f.manufacturingDateFormatted &&
-      !!f.fuelType &&
+      !!f.fuelType.trim() &&
       !!f.ownerName.trim() &&
       !!f.presentAddress.trim() &&
       !!f.permanentAddress.trim() &&
@@ -139,7 +136,7 @@ export class DeviceRcDetailsDialogComponent {
           makerModel: vd.makerModel ?? '',
           mobileNumber: vd.mobileNumber ?? '',
           manufacturingDateFormatted: toMonthFirstDay(vd.manufacturingDateFormatted),
-          fuelType: vd.fuelType ?? 'PETROL',
+          fuelType: (vd.fuelType ?? '').toUpperCase(),
           ownerName: vd.ownerName ?? '',
           presentAddress: vd.presentAddress ?? '',
           permanentAddress: vd.permanentAddress ?? '',
@@ -153,6 +150,10 @@ export class DeviceRcDetailsDialogComponent {
 
   setField<K extends keyof RcDetailsRequest>(key: K, value: RcDetailsRequest[K]): void {
     this.form.update((f) => ({ ...f, [key]: value }));
+  }
+
+  setFuelType(value: string): void {
+    this.form.update((f) => ({ ...f, fuelType: (value ?? '').toUpperCase() }));
   }
 
   setRcNumber(value: string): void {
@@ -203,7 +204,7 @@ export class DeviceRcDetailsDialogComponent {
           makerModel: d.makerModel ?? '',
           mobileNumber: d.mobileNumber || f.mobileNumber,
           manufacturingDateFormatted: toMonthFirstDay(d.manufacturingDateFormatted),
-          fuelType: d.fuelType || 'PETROL',
+          fuelType: (d.fuelType || f.fuelType).toUpperCase(),
           ownerName: d.ownerName ?? '',
           presentAddress: d.presentAddress ?? '',
           permanentAddress: d.permanentAddress ?? '',
