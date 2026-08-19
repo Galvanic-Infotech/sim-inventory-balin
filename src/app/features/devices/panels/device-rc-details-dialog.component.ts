@@ -6,7 +6,7 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { extractApiError, getApiResponseError } from '../../../core/utils/api-error.util';
 import { RcDetailsRequest } from '../../../shared/models/fitment.model';
 
-const FUEL_TYPES = ['PETROL', 'DIESEL', 'CNG', 'ELECTRIC', 'HYBRID', 'LPG'] as const;
+const FUEL_TYPES = ['PETROL', 'DIESEL', 'CNG ONLY', 'ELECTRIC', 'HYBRID', 'LPG'] as const;
 
 function toDateInput(v: string | null | undefined): string {
   if (!v) return '';
