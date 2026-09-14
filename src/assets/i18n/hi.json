@@ -1377,7 +1377,8 @@
         "activate": "सिम सक्रिय करें",
         "tempDeactivate": "अस्थायी निष्क्रिय",
         "resume": "कनेक्शन पुनः शुरू",
-        "smsWhitelist": "SMS व्हाइटलिस्टिंग"
+        "smsWhitelist": "SMS व्हाइटलिस्टिंग",
+        "printBarcode": "बारकोड प्रिंट करें"
       },
       "confirm": {
         "activateTitle": "सिम सक्रिय करें",

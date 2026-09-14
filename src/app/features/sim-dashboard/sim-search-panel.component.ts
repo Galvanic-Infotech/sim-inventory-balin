@@ -18,6 +18,8 @@ import { itemStatusLabel, normalizeItemStatus } from '../../shared/models/item-s
 import { extractApiError } from '../../core/utils/api-error.util';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { SimSmsWhitelistDialogComponent } from './sim-sms-whitelist-dialog.component';
+import { BarcodeComponent } from '../../shared/components/barcode/barcode.component';
+import { downloadSimLabelPrn } from '../../shared/utils/barcode-print.util';
 
 export type ValidTillPreset = '3months' | '6months' | '1year' | 'custom';
 
@@ -33,7 +35,7 @@ interface DetailField {
 @Component({
   selector: 'app-sim-search-panel',
   standalone: true,
-  imports: [FormsModule, TranslatePipe, SimSmsWhitelistDialogComponent],
+  imports: [FormsModule, TranslatePipe, SimSmsWhitelistDialogComponent, BarcodeComponent],
   templateUrl: './sim-search-panel.component.html',
   styleUrl: './sim-search-panel.component.scss',
 })
@@ -269,6 +271,10 @@ export class SimSearchPanelComponent implements OnDestroy {
         error: (err) => this.onActionError(err),
       });
     }
+  }
+
+  printBarcode(sim: SimDetail): void {
+    downloadSimLabelPrn(sim.iccid, sim.simPhone);
   }
 
   copyValue(value: string): void {

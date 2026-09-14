@@ -42,6 +42,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "allowedCommonJsDependencies": ["jsbarcode"],
             "browser": "src/main.ts",
             "index": "src/index.html",
             "tsConfig": "tsconfig.app.json",

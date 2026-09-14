@@ -110,6 +110,17 @@
           </div>
         }
 
+        <div class="sim-detail__barcodes">
+          <app-barcode
+            [value]="sim.iccid"
+            [label]="'simDashboard.search.fields.iccid' | translate"
+          />
+          <app-barcode
+            [value]="sim.simPhone"
+            [label]="'simDashboard.search.fields.simPhone' | translate"
+          />
+        </div>
+
         @if (actionError()) {
           <div class="alert alert-danger">{{ actionError() }}</div>
         }
@@ -145,6 +156,15 @@
               {{ 'simDashboard.search.actions.resume' | translate }}
             </button>
           }
+
+          <button
+            type="button"
+            class="btn btn-outline sim-detail__action"
+            (click)="printBarcode(sim)"
+          >
+            <span class="material-icons">print</span>
+            {{ 'simDashboard.search.actions.printBarcode' | translate }}
+          </button>
 
           <button
             type="button"
