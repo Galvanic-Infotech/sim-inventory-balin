@@ -1,10 +1,13 @@
 import {
   Component,
+  ElementRef,
+  afterNextRender,
   computed,
   inject,
   input,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SimService } from '../../core/services/sim.service';
@@ -40,7 +43,10 @@ export class ActivateDialogComponent {
 
   readonly minDate = formatValidTill(new Date());
 
+  private readonly iotInput = viewChild<ElementRef<HTMLInputElement>>('iotInput');
+
   constructor() {
+    afterNextRender(() => this.iotInput()?.nativeElement.focus());
     queueMicrotask(() => {
       const list = this.targets();
       if (list.length === 1) {
@@ -60,6 +66,12 @@ export class ActivateDialogComponent {
       oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
       this.validTill.set(formatValidTill(oneYearFromNow));
     });
+  }
+
+  // Barcode scanner types the IoT ID and we save as soon as a full 15-char id lands.
+  onIotIdChange(value: string): void {
+    this.iotId.set(value);
+    if (value.trim().length === 15) this.submit();
   }
 
   close(refresh: boolean): void {

@@ -79,10 +79,11 @@
         <div class="form-group">
           <label>{{ 'simInventory.edit.iotId' | translate }}</label>
           <input
+            #iotInput
             class="form-control"
             maxlength="64"
             [ngModel]="iotId()"
-            (ngModelChange)="iotId.set($event)"
+            (ngModelChange)="onIotIdChange($event)"
           />
         </div>
       }
