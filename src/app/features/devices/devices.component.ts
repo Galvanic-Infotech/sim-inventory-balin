@@ -2,18 +2,17 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DevicesListPanelComponent } from './panels/devices-list-panel.component';
 import { DevicesTransferPanelComponent } from './panels/transfer-panel.component';
-import { DevicesActivateRechargePanelComponent } from './panels/activate-recharge-panel.component';
 import { DevicesSimStatusPanelComponent } from './panels/sim-status-panel.component';
 import { TranslationService } from '../../core/services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface DevicesTab {
-  key: 'devices' | 'transfer' | 'activate-recharge' | 'sim-status';
+  key: 'devices' | 'transfer' | 'sim-status';
   labelKey: string;
   icon: string;
 }
 
-const VALID_TABS = new Set(['devices', 'transfer', 'activate-recharge', 'sim-status']);
+const VALID_TABS = new Set(['devices', 'transfer', 'sim-status']);
 
 @Component({
   selector: 'app-devices',
@@ -21,7 +20,6 @@ const VALID_TABS = new Set(['devices', 'transfer', 'activate-recharge', 'sim-sta
   imports: [
     DevicesListPanelComponent,
     DevicesTransferPanelComponent,
-    DevicesActivateRechargePanelComponent,
     DevicesSimStatusPanelComponent,
     TranslatePipe,
   ],
@@ -36,7 +34,6 @@ export class DevicesComponent {
   private readonly tabDefs: DevicesTab[] = [
     { key: 'devices', labelKey: 'devices.tabs.devices', icon: 'memory' },
     { key: 'transfer', labelKey: 'devices.tabs.transfer', icon: 'swap_horiz' },
-    { key: 'activate-recharge', labelKey: 'devices.tabs.activateRecharge', icon: 'sim_card' },
     { key: 'sim-status', labelKey: 'devices.tabs.simStatus', icon: 'signal_cellular_alt' },
   ];
 

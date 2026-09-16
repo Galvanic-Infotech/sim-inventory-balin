@@ -55,19 +55,71 @@
             <dt>{{ 'devices.details.fields.imei' | translate }}</dt>
             <dd>{{ d.imei || ('devices.details.notAvailable' | translate) }}</dd>
           </div>
-          <div>
-            <dt>{{ 'devices.details.fields.activationDate' | translate }}</dt>
-            <dd>{{ d.activationAt ? (d.activationAt | date: 'mediumDate') : ('devices.details.notAvailable' | translate) }}</dd>
-          </div>
         </dl>
       </section>
 
       <section class="ddd-section">
-        <h4 class="ddd-section-title">
-          <span class="material-icons">sim_card</span>
-          {{ 'devices.details.sections.sim' | translate }}
-        </h4>
+        <div class="ddd-section-head">
+          <h4 class="ddd-section-title">
+            <span class="material-icons">sim_card</span>
+            {{ 'devices.details.sections.sim' | translate }}
+          </h4>
+          <button
+            type="button"
+            class="btn btn-outline ddd-action"
+            (click)="onValidityUpdate()"
+            [disabled]="validityLoading() || !d.serialNumber"
+          >
+            <span class="material-icons">event_repeat</span>
+            {{ 'devices.details.validityUpdate' | translate }}
+          </button>
+        </div>
+        @if (confirmValidity()) {
+          <div class="alert alert-info ddd-toast">
+            <span class="material-icons">help_outline</span>
+            <span>{{ 'devices.details.validityConfirm' | translate: { sno: d.serialNumber } }}</span>
+            <div class="ddd-toast-actions">
+              <button
+                type="button"
+                class="btn btn-ghost"
+                (click)="cancelValidityUpdate()"
+                [disabled]="validityLoading()"
+              >
+                {{ 'common.cancel' | translate }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="confirmValidityUpdate()"
+                [disabled]="validityLoading()"
+              >
+                @if (validityLoading()) {
+                  <span class="spinner"></span>
+                  {{ 'devices.details.validityUpdating' | translate }}
+                } @else {
+                  {{ 'devices.details.validityConfirmAction' | translate }}
+                }
+              </button>
+            </div>
+          </div>
+        }
+        @if (validityError()) {
+          <div class="alert alert-danger ddd-toast">
+            <span class="material-icons">error</span>
+            {{ validityError() }}
+          </div>
+        }
+        @if (validitySuccess()) {
+          <div class="alert alert-success ddd-toast">
+            <span class="material-icons">check_circle</span>
+            {{ validitySuccess() }}
+          </div>
+        }
         <dl class="ddd-grid">
+          <div class="ddd-grid__full">
+            <dt>{{ 'devices.details.fields.activationDate' | translate }}</dt>
+            <dd>{{ d.activationAt ? (d.activationAt | date: 'mediumDate') : ('devices.details.notAvailable' | translate) }}</dd>
+          </div>
           <div>
             <dt>{{ 'devices.details.fields.simProvider' | translate }}</dt>
             <dd>{{ d.simProvider?.name || ('devices.details.notAvailable' | translate) }}</dd>

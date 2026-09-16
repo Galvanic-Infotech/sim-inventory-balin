@@ -268,7 +268,6 @@
       "installation": "Installation",
       "devices": "Devices",
       "transfer": "Transfer",
-      "activateRecharge": "Activate/Recharge",
       "simStatus": "SIM Status"
     },
     "status": {
@@ -348,7 +347,14 @@
       "openRcDetails": "RC Details",
       "close": "Close",
       "loading": "Loading details…",
-      "notAvailable": "—"
+      "notAvailable": "—",
+      "validityUpdate": "Validity Update",
+      "validityConfirm": "Refresh SIM validity for {{sno}} from the provider?",
+      "validityConfirmAction": "Update",
+      "validityUpdating": "Updating…",
+      "validitySuccess": "Validity updated",
+      "validityFailed": "Failed to update validity",
+      "validityNoSerial": "Serial number is required to update validity"
     },
     "inventory": {
       "title": "Inventory",

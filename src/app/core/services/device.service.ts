@@ -10,7 +10,6 @@ import {
   AisDeviceListFilters,
   AisDeviceSummary,
   AisEntityDeviceCount,
-  DeviceActivateRequest,
   DeviceByStatus,
   EntityInstallationGraph,
   MoveDevicesRequest,
@@ -78,8 +77,10 @@ export class DeviceService {
     return this.get<AisDeviceSummary>(this.EP.AIS_DEVICE_SUMMARY);
   }
 
-  activateDevices(req: DeviceActivateRequest): Observable<RbacResponse<unknown>> {
-    return this.http.post<RbacResponse<unknown>>(this.EP.AIS_DEVICE_ACTIVATE, req);
+  updateValidity(deviceSno: string): Observable<RbacResponse<unknown>> {
+    const form = new FormData();
+    form.append('deviceSno', deviceSno);
+    return this.http.post<RbacResponse<unknown>>(this.EP.AIS_DEVICE_UPDATE_VALIDITY, form);
   }
 
   private get<T>(path: string, params?: Record<string, string>): Observable<RbacResponse<T>> {

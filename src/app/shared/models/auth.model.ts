@@ -4,6 +4,7 @@ export interface LoginRequest {
   searchBy: LoginSearchBy;
   password: string;
   mobile: string;
+  captchaToken:string;
 }
 
 export interface LoginResponse {

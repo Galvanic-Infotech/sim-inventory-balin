@@ -72,3 +72,42 @@
   font-size: var(--font-xs);
   font-weight: 600;
 }
+
+.ddd-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.ddd-action {
+  padding: 6px 12px;
+  font-size: var(--font-xs);
+
+  .material-icons {
+    font-size: 16px;
+  }
+}
+
+.ddd-toast {
+  margin: 0;
+  padding: 8px var(--space-md);
+  font-size: var(--font-xs);
+  flex-wrap: wrap;
+}
+
+.ddd-toast-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-left: auto;
+
+  .btn {
+    padding: 6px 12px;
+    font-size: var(--font-xs);
+  }
+}
+
+.ddd-grid__full {
+  grid-column: 1 / -1;
+}

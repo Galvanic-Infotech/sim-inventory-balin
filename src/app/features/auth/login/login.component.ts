@@ -61,6 +61,7 @@ export class LoginComponent {
       searchBy: mode,
       password: this.password,
       mobile: id,
+      captchaToken: '1x00000000000000000000AA',
     };
 
     this.auth.login(payload).subscribe({

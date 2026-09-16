@@ -127,14 +127,6 @@ export interface MoveDevicesRequest {
   remarks?: string;
 }
 
-export type DeviceSimOperation = 'Activate' | 'Recharge';
-
-export interface DeviceActivateRequest {
-  operation: DeviceSimOperation;
-  itemIds: string[];
-  simProviderId?: string;
-}
-
 export { RECHARGE_BY_STATUS_PARAM, ITEM_STATUS };
 
 export type MovementDirection = 'in' | 'out';

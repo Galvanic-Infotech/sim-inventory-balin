@@ -268,7 +268,6 @@
       "installation": "इंस्टॉलेशन",
       "devices": "डिवाइस",
       "transfer": "ट्रांसफर",
-      "activateRecharge": "सक्रिय करें/रिचार्ज",
       "simStatus": "SIM स्थिति"
     },
     "status": {
@@ -348,7 +347,14 @@
       "openRcDetails": "RC विवरण",
       "close": "बंद करें",
       "loading": "विवरण लोड हो रहा है…",
-      "notAvailable": "—"
+      "notAvailable": "—",
+      "validityUpdate": "वैधता अपडेट",
+      "validityConfirm": "{{sno}} के लिए प्रदाता से SIM वैधता अपडेट करें?",
+      "validityConfirmAction": "अपडेट करें",
+      "validityUpdating": "अपडेट हो रहा है…",
+      "validitySuccess": "वैधता अपडेट हो गई",
+      "validityFailed": "वैधता अपडेट करने में विफल",
+      "validityNoSerial": "वैधता अपडेट करने के लिए सीरियल नंबर आवश्यक है"
     },
     "inventory": {
       "title": "इन्वेंटरी",

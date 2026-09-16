@@ -64,7 +64,7 @@ export const API_ENDPOINTS = {
     AIS_DEVICE_MOVE: '/AisDevice/move',
     AIS_DEVICE_MOVEMENT_SUMMARY: '/AisDevice/movement-summary',
     AIS_DEVICE_BY_STATUS: '/AisDeviceInventory/devices-by-status',
-    AIS_DEVICE_ACTIVATE: '/AisDevice/activate',
+    AIS_DEVICE_UPDATE_VALIDITY: '/AisDevice/update-validity',
     AIS_DEVICE_SUMMARY: '/AisDevice/summary',
     FITMENT: '/Fitment',
     FITMENT_LIST: '/Fitment/list',
